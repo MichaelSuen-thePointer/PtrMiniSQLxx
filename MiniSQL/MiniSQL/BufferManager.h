@@ -22,13 +22,13 @@ private:
     BufferManager();
 public:
     static BufferManager& instance();
+    BufferBlock& find_or_alloc(int fileIndex, int blockIndex);
 private:
-    void recycle_block(BufferBlock& block);
+    void release_block(BufferBlock& block);
     void write_file(const byte* content, int fileIndex, int blockIndex);
     byte* read_file(byte* buffer, int fileIndex, int blockIndex);
-    BufferBlock& get_block(int fileIndex, int blockIndex);
-    BufferBlock& add_block(int fileIndex, int blockIndex);
-    BufferBlock& replace_lru_block(int fileIndex, int blockIndex);
+    BufferBlock& alloc_block(int fileIndex, int blockIndex);
+    BufferBlock& replace_lru_block(byte* buffer, int fileIndex, int blockIndex);
 };
 
 class BlockPtr
@@ -64,11 +64,11 @@ public:
     }
     BufferBlock& operator*()
     {
-        return BufferManager::instance().get_block(_fileIndex, _blockIndex);
+        return BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
     }
     BufferBlock& operator->()
     {
-        return BufferManager::instance().get_block(_fileIndex, _blockIndex);
+        return BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
     }
 };
 
@@ -96,10 +96,23 @@ private:
         , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
     {
     }
+    void release()
+    {
+        BufferManager::instance().release_block(*this);
+    }
 public:
     ~BufferBlock()
     {
-        BufferManager::instance().recycle_block(*this);
+        release();
+    }
+    void reset()
+    {
+        release();
+        _buffer.reset();
+        _fileIndex = -1;
+        _blockIndex = -1;
+        _isLocked = false;
+        _lastModifiedTime = boost::posix_time::special_values::not_a_date_time;
     }
     void update_time()
     {
@@ -110,7 +123,7 @@ public:
     {
         return &reinterpret_cast<T*>(_buffer.get() + begin);
     }
-    explicit operator bool()
+    explicit operator bool() const
     {
         return _buffer != nullptr;
     }

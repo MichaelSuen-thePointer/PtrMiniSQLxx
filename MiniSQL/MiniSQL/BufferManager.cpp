@@ -7,9 +7,9 @@ BufferManager & BufferManager::instance()
     return instance;
 }
 
-void BufferManager::recycle_block(BufferBlock & block)
+void BufferManager::release_block(BufferBlock& block)
 {
-    if (block._hasModified)
+    if (block)
     {
         write_file(block._buffer.get(), block._fileIndex, block._blockIndex);
     }
@@ -34,7 +34,7 @@ byte* BufferManager::read_file(byte* buffer, int fileIndex, int blockIndex)
     return buffer;
 }
 
-BufferBlock& BufferManager::get_block(int fileIndex, int blockIndex)
+BufferBlock& BufferManager::find_or_alloc(int fileIndex, int blockIndex)
 {
     for (auto& block : _blocks)
     {
@@ -43,28 +43,27 @@ BufferBlock& BufferManager::get_block(int fileIndex, int blockIndex)
             return *block;
         }
     }
-    return add_block(fileIndex, blockIndex);
+    return alloc_block(fileIndex, blockIndex);
 }
 
-BufferBlock& BufferManager::add_block(int fileIndex, int blockIndex)
+BufferBlock& BufferManager::alloc_block(int fileIndex, int blockIndex)
 {
+    byte* buffer = new byte[BufferBlock::BlockSize];
+    read_file(buffer, fileIndex, blockIndex);
+
     for (auto& block : _blocks)
     {
         if (block == nullptr)
         {
-            byte* buffer = new byte[BufferBlock::BlockSize];
-            read_file(buffer, fileIndex, blockIndex);
             block.reset(new BufferBlock(buffer, fileIndex, blockIndex));
             return *block;
         }
     }
-    return replace_lru_block(fileIndex, blockIndex);
+    return replace_lru_block(buffer, fileIndex, blockIndex);
 }
 
-BufferBlock& BufferManager::replace_lru_block(int fileIndex, int blockIndex)
+BufferBlock& BufferManager::replace_lru_block(byte* buffer, int fileIndex, int blockIndex)
 {
-    byte* buffer = new byte[BufferBlock::BlockSize];
-    read_file(buffer, fileIndex, blockIndex);
     int lruIndex = -1;
     for (size_t i = 0; i != _blocks.size(); i++)
     {
