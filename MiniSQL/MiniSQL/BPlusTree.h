@@ -7,22 +7,23 @@ template<typename TKey>
 class BPlusTree
 {
 public:
+    using key_type = TKey;
+    using ptr_type = BlockPtr;
+    const static size_t key_size = sizeof(key_type);
+    const static size_t ptr_size = sizeof(ptr_type);
+    const static size_t key_count = (BufferBlock::BlockSize - ptr_size - sizeof(size_t) - sizeof(bool) - sizeof(BlockPtr)) / (key_size + ptr_size);
+    const static size_t ptr_count = key_count + 1;
+    
     struct BTreeNode
     {
-        using key_type = TKey;
-        const static size_t key_size = sizeof(key_type);
-        using ptr_type = BlockPtr;
-        const static size_t ptr_size = sizeof(ptr_type);
-        const static size_t key_count = (BufferBlock::BlockSize - ptr_size - sizeof(size_t) - sizeof(bool) - sizeof(BlockPtr)) / (key_size + ptr_size);
-        const static size_t ptr_count = key_count + 1;
         bool is_leaf;
         size_t count;
         ptr_type parent;
         key_type keys[key_count];
         ptr_type ptrs[ptr_count];
-        
-        static_assert(sizeof(BTreeNode) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
     };
+
+    static_assert(sizeof(BTreeNode) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
 private:
     BlockPtr _root;
 
