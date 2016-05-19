@@ -89,9 +89,9 @@ public:
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
     template<typename T>
-    T& as()
+    T* as()
     {
-        return *reinterpret_cast<T*>(_buffer.get() + _offset);
+        return reinterpret_cast<T*>(_buffer.get() + _offset);
     }
     BlockPtr ptr();
     explicit operator bool() const
