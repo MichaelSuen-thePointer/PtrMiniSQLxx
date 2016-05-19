@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <memory>
 #include <array>
+#include <set>
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>

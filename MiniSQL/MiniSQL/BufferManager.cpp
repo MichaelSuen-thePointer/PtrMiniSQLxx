@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 
-BufferManager & BufferManager::instance()
-{
-    static BufferManager instance;
-    return instance;
-}
 
 void BufferManager::release_block(BufferBlock& block)
 {
@@ -18,7 +13,8 @@ void BufferManager::release_block(BufferBlock& block)
 void BufferManager::write_file(const byte * content, int fileIndex, int blockIndex)
 {
     static char fileName[11];
-    FILE* stream = fopen(itoa(fileIndex, fileName), "a+");
+    FILE* stream;
+    fopen_s(&stream, itoa(fileIndex, fileName), "a+");
     fseek(stream, blockIndex * BufferBlock::BlockSize, SEEK_SET);
     fwrite(content, 1, BufferBlock::BlockSize, stream);
     fclose(stream);
@@ -27,7 +23,8 @@ void BufferManager::write_file(const byte * content, int fileIndex, int blockInd
 byte* BufferManager::read_file(byte* buffer, int fileIndex, int blockIndex)
 {
     static char fileName[11];
-    FILE* stream = fopen(itoa(fileIndex, fileName), "a+");
+    FILE* stream;
+    fopen_s(&stream, itoa(fileIndex, fileName), "a+");
     fseek(stream, blockIndex * BufferBlock::BlockSize, SEEK_SET);
     fread(buffer, 1, BufferBlock::BlockSize, stream);
     fclose(stream);
@@ -89,3 +86,4 @@ BufferBlock& BufferManager::replace_lru_block(byte* buffer, int fileIndex, int b
     _blocks[lruIndex].reset(new BufferBlock(buffer, fileIndex, blockIndex));
     return *_blocks[lruIndex];
 }
+

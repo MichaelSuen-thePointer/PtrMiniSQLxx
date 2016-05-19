@@ -19,9 +19,17 @@ public:
     const static int BlockCount = 128;
 private:
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
-    BufferManager();
+    BufferManager()
+        : _blocks()
+    {
+    }
 public:
-    static BufferManager& instance();
+    static BufferManager& instance()
+    {
+        static BufferManager instance;
+        return instance;
+    }
+
     BufferBlock& find_or_alloc(int fileIndex, int blockIndex);
 private:
     void release_block(BufferBlock& block);
@@ -31,50 +39,10 @@ private:
     BufferBlock& replace_lru_block(byte* buffer, int fileIndex, int blockIndex);
 };
 
-class BlockPtr
-{
-private:
-    int _fileIndex;
-    int _blockIndex;
-public:
-    BlockPtr(nullptr_t)
-        : BlockPtr()
-    {
-    }
-    BlockPtr()
-        : BlockPtr(-1, -1)
-    {
-    }
-    BlockPtr(int fileIndex, int blockIndex)
-        : _fileIndex(fileIndex)
-        , _blockIndex(blockIndex)
-    {
-    }
-    bool operator==(const BlockPtr& rhs)
-    {
-        return _fileIndex == rhs._fileIndex && _blockIndex == rhs._blockIndex;
-    }
-    bool operator!=(const BlockPtr& rhs)
-    {
-        return !(*this == rhs);
-    }
-    explicit operator bool()
-    {
-        return _fileIndex != -1 && _blockIndex != -1;
-    }
-    BufferBlock& operator*()
-    {
-        return BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
-    }
-    BufferBlock& operator->()
-    {
-        return BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
-    }
-};
-
 class BufferBlock : Uncopyable
 {
     friend class BufferManager;
+    friend class BlockPtr;
 public:
     const static int BlockSize = 4096;
 private:
@@ -83,6 +51,7 @@ private:
     int _blockIndex;
     bool _isLocked;
     boost::posix_time::ptime _lastModifiedTime;
+    int _offset;
 
     BufferBlock()
         : BufferBlock(nullptr, -1, -1)
@@ -94,6 +63,7 @@ private:
         , _blockIndex(blockIndex)
         , _isLocked(false)
         , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
+        , _offset(0)
     {
     }
     void release()
@@ -119,10 +89,11 @@ public:
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
     template<typename T>
-    T& reinterpret_block(int begin)
+    T& as()
     {
-        return &reinterpret_cast<T*>(_buffer.get() + begin);
+        return *reinterpret_cast<T*>(_buffer.get() + _offset);
     }
+    BlockPtr ptr();
     explicit operator bool() const
     {
         return _buffer != nullptr;
@@ -143,6 +114,58 @@ public:
 
 };
 
+class BlockPtr
+{
+    friend class BufferBlock;
+private:
+    int _fileIndex;
+    int _blockIndex;
+    int _offset;
+public:
+    BlockPtr(nullptr_t)
+        : BlockPtr()
+    {
+    }
+    BlockPtr()
+        : BlockPtr(-1, -1)
+    {
+    }
+    BlockPtr(int fileIndex, int blockIndex)
+        : BlockPtr(fileIndex, blockIndex, 0)
+    {
+    }
+    BlockPtr(int fileIndex, int blockIndex, int offset)
+        : _fileIndex(fileIndex)
+        , _blockIndex(blockIndex)
+        , _offset(offset)
+    {
+    }
+    bool operator==(const BlockPtr& rhs)
+    {
+        return _fileIndex == rhs._fileIndex && _blockIndex == rhs._blockIndex;
+    }
+    bool operator!=(const BlockPtr& rhs)
+    {
+        return !(*this == rhs);
+    }
+    explicit operator bool()
+    {
+        return _fileIndex != -1 && _blockIndex != -1;
+    }
+    BufferBlock& operator*()
+    {
+        auto& block = BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
+        block._offset = _offset;
+        return block;
+    }
+    BufferBlock* operator->()
+    {
+        auto& block = BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
+        block._offset = _offset;
+        return &block;
+    }
+};
+
 class InsuffcientSpace : public std::runtime_error
 {
 public:
@@ -151,3 +174,8 @@ public:
     {
     }
 };
+
+inline BlockPtr BufferBlock::ptr()
+{
+    return BlockPtr(_fileIndex, _blockIndex, _offset);
+}
