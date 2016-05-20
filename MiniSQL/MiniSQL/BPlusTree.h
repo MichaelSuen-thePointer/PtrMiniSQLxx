@@ -46,9 +46,10 @@ private:
         }
         T& operator[](size_t i) { assert(i < *_psize); return _array[i]; }
         T* begin() { return _array; }
-        T* end() { return _array + *psize; }
-        size_t capacity() { return _capacity; }
+        T* end() { return _array + *_psize; }
+        size_t capacity() const { return _capacity; }
         size_t& size() { return *_psize; }
+        const size_t& size() const { return *_psize; }
     };
 
     class TreeNode
@@ -60,15 +61,16 @@ private:
         OberservableArray<ptr_type> _ptrs;
     public:
         bool is_leaf() { return _base->is_leaf; }
-        size_t& count() { return _base->count; }
+        size_t& key_count() { return _base->total_key; }
+        size_t& ptr_count() { return _base->total_ptr; }
 
         TreeNode parent() { return TreeNode(_base->parent); }
         ptr_type& parent_ptr() { return _base->parent; }
 
-        TreeNode next() { assert(is_leaf()); return TreeNode(_base->ptrs[next_index]; }
+        TreeNode next() { assert(is_leaf()); return TreeNode(_base->ptrs[next_index]); }
         ptr_type& next_ptr() { assert(is_leaf()); return _base->ptrs[next_index]; }
 
-        ptr_type self_ptr() { return _selfPtr; }
+        ptr_type self_ptr() const { return _selfPtr; }
 
         OberservableArray<key_type>& keys() { return _keys; }
         OberservableArray<ptr_type>& ptrs() { return _ptrs; }
@@ -79,16 +81,36 @@ private:
             _base->total_ptr = 0;
             _base->parent = nullptr;
         }
-        TreeNode(ptr_type& blockPtr)
+        explicit TreeNode(ptr_type blockPtr)
             : _selfPtr(blockPtr)
             , _base(blockPtr->as<BTreeNodeModel>())
             , _keys(_base->keys, _base->total_key, key_count)
             , _ptrs(_base->ptrs, _base->totak_ptr, ptr_count)
         {
         }
-        TreeNode(BufferBlock& block)
+        explicit TreeNode(BufferBlock& block)
             : TreeNode(block.ptr())
         {
+        }
+        void insert_after_ptr(size_t i, const key_type& key, const ptr_type& ptr)
+        {
+
+        }
+        void insert_before_ptr(size_t i, const ptr_type& ptr, const key_type& key)
+        {
+            
+        }
+        void insert_after_key(size_t i, const ptr_type& ptr, const key_type& key)
+        {
+            
+        }
+        void insert_before_key(size_t i, const key_type& key, const ptr_type& ptr)
+        {
+            
+        }
+        void remove_entry(const key_type& key)
+        {
+            
         }
     };
     static_assert(sizeof(BTreeNodeModel) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
@@ -108,9 +130,9 @@ private:
             if (iterFirstGTKey == node.keys().end()) //iFirstGTKey == end
             {
                 auto iLastNonNullptr = std::find_if(std::make_reverse_iterator(node.ptrs().end()),
-                                                    std::make_reverse_iterator(node.ptrs().begin())
+                                                    std::make_reverse_iterator(node.ptrs().begin()),
                                                     [](const ptr_type& cptr) {
-                    return cptr != nullptr;
+                    return cptr != ptr_type(nullptr);
                 });
                 node = TreeNode(*iLastNonNullptr);
             }
@@ -139,11 +161,12 @@ private:
         {
             return targetLeaf.ptrs()[iValue];
         }
-        return nullptr;
+        return BlockPtr(nullptr);
     }
 
-    static void insert_leaf(TreeNode& leaf, const TKey& key, const BlockPtr& pValue)
+    static void insert_leaf(TreeNode& leaf, const TKey& key, const BlockPtr& ptr)
     {
+        /*
         auto place = std::find_if(leaf.keys().begin(), leaf.keys().end(), [&key](const key_type& ckey) {
             return ckey > key;
         });
@@ -154,9 +177,22 @@ private:
 
         leaf.keys()[offset] = key;
         leaf.ptrs()[offset] = pValue;
-        leaf.count()++;
+        ++leaf.keys().count();
+        ++leaf.ptrs().count();
+        */
+        if (key < leaf.keys()[0])
+        {
+            leaf.insert_before_ptr(0, ptr, key);
+        }
+        else
+        {
+            auto place = std::find_if(leaf.keys().begin(), leaf.keys().end(), [&key](const key_type& ckey) {
+                return ckey > key;
+            });
+            auto iInsertAfter = place - leaf.keys().begin() - 1;
+            leaf.insert_after_key(iInsertAfter, ptr, key);
+        }
     }
-
     static key_type find_min_key(const TreeNode& leaf)
     {
         assert(leaf.is_leaf());
@@ -170,6 +206,23 @@ private:
             }
         }
         return minKey;
+    }
+
+    template<typename TContainer, typename T>
+    static void sorted_insert(TContainer& cont, const T& value)
+    {
+        auto place = std::find_if(cont.begin(), cont.end(), [&value](const T& cvalue) {
+            return cvalue > value;
+        });
+        place_insert(cont, place - cont.begin(), value);
+    }
+
+    template<typename TContainer, typename T>
+    static void place_insert(TContainer& cont, size_t place, const T& value)
+    {
+        cont.count() += 1;
+        std::move(cont.begin() + place, cont.end(), cont.begin() + place + 1);
+        cont[place] = value;
     }
 
     void insert_parent(TreeNode& node, const key_type& key, const BlockPtr& ptr)
@@ -189,19 +242,70 @@ private:
             return;
         }
         //not root
-        TreeNode parent = node.parent()
-    }
-
-    void insert(const TKey& key, const BlockPtr& pValue)
-    {
-        TreeNode targetLeaf = find_leaf(key);
-        if (targetLeaf.count() < key_count - 1)
+        TreeNode p = node.parent();
+        if (p.ptrs().count() < ptr_count)
         {
-            insert_leaf(targetLeaf, key, pValue);
+            
+            auto iterInsertAfter = std::find(p.ptrs().begin(), p.ptrs().end(), node.self_ptr());
+            auto iInsertAfter = iterInsertAfter - p.ptrs().begin();
+            p.insert_adter_ptr(iInsertAfter, key, ptr);
+            /*
+            p.ptrs().count() += 1;
+            std::move(p.ptrs().begin() + iNode, p.ptrs().end(), p.ptrs().begin() + iNode + 1);
+            p.ptrs()[iNode] = ptr;
+
+            p.keys().count() += 1;
+            std::move(p.keys().begin() + iNode, p.keys().end(), p.keys().begin() + iNode + 1);
+            p.keys()[iNode] = key;
+            */
         }
         else
         {
-            assert(targetLeaf.count() == key_count - 1);
+            auto pair = insert_split_node(p, key, ptr);
+            insert_parent(p, pair.second, pair.first.self_ptr());
+        }
+    }
+    
+    void remove(const key_type& key, const ptr_type& ptr)
+    {
+        auto leaf = find_leaf(key);
+        remove_entry(leaf, key, ptr);
+    }
+
+    void remove_entry(TreeNode& node, const key_type& key, const ptr_type& ptr)
+    {
+        node.remove_entry(key);
+        if(node->parent_ptr() == nullptr && node->ptr_count() == 1)
+        {
+            _root = node->ptrs()[0];
+            node->parent_ptr() = nullptr;
+
+        }
+    }
+
+    static std::pair<TreeNode, key_type> insert_split_node(TreeNode& node, const key_type& key, const ptr_type& ptr)
+    {
+        
+    }
+
+    static TreeNode insert_split_leaf(TreeNode& node, const key_type& key, const ptr_type& ptr)
+    {
+        
+    }
+
+    void insert(const TKey& key, const BlockPtr& ptr)
+    {
+        TreeNode targetLeaf = find_leaf(key);
+        if (targetLeaf.count() < key_count)
+        {
+            insert_leaf(targetLeaf, key, ptr);
+        }
+        else
+        {
+            TreeNode newNode = insert_split_leaf(targetLeaf, key, ptr);
+            insert_parent(targetLeaf,newNode.keys()[0], newNode.self_ptr())
+            /*
+            assert(targetLeaf.count() == key_count);
             auto newIndex = IndexManager::instance().allocate();
             auto& newBlock = BufferManager::instance().find_or_alloc(newIndex.first, newIndex.second);
             TreeNode newLeaf(newBlock);
@@ -227,6 +331,8 @@ private:
 
             key_type minKey = find_min_key(newLeaf);
             insert_parent(targetLeaf, minKey, newBlock.ptr());
+            */
+
         }
     }
 

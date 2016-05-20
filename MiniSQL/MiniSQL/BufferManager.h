@@ -2,7 +2,7 @@
 
 struct BufferArrayDeleter
 {
-    void operator()(byte* array)
+    void operator()(byte* array) const
     {
         delete[] array;
     }
@@ -98,7 +98,7 @@ public:
     {
         return _buffer != nullptr;
     }
-    bool is_locked()
+    bool is_locked() const
     {
         return _isLocked;
     }
@@ -122,7 +122,7 @@ private:
     int _blockIndex;
     int _offset;
 public:
-    BlockPtr(nullptr_t)
+    explicit BlockPtr(nullptr_t)
         : BlockPtr()
     {
     }
@@ -140,15 +140,15 @@ public:
         , _offset(offset)
     {
     }
-    bool operator==(const BlockPtr& rhs)
+    bool operator==(const BlockPtr& rhs) const
     {
         return _fileIndex == rhs._fileIndex && _blockIndex == rhs._blockIndex;
     }
-    bool operator!=(const BlockPtr& rhs)
+    bool operator!=(const BlockPtr& rhs) const
     {
         return !(*this == rhs);
     }
-    explicit operator bool()
+    explicit operator bool() const
     {
         return _fileIndex != -1 && _blockIndex != -1;
     }
@@ -158,18 +158,26 @@ public:
         block._offset = _offset;
         return block;
     }
+    const BufferBlock& operator*() const
+    {
+        return **(const_cast<BlockPtr*>(this));
+    }
     BufferBlock* operator->()
     {
         auto& block = BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
         block._offset = _offset;
         return &block;
     }
+    const BufferBlock* operator->() const
+    {
+        return const_cast<BlockPtr*>(this)->operator->();
+    }
 };
 
 class InsuffcientSpace : public std::runtime_error
 {
 public:
-    InsuffcientSpace(const char* msg)
+    explicit InsuffcientSpace(const char* msg)
         : std::runtime_error(msg)
     {
     }

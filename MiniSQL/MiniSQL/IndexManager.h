@@ -20,15 +20,22 @@ public:
     using IndexPair = std::pair<int, int>;
 private:
     std::set<IndexPair> _indices;
+    std::set<IndexPair> _freeIndices;
     IndexManager()
         : _indices{ IndexPair(0, 0) }
     {
     }
-
+public:
     IndexPair allocate()
     {
+        if(_freeIndices.begin() != _freeIndices.end())
+        {
+            auto pair = *_freeIndices.begin();
+            _freeIndices.erase(_freeIndices.begin());
+            return pair;
+        }
         auto maxPlace = _indices.end();
-        maxPlace--;
+        --maxPlace;
         IndexPair newPair = *maxPlace;
         if (newPair.second == std::numeric_limits<int>::max())
         {
@@ -45,6 +52,10 @@ private:
         }
         _indices.insert(newPair);
         return newPair;
+    }
+    void deallocate(int fileIndex, int blockIndex)
+    {
+        _freeIndices.insert(IndexPair(fileIndex, blockIndex));
     }
 };
 
