@@ -18,9 +18,14 @@ class BufferManager : Uncopyable
 public:
     const static int BlockCount = 128;
 private:
+    using IndexPair = std::pair<int, int>;
+    std::set<IndexPair> _indices;
+    std::set<IndexPair> _freeIndices;
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
     BufferManager()
-        : _blocks()
+        : _indices()
+        , _freeIndices()
+        , _blocks()
     {
     }
 public:
@@ -31,12 +36,18 @@ public:
     }
 
     BufferBlock& find_or_alloc(int fileIndex, int blockIndex);
+    BufferBlock& alloc_block();
 private:
-    void release_block(BufferBlock& block);
+    size_t find_block(int fileIndex, int blockIndex);
+    void save_block(BufferBlock& block);
+    void drop_block(BufferBlock& block);
     void write_file(const byte* content, int fileIndex, int blockIndex);
     byte* read_file(byte* buffer, int fileIndex, int blockIndex);
     BufferBlock& alloc_block(int fileIndex, int blockIndex);
     BufferBlock& replace_lru_block(byte* buffer, int fileIndex, int blockIndex);
+
+    IndexPair allocate_index();
+    void deallocate_index(int fileIndex, int blockIndex);
 };
 
 class BufferBlock : Uncopyable
@@ -68,7 +79,7 @@ private:
     }
     void release()
     {
-        BufferManager::instance().release_block(*this);
+        BufferManager::instance().save_block(*this);
     }
 public:
     ~BufferBlock()

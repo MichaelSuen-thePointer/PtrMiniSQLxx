@@ -2,12 +2,20 @@
 #include "BufferManager.h"
 
 
-void BufferManager::release_block(BufferBlock& block)
+void BufferManager::save_block(BufferBlock& block)
 {
     if (block)
     {
         write_file(block._buffer.get(), block._fileIndex, block._blockIndex);
     }
+}
+
+void BufferManager::drop_block(BufferBlock& block)
+{
+    deallocate_index(block._fileIndex, block._blockIndex);
+    auto i = find_block(block._fileIndex, block._blockIndex);
+    assert(i != -1);
+    _blocks[i].reset();
 }
 
 void BufferManager::write_file(const byte * content, int fileIndex, int blockIndex)
@@ -33,14 +41,32 @@ byte* BufferManager::read_file(byte* buffer, int fileIndex, int blockIndex)
 
 BufferBlock& BufferManager::find_or_alloc(int fileIndex, int blockIndex)
 {
-    for (auto& block : _blocks)
+    auto i = find_block(fileIndex, blockIndex);
+    if(i != -1)
     {
-        if (block->_fileIndex == fileIndex && block->_blockIndex == blockIndex)
-        {
-            return *block;
-        }
+        return *_blocks[i];
     }
     return alloc_block(fileIndex, blockIndex);
+}
+
+BufferBlock& BufferManager::alloc_block()
+{
+    auto pair = allocate_index();
+    return alloc_block(pair.first, pair.second);
+}
+
+size_t BufferManager::find_block(int fileIndex, int blockIndex)
+{
+    for (size_t i = 0; i != _blocks.size(); ++i)
+    {
+        if (_blocks[i] != nullptr && 
+            _blocks[i]->_fileIndex == fileIndex &&
+            _blocks[i]->_blockIndex == blockIndex)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 BufferBlock& BufferManager::alloc_block(int fileIndex, int blockIndex)
@@ -53,6 +79,7 @@ BufferBlock& BufferManager::alloc_block(int fileIndex, int blockIndex)
         if (block == nullptr)
         {
             block.reset(new BufferBlock(buffer, fileIndex, blockIndex));
+            save_block(*block);
             return *block;
         }
     }
@@ -87,3 +114,35 @@ BufferBlock& BufferManager::replace_lru_block(byte* buffer, int fileIndex, int b
     return *_blocks[lruIndex];
 }
 
+BufferManager::IndexPair BufferManager::allocate_index()
+{
+    if (_freeIndices.begin() != _freeIndices.end())
+    {
+        auto pair = *_freeIndices.begin();
+        _freeIndices.erase(_freeIndices.begin());
+        return pair;
+    }
+    auto maxPlace = _indices.end();
+    --maxPlace;
+    IndexPair newPair = *maxPlace;
+    if (newPair.second == std::numeric_limits<int>::max())
+    {
+        if (newPair.first == std::numeric_limits<int>::max())
+        {
+            throw InsuffcientSpace("Not enough internal label to allocate.");
+        }
+        newPair.first++;
+        newPair.second = 0;
+    }
+    else
+    {
+        newPair.second++;
+    }
+    _indices.insert(newPair);
+    return newPair;
+}
+
+void BufferManager::deallocate_index(int fileIndex, int blockIndex)
+{
+    _freeIndices.insert(IndexPair(fileIndex, blockIndex));
+}
