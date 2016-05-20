@@ -94,23 +94,56 @@ private:
         }
         void insert_after_ptr(size_t i, const key_type& key, const ptr_type& ptr)
         {
+            assert(ptr_count() < BPlusTree<TKey>::ptr_count);
+            assert(key_count() < BPlusTree<TKey>::key_count);
+            assert(i + 1 >= 0 && i + 1 < ptr_count());
+            assert(i >= 0 && i < key_count());
+            
+            ptr_count() += 1;
+            std::move(ptrs().begin() + i + 1, ptrs().end(), ptrs().begin() + i + 2);
+            ptrs().begin()[i + 1] = ptr;
 
+            key_count() += 1;
+            std::move(keys().begin() + i, keys().end(), keys().begin() + i + 1);
+            keys().begin()[i] = key;
         }
         void insert_before_ptr(size_t i, const ptr_type& ptr, const key_type& key)
         {
-            
+            assert(ptr_count() < BPlusTree<TKey>::ptr_count);
+            assert(key_count() < BPlusTree<TKey>::key_count);
+            assert(i >= 0 && i < ptr_count());
+            assert(i >= 0 && i < key_count());
+
+            ptr_count() += 1;
+            std::move(ptrs().begin() + i, ptrs().end(), ptrs().begin() + i + 1);
+            ptrs().begin()[i] = ptr;
+
+            key_count() += 1;
+            std::move(keys().begin() + i, keys().end(), keys().begin() + i + 1);
+            keys().begin()[i] = key;
         }
         void insert_after_key(size_t i, const ptr_type& ptr, const key_type& key)
         {
-            
+            insert_before_ptr(i + 1, ptr, key);
         }
         void insert_before_key(size_t i, const key_type& key, const ptr_type& ptr)
         {
-            
+            insert_after_ptr(i, key, ptr);
         }
         void remove_entry(const key_type& key)
         {
-            
+            auto iterEntry = std::find(keys().begin(), keys().end(), [&key](const key_type& ckey)
+            {
+                return ckey == key;
+            });
+            if(iterEntry != keys().end())
+            {
+                auto offset = iterEntry - keys().begin();
+                std::move(keys().begin() + offset + 1, keys().end(), keys().begin() + offset);
+                std::move(ptrs().begin() + offset + 1, keys().end(), keys().begin() + offset);
+                key_count() -= 1;
+                ptr_count() -= 1;
+            }
         }
     };
     static_assert(sizeof(BTreeNodeModel) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
@@ -248,7 +281,7 @@ private:
             
             auto iterInsertAfter = std::find(p.ptrs().begin(), p.ptrs().end(), node.self_ptr());
             auto iInsertAfter = iterInsertAfter - p.ptrs().begin();
-            p.insert_adter_ptr(iInsertAfter, key, ptr);
+            p.insert_after_ptr(iInsertAfter, key, ptr);
             /*
             p.ptrs().count() += 1;
             std::move(p.ptrs().begin() + iNode, p.ptrs().end(), p.ptrs().begin() + iNode + 1);
@@ -303,7 +336,7 @@ private:
         else
         {
             TreeNode newNode = insert_split_leaf(targetLeaf, key, ptr);
-            insert_parent(targetLeaf,newNode.keys()[0], newNode.self_ptr())
+            insert_parent(targetLeaf, newNode.keys()[0], newNode.self_ptr());
             /*
             assert(targetLeaf.count() == key_count);
             auto newIndex = IndexManager::instance().allocate();
