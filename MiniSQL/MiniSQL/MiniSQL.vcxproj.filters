@@ -39,6 +39,9 @@
     <ClInclude Include="CatalogManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Tokenizer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CatalogManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Tokenizer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
