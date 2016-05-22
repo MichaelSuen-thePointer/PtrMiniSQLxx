@@ -18,32 +18,36 @@ struct Comparer
 
 struct IntComparer : Comparer
 {
+    friend struct Comparer;
     int operator()(const byte* a, const byte* b) override
     {
         return *reinterpret_cast<const int*>(a) - *reinterpret_cast<const int*>(b);
     }
-private:
+protected:
     IntComparer() = default;
 };
 
 struct FloatComparer : Comparer
 {
+    friend struct Comparer;
+
     int operator()(const byte* a, const byte* b) override
     {
-        return *reinterpret_cast<const float*>(a) - *reinterpret_cast<const float*>(b);
+        return std::less<float>()(*reinterpret_cast<const float*>(a), *reinterpret_cast<const float*>(b));
     }
-private:
+protected:
     FloatComparer() = default;
 };
 
 struct CharsComparer : Comparer
 {
+    friend struct Comparer;
     size_t size;
     int operator()(const byte* a, const byte* b) override
     {
         return strncmp(reinterpret_cast<const char*>(a), reinterpret_cast<const char*>(b), size);
     }
-private:
+protected:
     explicit CharsComparer(size_t _size)
         : size(_size)
     {
