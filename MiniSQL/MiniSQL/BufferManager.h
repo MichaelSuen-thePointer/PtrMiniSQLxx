@@ -105,6 +105,9 @@ public:
         return reinterpret_cast<T*>(_buffer.get() + _offset);
     }
     BlockPtr ptr();
+
+    byte* raw_ptr() { return this->as<byte>(); }
+
     explicit operator bool() const
     {
         return _buffer != nullptr;

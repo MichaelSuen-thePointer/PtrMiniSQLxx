@@ -147,7 +147,6 @@ private:
     };
     static_assert(sizeof(BTreeNodeModel) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
 
-private:
     BlockPtr _root;
 
     TreeNode find_leaf(const TKey& key)

@@ -1,6 +1,25 @@
 #pragma once
 
 #include "BufferManager.h"
+
+class InvalidKey : public std::runtime_error
+{
+public:
+    explicit InvalidKey(const char* msg)
+        : std::runtime_error(msg)
+    {
+    }
+};
+
+class InvalidType : public std::runtime_error
+{
+public:
+    explicit InvalidType(const char* msg)
+        : std::runtime_error(msg)
+    {
+    }
+};
+
 enum Type
 {
     Int,
@@ -33,7 +52,17 @@ struct FloatComparer : Comparer
 
     int operator()(const byte* a, const byte* b) override
     {
-        return std::less<float>()(*reinterpret_cast<const float*>(a), *reinterpret_cast<const float*>(b));
+        auto v1 = *reinterpret_cast<const float*>(a);
+        auto v2 = *reinterpret_cast<const float*>(b);
+        if(v1 > v2)
+        {
+            return 1;
+        }
+        if(v1 < v2)
+        {
+            return -1;
+        }
+        return 0;
     }
 protected:
     FloatComparer() = default;
@@ -56,43 +85,149 @@ protected:
 
 class TypeInfo
 {
+    friend class TableInfo;
 private:
     Type _type;
-    size_t _length;
+    size_t _size;
     std::shared_ptr<Comparer> _comparer;
 public:
     TypeInfo(Type type, size_t length)
         : _type(type)
-        , _length(length)
+        , _size(length)
         , _comparer(Comparer::from_type(type, length))
     {
     }
     explicit TypeInfo(Type type)
         : _type(type)
-        , _length(sizeof(int))
+        , _size(sizeof(int))
         , _comparer(Comparer::from_type(type))
     {
+    }
+    bool operator==(const TypeInfo& other) const
+    {
+        return _type == other._type && _size == other._size;
+    }
+    bool operator!=(const TypeInfo& other) const
+    {
+        return !(*this == other);
     }
 };
 
 class RecordItem
 {
+    friend class TableInfo;
 private:
     std::string _name;
     TypeInfo _info;
-    BlockPtr _base;
     size_t _offset;
 public:
-
+    RecordItem(const std::string& name, const TypeInfo& info, size_t offset)
+        : _name(name)
+        , _info(info)
+        , _offset(offset)
+    {
+    }
 };
 
 class TableInfo
 {
 private:
     std::string _name;
-    std::size_t _primaryPos;
-    std::size_t _indexPos;
-    std::vector<RecordItem> _records;
+    size_t _primaryPos;
+    size_t _indexPos;
+    std::vector<RecordItem> _keys;
+    size_t _totalSize;
+public:
+    class TupleProxy;
+    class ValueProxy : Uncopyable
+    {
+        friend class TupleProxy;
+    private:
+        byte* _raw;
+        TypeInfo* _info;
+        ValueProxy(byte* raw, TypeInfo* info)
+            : _raw(raw)
+            , _info(info)
+        {
+        }
+        ValueProxy(ValueProxy&& other)
+            : _raw(other._raw)
+            , _info(other._info)
+        {
+            other._raw = nullptr;
+            other._info = nullptr;
+        }
+    public:
+        int compare(const ValueProxy& other) const
+        {
+            if (*_info == *other._info)
+            {
+                return (*_info->_comparer)(_raw, other._raw);
+            }
+            throw InvalidType("compare type doesn't match");
+        }
+        bool operator==(const ValueProxy& other) const { return compare(other) == 0; }
+        bool operator!=(const ValueProxy& other) const { return compare(other) != 0; }
+        bool operator>(const ValueProxy& other) const { return compare(other) > 0; }
+        bool operator<(const ValueProxy& other) const { return compare(other) < 0; }
+        bool operator>=(const ValueProxy& other) const { return compare(other) >= 0; }
+        bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
+        int as_int() const { return *reinterpret_cast<int*>(_raw); }
+        float as_float() const { return *reinterpret_cast<float*>(_raw); }
+        std::string as_str() const { return std::string(reinterpret_cast<char*>(_raw), reinterpret_cast<char*>(_raw) + _info->_size); }
+    };
+
+    class TupleProxy : Uncopyable
+    {
+    private:
+        BlockPtr _block;
+        TableInfo* _info;
+        TupleProxy(BlockPtr block, TableInfo* info)
+            : _block(block)
+            , _info(info)
+        {
+        }
+        ValueProxy operator[](const std::string& keyName)
+        {
+            auto place = std::find_if(_info->_keys.begin(), _info->_keys.end(), [&keyName](const RecordItem& item) {
+                return item._name == keyName;
+            });
+            if (place == _info->_keys.end())
+            {
+                throw InvalidKey(("invalid key name: " + keyName).c_str());
+            }
+            return{ _block->raw_ptr() + place->_offset, &place->_info };
+        }
+    };
+
+    TableInfo(const std::string& name, const std::vector<std::pair<std::string, TypeInfo>>& keys, size_t primaryPos = -1)
+        : _name(name)
+        , _primaryPos(primaryPos == -1 ? 0 : primaryPos)
+        , _indexPos(primaryPos == -1 ? 0 : primaryPos)
+        , _keys()
+        , _totalSize()
+    {
+        const size_t blockSize = BufferBlock::BlockSize;
+        size_t offset = 0;
+        _keys.reserve(primaryPos == -1 ? keys.size() : keys.size() + 1);
+        if (primaryPos == -1)
+        {
+            _keys.emplace_back("_auto_primary_key_" + name, TypeInfo(Int), offset);
+            offset += 4;
+        }
+
+        for (auto& key : keys)
+        {
+            _keys.emplace_back(key.first, key.second, offset);
+            offset += key.second._size;
+            if (offset >= blockSize)
+            {
+                throw InsuffcientSpace("total size of keys exceeded 4096 bytes.");
+            }
+        }
+        _totalSize = offset;
+    }
+
 
 };
 
@@ -107,7 +242,7 @@ public:
 
 private:
     std::vector<TableInfo> _tables;
-    
+
     CatalogManager();
 
 
