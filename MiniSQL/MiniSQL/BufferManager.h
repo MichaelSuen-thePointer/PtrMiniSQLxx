@@ -61,6 +61,7 @@ private:
     int _fileIndex;
     int _blockIndex;
     bool _isLocked;
+    bool _hasModified;
     boost::posix_time::ptime _lastModifiedTime;
     int _offset;
 
@@ -73,6 +74,7 @@ private:
         , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)
         , _isLocked(false)
+        , _hasModified(false)
         , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
         , _offset(0)
     {
@@ -86,6 +88,13 @@ public:
     {
         release();
     }
+
+    void notify_modification()
+    {
+        _hasModified = true;
+        _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
+    }
+
     void reset()
     {
         release();
@@ -104,7 +113,7 @@ public:
     {
         return reinterpret_cast<T*>(_buffer.get() + _offset);
     }
-    BlockPtr ptr();
+    BlockPtr ptr() const;
 
     byte* raw_ptr() { return this->as<byte>(); }
 
@@ -154,6 +163,20 @@ public:
         , _offset(offset)
     {
     }
+    BlockPtr& operator=(const BlockPtr& other)
+    {
+        _fileIndex = other._fileIndex;
+        _blockIndex = other._blockIndex;
+        _offset = other._offset;
+        return *this;
+    }
+    BlockPtr& operator=(nullptr_t)
+    {
+        _fileIndex = -1;
+        _blockIndex = -1;
+        _offset = 0;
+        return *this;
+    }
     bool operator==(const BlockPtr& rhs) const
     {
         return _fileIndex == rhs._fileIndex && _blockIndex == rhs._blockIndex;
@@ -197,7 +220,7 @@ public:
     }
 };
 
-inline BlockPtr BufferBlock::ptr()
+inline BlockPtr BufferBlock::ptr() const
 {
     return BlockPtr(_fileIndex, _blockIndex, _offset);
 }

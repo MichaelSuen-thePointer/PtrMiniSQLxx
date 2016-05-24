@@ -72,7 +72,7 @@ struct CharsComparer : Comparer
 {
     friend struct Comparer;
     size_t size;
-    int operator()(const byte* a, const byte* b) override
+    virtual int operator()(const byte* a, const byte* b) override
     {
         return strncmp(reinterpret_cast<const char*>(a), reinterpret_cast<const char*>(b), size);
     }
@@ -172,6 +172,8 @@ public:
         bool operator<(const ValueProxy& other) const { return compare(other) < 0; }
         bool operator>=(const ValueProxy& other) const { return compare(other) >= 0; }
         bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
+        Type type() const { return _info->_type; }
+        size_t size() const { return _info->_size; }
         int as_int() const { return *reinterpret_cast<int*>(_raw); }
         float as_float() const { return *reinterpret_cast<float*>(_raw); }
         std::string as_str() const { return std::string(reinterpret_cast<char*>(_raw), reinterpret_cast<char*>(_raw) + _info->_size); }
@@ -179,6 +181,7 @@ public:
 
     class TupleProxy : Uncopyable
     {
+        friend class TableInfo;
     private:
         BlockPtr _block;
         TableInfo* _info;
@@ -186,6 +189,13 @@ public:
             : _block(block)
             , _info(info)
         {
+        }
+        TupleProxy(TupleProxy&& other)
+            : _block(other._block)
+            , _info(other._info)
+        {
+            other._block = nullptr;
+            other._info = nullptr;
         }
         ValueProxy operator[](const std::string& keyName)
         {
@@ -228,7 +238,15 @@ public:
         _totalSize = offset;
     }
 
+    TupleProxy operator[](const BlockPtr& ptr)
+    {
+        return{ ptr, this };
+    }
 
+    TupleProxy operator[](const BufferBlock& block)
+    {
+        return{ block.ptr(), this };
+    }
 };
 
 class CatalogManager : Uncopyable
