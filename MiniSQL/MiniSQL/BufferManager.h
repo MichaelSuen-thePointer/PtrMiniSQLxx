@@ -1,5 +1,14 @@
 #pragma once
 
+class InvalidIndex : public std::runtime_error
+{
+public:
+    explicit InvalidIndex(const char* msg)
+        : runtime_error(msg)
+    {
+    }
+};
+
 struct BufferArrayDeleter
 {
     void operator()(byte* array) const
@@ -19,8 +28,10 @@ public:
     const static int BlockCount = 128;
 private:
     using IndexPair = std::pair<int, int>;
-    std::set<IndexPair> _indices;
-    std::set<IndexPair> _freeIndices;
+    std::map<std::string, std::set<IndexPair>> _indices;
+    std::map<std::string, std::set<IndexPair>> _freeIndices;
+    std::map<int, std::string> _indexNameMap;
+    std::map<std::string, int> _nameIndexMap;
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
     BufferManager()
         : _indices()
@@ -35,19 +46,22 @@ public:
         return instance;
     }
 
-    BufferBlock& find_or_alloc(int fileIndex, int blockIndex);
-    BufferBlock& alloc_block();
+    BufferBlock& find_or_alloc(const std::string& fileName, int fileIndex, int blockIndex);
+    BufferBlock& alloc_block(const std::string& fileName);
 private:
-    size_t find_block(int fileIndex, int blockIndex);
+    size_t find_block(const std::string& fileName, int fileIndex, int blockIndex);
     void save_block(BufferBlock& block);
     void drop_block(BufferBlock& block);
-    void write_file(const byte* content, int fileIndex, int blockIndex);
-    byte* read_file(byte* buffer, int fileIndex, int blockIndex);
-    BufferBlock& alloc_block(int fileIndex, int blockIndex);
-    BufferBlock& replace_lru_block(byte* buffer, int fileIndex, int blockIndex);
+    void write_file(const byte* content, const std::string& fileName, int fileIndex, int blockIndex);
+    byte* read_file(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex);
+    BufferBlock& alloc_block(const std::string& name, int fileIndex, int blockIndex);
+    BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex);
 
-    IndexPair allocate_index();
-    void deallocate_index(int fileIndex, int blockIndex);
+    IndexPair allocate_index(const std::string& fileName);
+    void deallocate_index(const std::string& fileName, int fileIndex, int blockIndex);
+
+    int allocate_file_name_index(const std::string& fileName);
+    const std::string& check_index(int index);
 };
 
 class BufferBlock : Uncopyable
@@ -58,6 +72,7 @@ public:
     const static int BlockSize = 4096;
 private:
     std::unique_ptr<byte, BufferArrayDeleter> _buffer;
+    std::string _fileName;
     int _fileIndex;
     int _blockIndex;
     bool _isLocked;
@@ -66,11 +81,12 @@ private:
     int _offset;
 
     BufferBlock()
-        : BufferBlock(nullptr, -1, -1)
+        : BufferBlock(nullptr, "", -1, -1)
     {
     }
-    BufferBlock(byte* buffer, int fileIndex, int blockIndex)
+    BufferBlock(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex)
         : _buffer(buffer)
+        , _fileName(fileName)
         , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)
         , _isLocked(false)
@@ -141,6 +157,7 @@ class BlockPtr
 {
     friend class BufferBlock;
 private:
+    int _fileNameIndex;
     int _fileIndex;
     int _blockIndex;
     int _offset;
@@ -150,15 +167,16 @@ public:
     {
     }
     BlockPtr()
-        : BlockPtr(-1, -1)
+        : BlockPtr(-1, -1, -1)
     {
     }
-    BlockPtr(int fileIndex, int blockIndex)
-        : BlockPtr(fileIndex, blockIndex, 0)
+    BlockPtr(int fileNameIndex, int fileIndex, int blockIndex)
+        : BlockPtr(fileNameIndex, fileIndex, blockIndex, 0)
     {
     }
-    BlockPtr(int fileIndex, int blockIndex, int offset)
-        : _fileIndex(fileIndex)
+    BlockPtr(int fileNameIndex, int fileIndex, int blockIndex, int offset)
+        : _fileNameIndex(fileNameIndex)
+        , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)
         , _offset(offset)
     {
@@ -191,7 +209,7 @@ public:
     }
     BufferBlock& operator*()
     {
-        auto& block = BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
+        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_index(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return block;
     }
@@ -201,7 +219,7 @@ public:
     }
     BufferBlock* operator->()
     {
-        auto& block = BufferManager::instance().find_or_alloc(_fileIndex, _blockIndex);
+        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_index(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return &block;
     }
@@ -222,5 +240,6 @@ public:
 
 inline BlockPtr BufferBlock::ptr() const
 {
+
     return BlockPtr(_fileIndex, _blockIndex, _offset);
 }

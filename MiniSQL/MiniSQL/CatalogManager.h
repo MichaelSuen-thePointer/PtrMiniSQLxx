@@ -113,18 +113,20 @@ public:
     }
 };
 
-class RecordItem
+class KeyItem
 {
     friend class TableInfo;
 private:
     std::string _name;
     TypeInfo _info;
     size_t _offset;
+    bool _isUnique;
 public:
-    RecordItem(const std::string& name, const TypeInfo& info, size_t offset)
+    KeyItem(const std::string& name, const TypeInfo& info, size_t offset, bool isUnique)
         : _name(name)
         , _info(info)
         , _offset(offset)
+        , _isUnique(isUnique)
     {
     }
 };
@@ -135,7 +137,7 @@ private:
     std::string _name;
     size_t _primaryPos;
     size_t _indexPos;
-    std::vector<RecordItem> _keys;
+    std::vector<KeyItem> _keys;
     size_t _totalSize;
 public:
     class TupleProxy;
@@ -199,7 +201,7 @@ public:
         }
         ValueProxy operator[](const std::string& keyName)
         {
-            auto place = std::find_if(_info->_keys.begin(), _info->_keys.end(), [&keyName](const RecordItem& item) {
+            auto place = std::find_if(_info->_keys.begin(), _info->_keys.end(), [&keyName](const KeyItem& item) {
                 return item._name == keyName;
             });
             if (place == _info->_keys.end())
