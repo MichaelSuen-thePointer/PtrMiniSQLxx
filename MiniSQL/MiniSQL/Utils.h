@@ -25,3 +25,38 @@ char* itoa(int num, char(&buf)[size])
 
     return buf;
 }
+
+template<typename T, typename U, std::enable_if_t<
+    std::is_integral<T>::value &&
+    std::is_convertible<U, T>::value>* = nullptr>
+std::pair<T, T>& operator+=(std::pair<T, T>& lhs, U value)
+{
+    if(lhs.second <= std::numeric_limits<T>::max() - value)
+    {
+        lhs.second += value;
+    }
+    else
+    {
+        lhs.first += 1;
+        lhs.second = value - (std::numeric_limits<T>::max() - lhs.second);
+    }
+    return lhs;
+}
+
+template<typename T, typename U, std::enable_if_t<
+    std::is_integral<T>::value &&
+    std::is_convertible<U, T>::value>* = nullptr>
+std::pair<T, T> operator+(const std::pair<T, T>& lhs, U value)
+{
+    std::pair<T, T> result = lhs;
+    if (result.second <= std::numeric_limits<T>::max() - value)
+    {
+        result.second += value;
+    }
+    else
+    {
+        result.first += 1;
+        result.second = value - (std::numeric_limits<T>::max() - result.second);
+    }
+    return result;
+}

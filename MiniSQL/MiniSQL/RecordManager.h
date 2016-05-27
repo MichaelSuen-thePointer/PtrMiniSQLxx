@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BufferManager.h"
-#include "CatalogManager.h"
 
 class TableNotExist : public std::runtime_error
 {
@@ -17,16 +16,18 @@ class RecordManager
 public:
     class TableRecordList
     {
+        friend class RecordManager;
     private:
         using Record = std::pair<int, int>;
-        TableInfo* _info;
+        std::string _fileName;
         std::deque<Record> _records;
         std::set<Record> _freeRecords;
+        std::pair<int, int> _currentMax;
 
-    private:
-        TableRecordList(TableInfo* info, std::deque<Record>&& records,
-                                 std::set<Record>&& freeRecords)
-            : _info(info)
+        TableRecordList(const std::string& tableName,
+                        std::deque<Record>&& records,
+                        std::set<Record>&& freeRecords)
+            : _fileName(tableName + "_records.txt")
             , _records(std::move(records))
             , _freeRecords(std::move(freeRecords))
         {
@@ -51,14 +52,32 @@ public:
         reverse_iterator rend() { return _records.rend(); }
         const_reverse_iterator rend() const { return _records.rend(); }
 
-        TableInfo::TupleProxy operator[](size_t index) const
+        BlockPtr operator[](size_t index) const
         {
             auto& pair = _records[index];
-            BlockPtr ptr(BufferManager::instance().check_file_index(_info->name()), pair.first, pair.second);
-
-            return (*_info)[ptr];
+            return{ BufferManager::instance().check_file_index(_fileName), pair.first, pair.second };
         }
 
+        void insert(byte* buffer, size_t size)
+        {
+            std::pair<int, int> entry;
+            if(_freeRecords.size())
+            {
+                entry = *_freeRecords.begin();
+                _freeRecords.erase(_freeRecords.begin());
+            }
+            else
+            {
+                _currentMax += 1;
+                entry = _currentMax;
+            }
+            auto& block = BufferManager::instance().find_or_alloc(_fileName, 0, entry.first);
+            assert((BufferBlock::BlockSize - size) >= entry.second);
+            memcpy(block.raw_ptr() + entry.second, buffer, size);
+            block.notify_modification();
+            
+            _records.push_back(entry);
+        }
 
     };
 
@@ -80,7 +99,7 @@ public:
     void insert_entry(const std::string& tableName, byte* entry)
     {
         auto tableInfo = _tableInfos.find(tableName);
-        if(tableInfo == _tableInfos.end())
+        if (tableInfo == _tableInfos.end())
         {
             throw TableNotExist(tableName.c_str());
         }
