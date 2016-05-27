@@ -48,6 +48,10 @@ public:
 
     BufferBlock& find_or_alloc(const std::string& fileName, int fileIndex, int blockIndex);
     BufferBlock& alloc_block(const std::string& fileName);
+
+    int allocate_file_name_index(const std::string& fileName);
+    const std::string& check_file_name(int index);
+    int check_file_index(const std::string& file);
 private:
     size_t find_block(const std::string& fileName, int fileIndex, int blockIndex);
     void save_block(BufferBlock& block);
@@ -60,8 +64,6 @@ private:
     IndexPair allocate_index(const std::string& fileName);
     void deallocate_index(const std::string& fileName, int fileIndex, int blockIndex);
 
-    int allocate_file_name_index(const std::string& fileName);
-    const std::string& check_index(int index);
 };
 
 class BufferBlock : Uncopyable
@@ -209,7 +211,7 @@ public:
     }
     BufferBlock& operator*()
     {
-        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_index(_fileNameIndex), _fileIndex, _blockIndex);
+        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return block;
     }
@@ -219,7 +221,7 @@ public:
     }
     BufferBlock* operator->()
     {
-        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_index(_fileNameIndex), _fileIndex, _blockIndex);
+        auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return &block;
     }

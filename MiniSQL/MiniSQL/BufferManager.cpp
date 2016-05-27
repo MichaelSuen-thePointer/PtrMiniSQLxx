@@ -187,9 +187,16 @@ int BufferManager::allocate_file_name_index(const std::string& fileName)
     return index;
 }
 
-const std::string& BufferManager::check_index(int index)
+const std::string& BufferManager::check_file_name(int index)
 {
     auto place = _indexNameMap.find(index);
     assert(place != _indexNameMap.end());
+    return place->second;
+}
+
+int BufferManager::check_file_index(const std::string& file)
+{
+    auto place = _nameIndexMap.find(file);
+    assert(place != _nameIndexMap.end());
     return place->second;
 }

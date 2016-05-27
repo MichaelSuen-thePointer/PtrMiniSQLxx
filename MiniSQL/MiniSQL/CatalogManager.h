@@ -185,13 +185,14 @@ public:
     {
         friend class TableInfo;
     private:
-        BlockPtr _block;
+        mutable BlockPtr _block;
         TableInfo* _info;
         TupleProxy(BlockPtr block, TableInfo* info)
             : _block(block)
             , _info(info)
         {
         }
+    public:
         TupleProxy(TupleProxy&& other)
             : _block(other._block)
             , _info(other._info)
@@ -199,7 +200,7 @@ public:
             other._block = nullptr;
             other._info = nullptr;
         }
-        ValueProxy operator[](const std::string& keyName)
+        ValueProxy operator[](const std::string& keyName) const
         {
             auto place = std::find_if(_info->_keys.begin(), _info->_keys.end(), [&keyName](const KeyItem& item) {
                 return item._name == keyName;
@@ -212,7 +213,7 @@ public:
         }
     };
 
-    TableInfo(const std::string& name, const std::vector<std::pair<std::string, TypeInfo>>& keys, size_t primaryPos = -1)
+    TableInfo(const std::string& name, const std::vector<std::tuple<std::string, TypeInfo, bool>>& keys, size_t primaryPos = -1)
         : _name(name)
         , _primaryPos(primaryPos == -1 ? 0 : primaryPos)
         , _indexPos(primaryPos == -1 ? 0 : primaryPos)
@@ -224,14 +225,14 @@ public:
         _keys.reserve(primaryPos == -1 ? keys.size() : keys.size() + 1);
         if (primaryPos == -1)
         {
-            _keys.emplace_back("_auto_primary_key_" + name, TypeInfo(Int), offset);
+            _keys.emplace_back("_auto_primary_key_" + name, TypeInfo(Int), offset, true);
             offset += 4;
         }
 
         for (auto& key : keys)
         {
-            _keys.emplace_back(key.first, key.second, offset);
-            offset += key.second._size;
+            _keys.emplace_back(std::get<0>(key), std::get<1>(key), offset, std::get<2>(key));
+            offset += std::get<1>(key)._size;
             if (offset >= blockSize)
             {
                 throw InsuffcientSpace("total size of keys exceeded 4096 bytes.");
@@ -239,6 +240,8 @@ public:
         }
         _totalSize = offset;
     }
+
+    const std::string& name() const { return _name; }
 
     TupleProxy operator[](const BlockPtr& ptr)
     {

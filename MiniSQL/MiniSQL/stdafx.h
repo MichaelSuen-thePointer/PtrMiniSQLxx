@@ -12,6 +12,8 @@
 #include <array>
 #include <vector>
 #include <set>
+#include <list>
+#include <deque>
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>

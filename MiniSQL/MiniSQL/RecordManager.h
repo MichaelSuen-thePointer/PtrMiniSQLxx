@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BufferManager.h"
+#include "CatalogManager.h"
 
 class TableNotExist : public std::runtime_error
 {
@@ -14,81 +15,55 @@ public:
 class RecordManager
 {
 public:
-    class TableRecordList;
-    class TableRecordInfo
-    {
-        friend class TableRecordList;
-    private:
-        size_t _recordSize;
-        std::vector<BlockPtr> _recordPtrs;
-    public:
-        TableRecordInfo(size_t size, const std::vector<BlockPtr>& records)
-            : _recordSize(size)
-            , _recordPtrs(records)
-        {
-        }
-    };
-
-    const static size_t ptr_count = (BufferBlock::BlockSize - sizeof(size_t)) / sizeof(BlockPtr);
-
-    struct TableRecordListModel
-    {
-        size_t _count;
-        BlockPtr _head[1];
-    };
-
-    class TableRecordListIterator
-    {
-    private:
-        TableRecordList* _parent;
-        size_t _blockIndex;
-        size_t _entryIndex;
-    public:
-
-    };
-
     class TableRecordList
     {
     private:
-        TableRecordInfo* _info;
-        std::vector<TableRecordListModel*> _bases;
-    public:
-        explicit TableRecordList(TableRecordInfo& info)
-            : _info(&info)
-            , _bases()
-        {
-            _bases.reserve(info._recordPtrs.size());
-            for (auto& ptr : info._recordPtrs)
-            {
-                _bases.push_back(ptr->as<TableRecordListModel>());
-            }
-        }
+        using Record = std::pair<int, int>;
+        TableInfo* _info;
+        std::deque<Record> _records;
+        std::set<Record> _freeRecords;
 
+    private:
+        TableRecordList(TableInfo* info, std::deque<Record>&& records,
+                                 std::set<Record>&& freeRecords)
+            : _info(info)
+            , _records(std::move(records))
+            , _freeRecords(std::move(freeRecords))
+        {
+        }
+    public:
+        using record_list = decltype(_records);
+        using iterator = typename record_list::iterator;
+        using const_iterator = typename record_list::const_iterator;
+        using reverse_iterator = typename record_list::reverse_iterator;
+        using const_reverse_iterator = typename record_list::const_reverse_iterator;
         size_t size() const
         {
-            size_t count = 0;
-            for(auto& model : _bases)
-            {
-                count += model->_count;
-            }
-            return count;
+            return _records.size();
         }
 
-        BlockPtr operator[](size_t index) const
+        iterator begin() { return _records.begin(); }
+        const_iterator begin() const { return _records.begin(); }
+        iterator end() { return _records.end(); }
+        const_iterator end() const { return _records.end(); }
+        reverse_iterator rbegin() { return _records.rbegin(); }
+        const_reverse_iterator rbegin() const { return _records.rbegin(); }
+        reverse_iterator rend() { return _records.rend(); }
+        const_reverse_iterator rend() const { return _records.rend(); }
+
+        TableInfo::TupleProxy operator[](size_t index) const
         {
-            assert(_bases.size());
-            size_t i = 0;
-            while (index >= _bases[i]->_count)
-            {
-                i++;
-                index -= _bases[i]->_count;
-            }
-            return _bases[i]->_head[index];
+            auto& pair = _records[index];
+            BlockPtr ptr(BufferManager::instance().check_file_index(_info->name()), pair.first, pair.second);
+
+            return (*_info)[ptr];
         }
+
+
     };
 
 private:
-    std::map<std::string, TableRecordInfo> _tableInfos;
+    std::map<std::string, TableRecordList> _tableInfos;
 
     RecordManager()
         : _tableInfos()
