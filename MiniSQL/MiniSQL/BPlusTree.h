@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BufferManager.h"
-
+#include <tuple>
 class BPlusTreeBase
 {
 public:
@@ -69,6 +69,8 @@ private:
         OberservableArray<ptr_type> _ptrs;
     public:
         bool is_leaf() { return _base->is_leaf; }
+        bool is_root() { return parent_ptr() != nullptr; }
+
         size_t& key_count() { return _base->total_key; }
         size_t& ptr_count() { return _base->total_ptr; }
 
@@ -77,6 +79,41 @@ private:
 
         TreeNode next() { assert(is_leaf()); return TreeNode(_base->ptrs[next_index]); }
         ptr_type& next_ptr() { assert(is_leaf()); return _base->ptrs[next_index]; }
+
+        size_t self_pos()
+        {
+            assert(!is_root());
+            auto selfPos = std::find(parent().ptrs().begin(), parent().ptrs().end(), self_ptr());
+            if (selfPos != parent().ptrs().end())
+            {
+                return selfPos - parent().ptrs().begin();
+            }
+            return -1;
+        }
+
+        std::pair<key_type, ptr_type> right_key_and_sibling()
+        {
+            assert(parent_ptr());
+            auto selfPos = self_pos();
+            assert(selfPos != -1);
+            if (selfPos < parent().ptr_count() - 1)
+            {
+                return{ parent().keys()[selfPos], parent().ptrs()[selfPos + 1] };
+            }
+            return{ key_type(), nullptr };
+        }
+
+        std::pair<key_type, ptr_type> left_key_and_sibling()
+        {
+            assert(parent_ptr());
+            auto selfPos = self_pos();
+            assert(selfPos != -1);
+            if (selfPos > 1)
+            {
+                return{ parent().keys()[selfPos - 1], parent().ptrs()[selfPos - 1] };
+            }
+            return{ key_type(), nullptr };
+        }
 
         ptr_type self_ptr() const { return _selfPtr; }
 
@@ -92,8 +129,8 @@ private:
         explicit TreeNode(ptr_type blockPtr)
             : _selfPtr(blockPtr)
             , _base(blockPtr->as<BTreeNodeModel>())
-            , _keys(_base->keys, _base->total_key, key_count)
-            , _ptrs(_base->ptrs, _base->totak_ptr, ptr_count)
+            , _keys(_base->keys, _base->total_key, BPlusTree<TKey>::key_count)
+            , _ptrs(_base->ptrs, _base->totak_ptr, BPlusTree<TKey>::ptr_count)
         {
         }
         explicit TreeNode(BufferBlock& block)
@@ -294,11 +331,26 @@ private:
     void remove_entry(TreeNode& node, const key_type& key, const ptr_type& ptr)
     {
         node.remove_entry(key);
-        if (node->parent_ptr() == nullptr && node->ptr_count() == 1)
+        if (node->parent_ptr() == nullptr && node->ptr_count() == 1) //is root and only one child
         {
             _root = node->ptrs()[0];
-            node->parent_ptr() = nullptr;
-            //TODO: finish it
+        }
+        else if (node.ptr_count() < ptr_count / 2)
+        {
+            auto psibling = node.right_key_and_sibling();
+            if (psibling == nullptr)
+            {
+                psibling = node.left_key_and_sibling();
+            }
+            assert(psibling.second != nullptr);
+            TreeNode sibling(psibling.second);
+            key_type sideKey = psibling.first;
+            if(sibling.key_count() + node.key_count() <= key_count &&
+               sibling.ptr_count() + node.ptr_count() <= ptr_count)
+            {
+                // TODO: 
+            }
+
         }
     }
 

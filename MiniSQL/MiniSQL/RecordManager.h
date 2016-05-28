@@ -33,29 +33,15 @@ public:
         {
         }
     public:
-        using record_list = decltype(_records);
-        using iterator = typename record_list::iterator;
-        using const_iterator = typename record_list::const_iterator;
-        using reverse_iterator = typename record_list::reverse_iterator;
-        using const_reverse_iterator = typename record_list::const_reverse_iterator;
         size_t size() const
         {
             return _records.size();
         }
 
-        iterator begin() { return _records.begin(); }
-        const_iterator begin() const { return _records.begin(); }
-        iterator end() { return _records.end(); }
-        const_iterator end() const { return _records.end(); }
-        reverse_iterator rbegin() { return _records.rbegin(); }
-        const_reverse_iterator rbegin() const { return _records.rbegin(); }
-        reverse_iterator rend() { return _records.rend(); }
-        const_reverse_iterator rend() const { return _records.rend(); }
-
         BlockPtr operator[](size_t index) const
         {
             auto& pair = _records[index];
-            return{ BufferManager::instance().check_file_index(_fileName), pair.first, pair.second };
+            return{ BufferManager::instance().check_file_index(_fileName), 0, pair.first, pair.second };
         }
 
         void insert(byte* buffer, size_t size)
@@ -79,6 +65,15 @@ public:
             _records.push_back(entry);
         }
 
+        void erase(size_t i)
+        {
+            assert(i >= 0 && i < _records.size());
+            
+            auto result = _freeRecords.insert(_records[i]);
+            assert(result.second);
+
+            _records.erase(_records.begin() + i);
+        }
     };
 
 private:

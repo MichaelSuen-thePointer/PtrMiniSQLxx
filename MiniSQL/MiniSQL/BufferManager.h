@@ -52,10 +52,10 @@ public:
     int allocate_file_name_index(const std::string& fileName);
     const std::string& check_file_name(int index);
     int check_file_index(const std::string& file);
+    void drop_block(BufferBlock& block);
 private:
     size_t find_block(const std::string& fileName, int fileIndex, int blockIndex);
     void save_block(BufferBlock& block);
-    void drop_block(BufferBlock& block);
     void write_file(const byte* content, const std::string& fileName, int fileIndex, int blockIndex);
     byte* read_file(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex);
     BufferBlock& alloc_block(const std::string& name, int fileIndex, int blockIndex);
@@ -164,7 +164,7 @@ private:
     int _blockIndex;
     int _offset;
 public:
-    explicit BlockPtr(nullptr_t)
+    BlockPtr(nullptr_t)
         : BlockPtr()
     {
     }
