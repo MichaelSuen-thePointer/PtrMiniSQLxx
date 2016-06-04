@@ -30,9 +30,6 @@
     <ClInclude Include="BufferManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BPlusTree.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CatalogManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -43,6 +40,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="API.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryWriteStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryReadStream.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,9 +59,6 @@
     <ClCompile Include="BufferManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BPlusTree.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="CatalogManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -66,6 +66,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RecordManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryWriteStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryReadStream.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

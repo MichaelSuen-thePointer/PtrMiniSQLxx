@@ -1,13 +1,16 @@
-// MiniSQL.cpp : 定义控制台应用程序的入口点。
-//
-
 #include "stdafx.h"
-#include "Tokenizer.h"
+#include "RecordManager.h"
+
 
 int main()
 {
-    std::string teststring =
-        R"__(0123123;0.123123;-.123;-0.123;-123)__";
+    auto& rm = RecordManager::instance();
 
-    Tokenizer lex(teststring);
+    //rm.create_table("test_table", 22);
+
+    char entry[] = "helloworld, helloworld";
+
+    rm.insert_entry("test_table", (byte*)entry);
+    rm.insert_entry("test_table", (byte*)entry);
+    rm.insert_entry("test_table", (byte*)entry);
 }

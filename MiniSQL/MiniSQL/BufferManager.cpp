@@ -4,7 +4,7 @@
 
 void BufferManager::save_block(BufferBlock& block)
 {
-    if (block)
+    if (block._hasModified)
     {
         write_file(block._buffer.get(), block._fileName, block._fileIndex, block._blockIndex);
     }
@@ -18,20 +18,52 @@ void BufferManager::drop_block(BufferBlock& block)
     _blocks[i].reset();
 }
 
+bool BufferManager::has_block(const std::string& fileName, int fileIndex, int blockIndex)
+{
+    FILE* fp;
+    if ((fp = fopen((fileName + std::to_string(fileIndex)).c_str(), "r")) == nullptr)
+    {
+        return false;
+    }
+    fseek(fp, 0, SEEK_END);
+    auto size = ftell(fp);
+    fclose(fp);
+    if (size < blockIndex * BufferBlock::BlockSize)
+    {
+        return false;
+    }
+    return true;
+}
+
 void BufferManager::write_file(const byte * content, const std::string& fileName, int fileIndex, int blockIndex)
 {
     FILE* stream;
-    fopen_s(&stream, (fileName + std::to_string(fileIndex)).c_str(), "a+");
+    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
     fseek(stream, blockIndex * BufferBlock::BlockSize, SEEK_SET);
+    auto cur = ftell(stream);
     fwrite(content, 1, BufferBlock::BlockSize, stream);
+    auto pos = ftell(stream);
     fclose(stream);
 }
 
 byte* BufferManager::read_file(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex)
 {
     FILE* stream;
-    fopen_s(&stream, (fileName + std::to_string(fileIndex)).c_str(), "a+");
+    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
+    if (stream == nullptr)
+    {
+        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "w");
+        fclose(stream);
+        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
+    }
+    fseek(stream, 0, SEEK_END);
+    while (ftell(stream) < (blockIndex + 1) * BufferBlock::BlockSize)
+    {
+        fwrite(buffer, 1, BufferBlock::BlockSize, stream);
+        fseek(stream, 0, SEEK_END);
+    }
     fseek(stream, blockIndex * BufferBlock::BlockSize, SEEK_SET);
+
     fread(buffer, 1, BufferBlock::BlockSize, stream);
     fclose(stream);
     return buffer;
@@ -78,7 +110,6 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, int fileInd
         if (block == nullptr)
         {
             block.reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
-            save_block(*block);
             return *block;
         }
     }
@@ -177,8 +208,8 @@ int BufferManager::allocate_file_name_index(const std::string& fileName)
         {
             index = 0;
         }
-        _indexNameMap.insert({ index, fileName });
-        _nameIndexMap.insert({ fileName, index });
+        _indexNameMap.insert({index, fileName});
+        _nameIndexMap.insert({fileName, index});
     }
     else
     {

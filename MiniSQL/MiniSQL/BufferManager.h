@@ -53,6 +53,8 @@ public:
     const std::string& check_file_name(int index);
     int check_file_index(const std::string& file);
     void drop_block(BufferBlock& block);
+
+    bool has_block(const std::string& fileName, int fileIndex, int blockIndex);
 private:
     size_t find_block(const std::string& fileName, int fileIndex, int blockIndex);
     void save_block(BufferBlock& block);

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "targetver.h"
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 #include <memory>
 #include <array>
@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <boost/date_time.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
 #include "Uncopyable.h"
 #include "Utils.h"
 
