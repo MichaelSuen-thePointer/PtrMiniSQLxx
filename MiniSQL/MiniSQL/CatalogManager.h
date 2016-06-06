@@ -147,6 +147,7 @@ public:
     private:
         byte* _raw;
         TypeInfo* _info;
+    public:
         ValueProxy(byte* raw, TypeInfo* info)
             : _raw(raw)
             , _info(info)
@@ -159,7 +160,6 @@ public:
             other._raw = nullptr;
             other._info = nullptr;
         }
-    public:
         int compare(const ValueProxy& other) const
         {
             if (*_info == *other._info)
@@ -174,6 +174,7 @@ public:
         bool operator<(const ValueProxy& other) const { return compare(other) < 0; }
         bool operator>=(const ValueProxy& other) const { return compare(other) >= 0; }
         bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
+        const TypeInfo& type_info() const { return *_info; }
         Type type() const { return _info->_type; }
         size_t size() const { return _info->_size; }
         int as_int() const { return *reinterpret_cast<int*>(_raw); }
@@ -215,19 +216,14 @@ public:
 
     TableInfo(const std::string& name, const std::vector<std::tuple<std::string, TypeInfo, bool>>& keys, size_t primaryPos = -1)
         : _name(name)
-        , _primaryPos(primaryPos == -1 ? 0 : primaryPos)
-        , _indexPos(primaryPos == -1 ? 0 : primaryPos)
+        , _primaryPos(primaryPos)
+        , _indexPos(primaryPos)
         , _keys()
         , _totalSize()
     {
         const size_t blockSize = BufferBlock::BlockSize;
         size_t offset = 0;
-        _keys.reserve(primaryPos == -1 ? keys.size() : keys.size() + 1);
-        if (primaryPos == -1)
-        {
-            _keys.emplace_back("_auto_primary_key_" + name, TypeInfo(Int), offset, true);
-            offset += 4;
-        }
+        _keys.reserve(keys.size());
 
         for (auto& key : keys)
         {
