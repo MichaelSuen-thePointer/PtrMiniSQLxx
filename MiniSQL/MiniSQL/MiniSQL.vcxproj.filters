@@ -48,6 +48,9 @@
     <ClInclude Include="MemoryReadStream.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Serialization.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

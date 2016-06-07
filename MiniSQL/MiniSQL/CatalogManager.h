@@ -3,6 +3,11 @@
 #include "BufferManager.h"
 #include "Uncopyable.h"
 
+#include "MemoryWriteStream.h"
+#include "MemoryReadStream.h"
+
+#include "Serialization.h"
+
 class InvalidKey : public std::runtime_error
 {
 public:
@@ -28,28 +33,28 @@ enum Type
     Chars
 };
 
-struct Comparer
+struct Comparator
 {
     virtual int operator()(const byte* a, const byte* b) = 0;
-    virtual ~Comparer() = default;
-    static std::shared_ptr<Comparer> from_type(Type type, size_t length);
-    static std::shared_ptr<Comparer> from_type(Type type);
+    virtual ~Comparator() = default;
+    static Comparator* from_type(Type type, size_t length);
+    static Comparator* from_type(Type type);
 };
 
-struct IntComparer : Comparer
+struct IntComparator : Comparator
 {
-    friend struct Comparer;
+    friend struct Comparator;
     int operator()(const byte* a, const byte* b) override
     {
         return *reinterpret_cast<const int*>(a) - *reinterpret_cast<const int*>(b);
     }
 protected:
-    IntComparer() = default;
+    IntComparator() = default;
 };
 
-struct FloatComparer : Comparer
+struct FloatComparator : Comparator
 {
-    friend struct Comparer;
+    friend struct Comparator;
 
     int operator()(const byte* a, const byte* b) override
     {
@@ -66,19 +71,19 @@ struct FloatComparer : Comparer
         return 0;
     }
 protected:
-    FloatComparer() = default;
+    FloatComparator() = default;
 };
 
-struct CharsComparer : Comparer
+struct CharsComparator : Comparator
 {
-    friend struct Comparer;
+    friend struct Comparator;
     size_t size;
     virtual int operator()(const byte* a, const byte* b) override
     {
         return strncmp(reinterpret_cast<const char*>(a), reinterpret_cast<const char*>(b), size);
     }
 protected:
-    explicit CharsComparer(size_t _size)
+    explicit CharsComparator(size_t _size)
         : size(_size)
     {
     }
@@ -87,21 +92,22 @@ protected:
 class TypeInfo
 {
     friend class TableInfo;
+    friend class Serializer<TypeInfo>;
 private:
     Type _type;
     size_t _size;
-    std::shared_ptr<Comparer> _comparer;
+    std::shared_ptr<Comparator> _comparer;
 public:
     TypeInfo(Type type, size_t length)
         : _type(type)
         , _size(length)
-        , _comparer(Comparer::from_type(type, length))
+        , _comparer(Comparator::from_type(type, length))
     {
     }
     explicit TypeInfo(Type type)
         : _type(type)
         , _size(sizeof(int))
-        , _comparer(Comparer::from_type(type))
+        , _comparer(Comparator::from_type(type))
     {
     }
     bool operator==(const TypeInfo& other) const
@@ -114,9 +120,37 @@ public:
     }
 };
 
+template<>
+class Serializer<TypeInfo>
+{
+public:
+    static TypeInfo deserialize(MemoryReadStream& mrs)
+    {
+        Type type;
+        mrs >> type;
+        if (type == Chars)
+        {
+            size_t size;
+            mrs >> size;
+            return TypeInfo(type, size);
+        }
+        return TypeInfo(type);
+    }
+
+    static void serialize(MemoryWriteStream& mws, const TypeInfo& value)
+    {
+        mws << value._type;
+        if (value._type == Chars)
+        {
+            mws << value._size;
+        }
+    }
+};
+
 class TokenField
 {
     friend class TableInfo;
+    friend class Serializer<TokenField>;
 private:
     std::string _name;
     TypeInfo _info;
@@ -136,14 +170,48 @@ public:
     bool is_unique() const { return _isUnique; }
 };
 
+template<>
+class Serializer<TokenField>
+{
+public:
+    static TokenField deserialize(MemoryReadStream& mrs)
+    {
+        std::string name;
+        mrs >> name;
+        TypeInfo info = Serializer<TypeInfo>::deserialize(mrs);
+        size_t offset;
+        mrs >> offset;
+        bool isUnique;
+        mrs >> isUnique;
+        return TokenField(name, info, offset, isUnique);
+    }
+    static void serialize(MemoryWriteStream& mws, const TokenField& value)
+    {
+        mws << value._name;
+        Serializer<TypeInfo>::serialize(mws, value._info);
+        mws << value._offset;
+        mws << value._isUnique;
+    }
+};
+
 class TableInfo
 {
+    friend class Serializer<TableInfo>;
 private:
     std::string _name;
     size_t _primaryPos;
     size_t _indexPos;
+    size_t _size;
     std::vector<TokenField> _fields;
-    size_t _entrySize;
+
+    TableInfo(const std::string& name, size_t primaryPos, size_t indexPos, size_t size, const std::vector<TokenField> _fields)
+        : _name(name)
+        , _primaryPos(primaryPos)
+        , _indexPos(indexPos)
+        , _size(size)
+        , _fields(_fields)
+    {
+    }
 public:
     class TupleProxy;
     class ValueProxy : Uncopyable
@@ -218,27 +286,33 @@ public:
         }
     };
 
-    TableInfo(const std::string& name, const std::vector<std::tuple<std::string, TypeInfo, bool>>& keys, size_t primaryPos = -1)
+    TableInfo(const std::string& name)
         : _name(name)
-        , _primaryPos(primaryPos)
-        , _indexPos(primaryPos)
+        , _primaryPos(-1)
+        , _indexPos(-1)
+        , _size(0)
         , _fields()
-        , _entrySize()
     {
-        const size_t blockSize = BufferBlock::BlockSize;
-        size_t offset = 0;
-        _fields.reserve(keys.size());
+    }
 
-        for (auto& key : keys)
+    void add_field(const std::string& name, TypeInfo type, bool isUnique)
+    {
+        assert(locate_field(name) == -1);
+        _fields.emplace_back(name, type, _size, isUnique);
+        _size += type._size;
+        if (isUnique)
         {
-            _fields.emplace_back(std::get<0>(key), std::get<1>(key), offset, std::get<2>(key));
-            offset += std::get<1>(key)._size;
-            if (offset >= blockSize)
-            {
-                throw InsuffcientSpace("total size of keys exceeded 4096 bytes.");
-            }
+            _indexPos = _fields.size() - 1;
         }
-        _entrySize = offset;
+    }
+
+    void set_primary(const std::string& name)
+    {
+        auto pos = locate_field(name);
+        assert(pos != -1);
+        _primaryPos = pos;
+        _indexPos = pos;
+        _fields[pos]._isUnique = true;
     }
 
     const std::string& name() const { return _name; }
@@ -247,7 +321,7 @@ public:
 
     size_t index_pos() const { return _indexPos; }
 
-    size_t entry_size() const { return _entrySize; }
+    size_t entry_size() const { return _size; }
 
     TupleProxy operator[](const BlockPtr& ptr)
     {
@@ -257,6 +331,18 @@ public:
     TupleProxy operator[](const BufferBlock& block)
     {
         return{block.ptr(), this};
+    }
+
+    size_t locate_field(const std::string& fieldName)
+    {
+        for (size_t i = 0; i != _fields.size(); i++)
+        {
+            if (_fields[i].name() == fieldName)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     const TokenField& field(const std::string& fieldName)
@@ -272,6 +358,42 @@ public:
     }
 };
 
+template<>
+class Serializer<TableInfo>
+{
+public:
+    static TableInfo deserialize(MemoryReadStream& mrs)
+    {
+        std::string tableName;
+        size_t primaryPos;
+        size_t indexPos;
+        size_t size;
+        size_t fieldCount;
+
+        mrs >> tableName;
+        mrs >> primaryPos;
+        mrs >> indexPos;
+        mrs >> size;
+        mrs >> fieldCount;
+
+        std::vector<TokenField> fields;
+        for (size_t i = 0; i != fieldCount; i++)
+        {
+            fields.push_back(Serializer<TokenField>::deserialize(mrs));
+        }
+        return TableInfo(tableName, primaryPos, indexPos, size, fields);
+    }
+
+    static void serialize(MemoryWriteStream& mws, const TableInfo& value)
+    {
+        mws << value._name << value._primaryPos << value._indexPos << value._size << value._fields.size();
+        for (auto& entry : value._fields)
+        {
+            Serializer<TokenField>::serialize(mws, entry);
+        }
+    }
+};
+
 class CatalogManager : Uncopyable
 {
 public:
@@ -281,11 +403,31 @@ public:
         return instance;
     }
 
+    const static char* const FileName; /*= "CatalogManagerConfig"*/
+
+    ~CatalogManager();
+
+    void add_table(const TableInfo& tableInfo)
+    {
+        assert(locate_table(tableInfo.name()) == -1);
+        _tables.push_back(tableInfo);
+    }
+
+    size_t locate_table(const std::string& tableName)
+    {
+        for(size_t i = 0; i != _tables.size(); i++)
+        {
+            if(_tables[i].name() == tableName)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 private:
     std::vector<TableInfo> _tables;
-
+    
     CatalogManager();
-
-
 };
 
