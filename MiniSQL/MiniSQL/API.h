@@ -6,6 +6,16 @@
 #include <memory>
 #include <vector>
 
+class InvalidComparisonType : public std::runtime_error
+{
+public:
+    InvalidComparisonType(const char* str)
+        : runtime_error(str)
+    {
+    }
+};
+
+
 class Value
 {
 public:
@@ -16,11 +26,15 @@ public:
 class TokenFieldValue : public Value
 {
 private:
-    std::string _entryName;
+    std::string _fieldName;
 public:
+    TokenFieldValue(const std::string& fieldName)
+        : _fieldName(fieldName)
+    {
+    }
     TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) override
     {
-        return info[block][_entryName];
+        return info[block][_fieldName];
     }
 };
 
@@ -28,11 +42,11 @@ class ImmediateValue : public Value
 {
 private:
     std::unique_ptr<byte, BufferArrayDeleter> _value;
-    TypeInfo* _type;
+    const TypeInfo* _type;
 public:
-    ImmediateValue(byte* value, TypeInfo* type)
+    ImmediateValue(byte* value, const TypeInfo& type)
         : _value(value)
-        , _type(type)
+        , _type(&type)
     { }
     TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) override
     {
@@ -56,17 +70,18 @@ public:
         , _rhs(rhs)
     {
     }
-    virtual bool compare(TableInfo& info, const BufferBlock& block) const = 0;
+    virtual bool evaluate(TableInfo& info, const BufferBlock& block) const = 0;
     virtual ComparisonType type() const = 0;
 };
 
 class EqComparison : public Comparison
 {
+public:
     EqComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) == _rhs->value(info, block);
     }
@@ -75,11 +90,12 @@ class EqComparison : public Comparison
 
 class NeComparison : public Comparison
 {
+public:
     NeComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) != _rhs->value(info, block);
     }
@@ -88,11 +104,12 @@ class NeComparison : public Comparison
 
 class GtComparison : public Comparison
 {
+public:
     GtComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) > _rhs->value(info, block);
     }
@@ -101,11 +118,12 @@ class GtComparison : public Comparison
 
 class LtComparison : public Comparison
 {
+public:
     LtComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) < _rhs->value(info, block);
     }
@@ -114,11 +132,12 @@ class LtComparison : public Comparison
 
 class GeComparison : public Comparison
 {
+public:
     GeComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) >= _rhs->value(info, block);
     }
@@ -127,11 +146,12 @@ class GeComparison : public Comparison
 
 class LeComparison : public Comparison
 {
+public:
     LeComparison(Value* lhs, Value* rhs)
         : Comparison(lhs, rhs)
     {
     }
-    bool compare(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) <= _rhs->value(info, block);
     }
@@ -153,20 +173,62 @@ public:
     void add_query(Comparison::ComparisonType type, const std::string& fieldName, byte* value)
     {
         std::unique_ptr<Comparison> comparison;
+        auto lValue = new TokenFieldValue(fieldName);
+        auto rValue = new ImmediateValue(value, _info->field(fieldName).type_info());
+        Comparison* expr;
         switch (type)
         {
         case Comparison::ComparisonType::Eq: 
-            comparison.reset(new EqComparison(new TokenFieldValue(fieldName), new ImmediateValue(value, _info->field(fieldName).type_info())));
+            expr = new EqComparison(lValue, rValue);
             break;
-        case Comparison::ComparisonType::Ne: break;
-        case Comparison::ComparisonType::Lt: break;
-        case Comparison::ComparisonType::Gt: break;
-        case Comparison::ComparisonType::Le: break;
-        case Comparison::ComparisonType::Ge: break;
-        default: break;
+        case Comparison::ComparisonType::Ne:
+            expr = new NeComparison(lValue, rValue);
+            break;
+        case Comparison::ComparisonType::Lt:
+            expr = new LtComparison(lValue, rValue);
+            break;
+        case Comparison::ComparisonType::Gt:
+            expr = new GtComparison(lValue, rValue);
+            break;
+        case Comparison::ComparisonType::Le: 
+            expr = new LeComparison(lValue, rValue);
+            break;
+        case Comparison::ComparisonType::Ge: 
+            expr = new GeComparison(lValue, rValue);
+            break;
+        default: 
+            throw InvalidComparisonType("invalid comparison type");
+            break;
         }
+        _comparisonNodes.emplace_back(expr);
     }
+    std::vector<BlockPtr> execute_linearly()
+    {
+        auto& recMgr = RecordManager::instance();
+        auto& recList = recMgr[_info->name()];
+        auto listSize = recList.size();
 
+        std::vector<BlockPtr> queryResult;
+
+        for (size_t i = 0; i != listSize; i++)
+        {
+            bool success = true;
+            for (auto& cmpEntry : _comparisonNodes)
+            {
+                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                {
+                    success = false;
+                    break;
+                }
+            }
+            if (success)
+            {
+                queryResult.push_back(recList[i]);
+            }
+        }
+        
+        return queryResult;
+    }
 };
 
 class API

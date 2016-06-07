@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BufferManager.h"
+#include "Uncopyable.h"
 
 class InvalidKey : public std::runtime_error
 {
@@ -129,6 +130,10 @@ public:
         , _isUnique(isUnique)
     {
     }
+    const std::string& name() const { return _name; }
+    const TypeInfo& type_info() const { return _info; }
+    size_t offset() const { return _offset; }
+    bool is_unique() const { return _isUnique; }
 };
 
 class TableInfo
@@ -138,7 +143,7 @@ private:
     size_t _primaryPos;
     size_t _indexPos;
     std::vector<TokenField> _fields;
-    size_t _totalSize;
+    size_t _entrySize;
 public:
     class TupleProxy;
     class ValueProxy : Uncopyable
@@ -146,9 +151,9 @@ public:
         friend class TupleProxy;
     private:
         byte* _raw;
-        TypeInfo* _info;
+        const TypeInfo* _info;
     public:
-        ValueProxy(byte* raw, TypeInfo* info)
+        ValueProxy(byte* raw, const TypeInfo* info)
             : _raw(raw)
             , _info(info)
         {
@@ -181,7 +186,6 @@ public:
         float as_float() const { return *reinterpret_cast<float*>(_raw); }
         std::string as_str() const { return std::string(reinterpret_cast<char*>(_raw), reinterpret_cast<char*>(_raw) + _info->_size); }
     };
-
     class TupleProxy : Uncopyable
     {
         friend class TableInfo;
@@ -219,7 +223,7 @@ public:
         , _primaryPos(primaryPos)
         , _indexPos(primaryPos)
         , _fields()
-        , _totalSize()
+        , _entrySize()
     {
         const size_t blockSize = BufferBlock::BlockSize;
         size_t offset = 0;
@@ -234,10 +238,16 @@ public:
                 throw InsuffcientSpace("total size of keys exceeded 4096 bytes.");
             }
         }
-        _totalSize = offset;
+        _entrySize = offset;
     }
 
     const std::string& name() const { return _name; }
+
+    size_t primary_pos() const { return _primaryPos; }
+
+    size_t index_pos() const { return _indexPos; }
+
+    size_t entry_size() const { return _entrySize; }
 
     TupleProxy operator[](const BlockPtr& ptr)
     {
@@ -249,16 +259,16 @@ public:
         return{block.ptr(), this};
     }
 
-    TokenField* field(const std::string& fieldName)
+    const TokenField& field(const std::string& fieldName)
     {
         for (auto& entry : _fields)
         {
             if (entry._name == fieldName)
             {
-                return &entry;
+                return entry;
             }
         }
-        return nullptr;
+        throw InvalidKey(fieldName.c_str());
     }
 };
 

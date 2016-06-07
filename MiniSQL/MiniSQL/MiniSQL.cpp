@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "RecordManager.h"
+#include "API.h"
 
 
 int main()

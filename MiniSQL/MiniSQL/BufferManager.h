@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cassert>
+#include <array>
+#include <boost/date_time.hpp>
+
 class InvalidIndex : public std::runtime_error
 {
 public:
