@@ -26,8 +26,8 @@ public:
                                      - sizeof(bool)
                                      - sizeof(BlockPtr)
                                      ) / (key_size + ptr_size);
-    const static size_t ptr_count = key_count;
-    const static size_t next_index = ptr_count;
+    const static size_t ptr_count = key_count + 1;
+    const static size_t next_index = ptr_count - 1;
     struct BTreeNodeModel
     {
         bool is_leaf;

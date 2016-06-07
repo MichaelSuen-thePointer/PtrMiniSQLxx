@@ -54,11 +54,11 @@ struct FloatComparer : Comparer
     {
         auto v1 = *reinterpret_cast<const float*>(a);
         auto v2 = *reinterpret_cast<const float*>(b);
-        if(v1 > v2)
+        if (v1 > v2)
         {
             return 1;
         }
-        if(v1 < v2)
+        if (v1 < v2)
         {
             return -1;
         }
@@ -113,7 +113,7 @@ public:
     }
 };
 
-class KeyItem
+class TokenField
 {
     friend class TableInfo;
 private:
@@ -122,7 +122,7 @@ private:
     size_t _offset;
     bool _isUnique;
 public:
-    KeyItem(const std::string& name, const TypeInfo& info, size_t offset, bool isUnique)
+    TokenField(const std::string& name, const TypeInfo& info, size_t offset, bool isUnique)
         : _name(name)
         , _info(info)
         , _offset(offset)
@@ -137,7 +137,7 @@ private:
     std::string _name;
     size_t _primaryPos;
     size_t _indexPos;
-    std::vector<KeyItem> _keys;
+    std::vector<TokenField> _fields;
     size_t _totalSize;
 public:
     class TupleProxy;
@@ -203,14 +203,14 @@ public:
         }
         ValueProxy operator[](const std::string& keyName) const
         {
-            auto place = std::find_if(_info->_keys.begin(), _info->_keys.end(), [&keyName](const KeyItem& item) {
+            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
                 return item._name == keyName;
             });
-            if (place == _info->_keys.end())
+            if (place == _info->_fields.end())
             {
                 throw InvalidKey(("invalid key name: " + keyName).c_str());
             }
-            return{ _block->raw_ptr() + place->_offset, &place->_info };
+            return{_block->raw_ptr() + place->_offset, &place->_info};
         }
     };
 
@@ -218,16 +218,16 @@ public:
         : _name(name)
         , _primaryPos(primaryPos)
         , _indexPos(primaryPos)
-        , _keys()
+        , _fields()
         , _totalSize()
     {
         const size_t blockSize = BufferBlock::BlockSize;
         size_t offset = 0;
-        _keys.reserve(keys.size());
+        _fields.reserve(keys.size());
 
         for (auto& key : keys)
         {
-            _keys.emplace_back(std::get<0>(key), std::get<1>(key), offset, std::get<2>(key));
+            _fields.emplace_back(std::get<0>(key), std::get<1>(key), offset, std::get<2>(key));
             offset += std::get<1>(key)._size;
             if (offset >= blockSize)
             {
@@ -241,12 +241,24 @@ public:
 
     TupleProxy operator[](const BlockPtr& ptr)
     {
-        return{ ptr, this };
+        return{ptr, this};
     }
 
     TupleProxy operator[](const BufferBlock& block)
     {
-        return{ block.ptr(), this };
+        return{block.ptr(), this};
+    }
+
+    TokenField* field(const std::string& fieldName)
+    {
+        for (auto& entry : _fields)
+        {
+            if (entry._name == fieldName)
+            {
+                return &entry;
+            }
+        }
+        return nullptr;
     }
 };
 
