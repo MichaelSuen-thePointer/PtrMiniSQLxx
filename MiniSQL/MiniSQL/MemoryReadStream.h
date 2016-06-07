@@ -1,7 +1,5 @@
 #pragma once
 
-#include <sstream>
-
 class MemoryReadStream : Uncopyable
 {
     byte* _buffer;

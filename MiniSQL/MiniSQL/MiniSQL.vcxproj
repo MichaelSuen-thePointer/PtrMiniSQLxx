@@ -150,6 +150,7 @@
     <ClInclude Include="API.h" />
     <ClInclude Include="BufferManager.h" />
     <ClInclude Include="CatalogManager.h" />
+    <ClInclude Include="Interpreter.h" />
     <ClInclude Include="MemoryReadStream.h" />
     <ClInclude Include="MemoryWriteStream.h" />
     <ClInclude Include="RecordManager.h" />

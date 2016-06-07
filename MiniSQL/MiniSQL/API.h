@@ -226,7 +226,6 @@ public:
                 queryResult.push_back(recList[i]);
             }
         }
-        
         return queryResult;
     }
 };
