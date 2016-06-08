@@ -36,9 +36,9 @@ CatalogManager::~CatalogManager()
 {
     auto& block0 = BufferManager::instance().find_or_alloc(FileName, 0, 0);
     MemoryWriteStream stream(block0.raw_ptr(), BufferBlock::BlockSize);
-    stream << _tables.size();
+    stream << static_cast<uint16_t>(_tables.size());
     block0.notify_modification();
-    size_t i = 1;
+    uint16_t i = 1;
     for (auto& info : _tables)
     {
         auto& tableBlock = BufferManager::instance().find_or_alloc(FileName, 0, i);
@@ -57,11 +57,11 @@ CatalogManager::CatalogManager()
     }
     auto& block0 = BufferManager::instance().find_or_alloc(FileName, 0, 0);
     MemoryReadStream stream(block0.raw_ptr(), BufferBlock::BlockSize);
-    size_t tableSize;
+    uint16_t tableSize;
     stream >> tableSize;
     _tables.reserve(tableSize);
 
-    for (size_t i = 0; i != tableSize; i++)
+    for (uint16_t i = 0; i != tableSize; i++)
     {
         auto& blocki = BufferManager::instance().find_or_alloc(FileName, 0, i + 1);
         MemoryReadStream mrs(blocki.raw_ptr(), BufferBlock::BlockSize);

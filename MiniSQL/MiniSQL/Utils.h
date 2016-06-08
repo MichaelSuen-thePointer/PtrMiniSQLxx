@@ -40,14 +40,14 @@ template<typename T, typename U, std::enable_if_t<
     std::is_convertible<U, T>::value>* = nullptr>
 std::pair<T, T>& operator+=(std::pair<T, T>& lhs, U value)
 {
-    if(lhs.second <= std::numeric_limits<T>::max() - value)
+    if(lhs.second <= (T)(std::numeric_limits<T>::max() - (T)value))
     {
         lhs.second += value;
     }
     else
     {
         lhs.first += 1;
-        lhs.second = value - (std::numeric_limits<T>::max() - lhs.second);
+        lhs.second = (T)value - (T)(std::numeric_limits<T>::max() - lhs.second);
     }
     return lhs;
 }
@@ -58,14 +58,14 @@ template<typename T, typename U, std::enable_if_t<
 std::pair<T, T> operator+(const std::pair<T, T>& lhs, U value)
 {
     std::pair<T, T> result = lhs;
-    if (result.second <= std::numeric_limits<T>::max() - value)
+    if (lhs.second <= (T)(std::numeric_limits<T>::max() - (T)value))
     {
-        result.second += value;
+        lhs.second += value;
     }
     else
     {
-        result.first += 1;
-        result.second = value - (std::numeric_limits<T>::max() - result.second);
+        lhs.first += 1;
+        lhs.second = (T)value - (T)(std::numeric_limits<T>::max() - lhs.second);
     }
     return result;
 }

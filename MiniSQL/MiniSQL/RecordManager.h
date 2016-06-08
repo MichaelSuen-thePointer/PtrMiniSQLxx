@@ -3,6 +3,7 @@
 #include "BufferManager.h"
 #include "MemoryWriteStream.h"
 #include "MemoryReadStream.h"
+#include "Utils.h"
 #include <map>
 #include <deque>
 #include <set>
@@ -40,11 +41,13 @@ public:
         uint16_t _entrySize;
         Record _nextPos;
 
+        const static size_t MaxRecordCount = std::numeric_limits<uint16_t>::max() / sizeof(Record) * (size_t)BufferBlock::BlockSize;
+
         TableRecordList(const std::string& tableName,
-                        std::deque<Record>&& records,
-                        std::set<Record>&& freeRecords,
-                        uint16_t entrySize,
-                        Record nextPos)
+            std::deque<Record>&& records,
+            std::set<Record>&& freeRecords,
+            uint16_t entrySize,
+            Record nextPos)
             : _fileName(tableName + "_records")
             , _records(std::move(records))
             , _freeRecords(std::move(freeRecords))
@@ -95,11 +98,23 @@ public:
             }
             else
             {
+                if (_records.size() + _freeRecords.size() >= MaxRecordCount)
+                {
+                    throw InsuffcientSpace("not enough space for new record");
+                }
                 entry = _nextPos;
                 _nextPos += 1;
+                if (_nextPos.second * _entrySize >= BufferBlock::BlockSize)
+                {
+                    if (_nextPos.first == std::numeric_limits<uint16_t>::max())
+                    {
+                        throw InsuffcientSpace("not enough space for new record");
+                    }
+                    _nextPos.first++;
+                    _nextPos.second = 0;
+                }
             }
             auto& block = BufferManager::instance().find_or_alloc(_fileName, 0, entry.first);
-            assert(BufferBlock::BlockSize - _entrySize >= (int)entry.second);
             memcpy(block.raw_ptr() + entry.second * _entrySize, buffer, _entrySize);
             block.notify_modification();
 
@@ -132,15 +147,7 @@ private:
 
     RecordManager();
 
-    TableRecordList& find_table(const std::string& tableName)
-    {
-        auto tableInfo = _tableInfos.find(tableName);
-        if (tableInfo == _tableInfos.end())
-        {
-            throw TableNotExist(tableName.c_str());
-        }
-        return tableInfo->second;
-    }
+
 
     bool table_exists(const std::string& tableName)
     {
@@ -152,6 +159,16 @@ public:
     {
         static RecordManager instance;
         return instance;
+    }
+
+    TableRecordList& find_table(const std::string& tableName)
+    {
+        auto tableInfo = _tableInfos.find(tableName);
+        if (tableInfo == _tableInfos.end())
+        {
+            throw TableNotExist(tableName.c_str());
+        }
+        return tableInfo->second;
     }
 
     void insert_entry(const std::string& tableName, byte* entry)
@@ -173,6 +190,10 @@ public:
 
     void create_table(const std::string& tableName, uint16_t entrySize)
     {
+        if (_tableInfos.size() > std::numeric_limits<uint16_t>::max())
+        {
+            throw InsuffcientSpace("allows at most 65536 tables");
+        }
         if (table_exists(tableName))
         {
             throw TableExist(tableName.c_str());
@@ -182,8 +203,11 @@ public:
 
     void delete_table(const std::string& tableName)
     {
-        auto& table = find_table(tableName);
-        table.clear();
+        if (!table_exists(tableName))
+        {
+            throw TableNotExist(tableName.c_str());
+        }
+        _tableInfos.erase(tableName);
     }
 };
 

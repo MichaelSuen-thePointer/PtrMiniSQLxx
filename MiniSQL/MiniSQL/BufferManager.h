@@ -37,20 +37,22 @@ public:
     using offset_t = uint16_t;
 private:
     using IndexPair = std::pair<uint32_t, uint16_t>;
-    std::map<std::string, std::set<IndexPair>> _indices;
-    std::map<std::string, std::set<IndexPair>> _freeIndices;
 
     std::map<uint32_t, std::string> _indexNameMap;
     std::map<std::string, uint32_t> _nameIndexMap;
     
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
     BufferManager()
-        : _indices()
-        , _freeIndices()
-        , _blocks()
+        : _blocks()
     {
+        //TODO: boostrap it
     }
 public:
+    ~BufferManager()
+    {
+        //TODO: boostrap it
+    }
+
     static BufferManager& instance()
     {
         static BufferManager instance;
@@ -58,12 +60,10 @@ public:
     }
 
     BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
-    BufferBlock& alloc_block(const std::string& fileName);
 
     uint32_t allocate_file_name_index(const std::string& fileName);
     const std::string& check_file_name(uint32_t index);
     uint32_t check_file_index(const std::string& file);
-    void drop_block(BufferBlock& block);
 
     bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:
@@ -73,9 +73,6 @@ private:
     byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     BufferBlock& alloc_block(const std::string& name, uint32_t fileIndex, uint16_t blockIndex);
     BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
-
-    IndexPair allocate_index(const std::string& fileName);
-    void deallocate_index(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 
 };
 
@@ -182,7 +179,7 @@ public:
     {
     }
     BlockPtr()
-        : BlockPtr(-1, -1, -1)
+        : BlockPtr(-1, -1, -1, -1)
     {
     }
     BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint16_t blockIndex)
@@ -255,6 +252,5 @@ public:
 
 inline BlockPtr BufferBlock::ptr() const
 {
-
-    return BlockPtr(_fileIndex, _blockIndex, _offset);
+    return BlockPtr(BufferManager::instance().check_file_index(_fileName), _fileIndex, _blockIndex, _offset);
 }
