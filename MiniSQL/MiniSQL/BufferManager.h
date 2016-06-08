@@ -30,12 +30,19 @@ class BufferManager : Uncopyable
     friend class BlockPtr;
 public:
     const static int BlockCount = 128;
+
+    using file_name_index_t = uint32_t;
+    using file_index_t = uint32_t;
+    using block_index_t = uint16_t;
+    using offset_t = uint16_t;
 private:
-    using IndexPair = std::pair<int, int>;
+    using IndexPair = std::pair<uint32_t, uint16_t>;
     std::map<std::string, std::set<IndexPair>> _indices;
     std::map<std::string, std::set<IndexPair>> _freeIndices;
-    std::map<int, std::string> _indexNameMap;
-    std::map<std::string, int> _nameIndexMap;
+
+    std::map<uint32_t, std::string> _indexNameMap;
+    std::map<std::string, uint32_t> _nameIndexMap;
+    
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
     BufferManager()
         : _indices()
@@ -50,25 +57,25 @@ public:
         return instance;
     }
 
-    BufferBlock& find_or_alloc(const std::string& fileName, int fileIndex, int blockIndex);
+    BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     BufferBlock& alloc_block(const std::string& fileName);
 
-    int allocate_file_name_index(const std::string& fileName);
-    const std::string& check_file_name(int index);
-    int check_file_index(const std::string& file);
+    uint32_t allocate_file_name_index(const std::string& fileName);
+    const std::string& check_file_name(uint32_t index);
+    uint32_t check_file_index(const std::string& file);
     void drop_block(BufferBlock& block);
 
-    bool has_block(const std::string& fileName, int fileIndex, int blockIndex);
+    bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:
-    size_t find_block(const std::string& fileName, int fileIndex, int blockIndex);
+    size_t find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     void save_block(BufferBlock& block);
-    void write_file(const byte* content, const std::string& fileName, int fileIndex, int blockIndex);
-    byte* read_file(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex);
-    BufferBlock& alloc_block(const std::string& name, int fileIndex, int blockIndex);
-    BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex);
+    void write_file(const byte* content, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    BufferBlock& alloc_block(const std::string& name, uint32_t fileIndex, uint16_t blockIndex);
+    BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 
     IndexPair allocate_index(const std::string& fileName);
-    void deallocate_index(const std::string& fileName, int fileIndex, int blockIndex);
+    void deallocate_index(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 
 };
 
@@ -81,12 +88,12 @@ public:
 private:
     std::unique_ptr<byte, BufferArrayDeleter> _buffer;
     std::string _fileName;
-    int _fileIndex;
-    int _blockIndex;
+    uint32_t _fileIndex;
+    uint16_t _blockIndex;
     bool _isLocked;
     bool _hasModified;
     boost::posix_time::ptime _lastModifiedTime;
-    int _offset;
+    uint16_t _offset;
 
     BufferBlock()
         : BufferBlock(nullptr, "", -1, -1)
@@ -165,10 +172,10 @@ class BlockPtr
 {
     friend class BufferBlock;
 private:
-    int _fileNameIndex;
-    int _fileIndex;
-    int _blockIndex;
-    int _offset;
+    uint32_t _fileNameIndex;
+    uint32_t _fileIndex;
+    uint16_t _blockIndex;
+    uint16_t _offset;
 public:
     BlockPtr(nullptr_t)
         : BlockPtr()
@@ -178,11 +185,11 @@ public:
         : BlockPtr(-1, -1, -1)
     {
     }
-    BlockPtr(int fileNameIndex, int fileIndex, int blockIndex)
+    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint16_t blockIndex)
         : BlockPtr(fileNameIndex, fileIndex, blockIndex, 0)
     {
     }
-    BlockPtr(int fileNameIndex, int fileIndex, int blockIndex, int offset)
+    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint16_t blockIndex, uint16_t offset)
         : _fileNameIndex(fileNameIndex)
         , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)

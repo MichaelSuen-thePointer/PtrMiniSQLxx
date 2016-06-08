@@ -12,7 +12,7 @@ RecordManager::~RecordManager()
 
     MemoryWriteStream ostream(rawMem, BufferBlock::BlockSize);
 
-    ostream << _tableInfos.size();
+    ostream << static_cast<uint16_t>(_tableInfos.size());
 
     for (auto& tableInfoPair : _tableInfos)
     {
@@ -29,13 +29,13 @@ RecordManager::~RecordManager()
         byte* tableRawMem = tableInfoBlock.as<byte>();
         MemoryWriteStream otableStream(tableRawMem, BufferBlock::BlockSize);
 
-        otableStream << tableInfoPair.second._records.size();
+        otableStream << static_cast<uint16_t>(tableInfoPair.second._records.size());
         for (auto& entry : tableInfoPair.second._records)
         {
             otableStream << entry.first << entry.second;
         }
 
-        otableStream << tableInfoPair.second._freeRecords.size();
+        otableStream << static_cast<uint16_t>(tableInfoPair.second._freeRecords.size());
         for (auto& entry : tableInfoPair.second._freeRecords)
         {
             otableStream << entry.first << entry.second;
@@ -65,11 +65,11 @@ RecordManager::RecordManager()
 
     MemoryReadStream ostream(rawMem, BufferBlock::BlockSize);
 
-    size_t tableInfoSize;
+    uint16_t tableInfoSize;
 
     ostream >> tableInfoSize;
 
-    for (size_t i = 0; i != tableInfoSize; i++)
+    for (uint16_t i = 0; i != tableInfoSize; i++)
     {
         std::string tableName;
         ostream >> tableName;
@@ -81,28 +81,28 @@ RecordManager::RecordManager()
         MemoryReadStream otableStream(tableRawMem, BufferBlock::BlockSize);
 
         std::deque<TableRecordList::Record> records;
-        size_t recordSize;
+        uint16_t recordSize;
         otableStream >> recordSize;
 
-        for (size_t i = 0; i != recordSize; i++)
+        for (uint16_t i = 0; i != recordSize; i++)
         {
-            std::pair<int, int> entry;
+            TableRecordList::Record entry;
             otableStream >> entry.first >> entry.second;
             records.push_back(entry);
         }
 
         std::set<TableRecordList::Record> freeRecords;
-        size_t freeRecordSize;
+        uint16_t freeRecordSize;
 
         otableStream >> freeRecordSize;
-        for (size_t i = 0; i != freeRecordSize; i++)
+        for (uint16_t i = 0; i != freeRecordSize; i++)
         {
-            std::pair<int, int> entry;
+            TableRecordList::Record entry;
             otableStream >> entry.first >> entry.second;
             freeRecords.insert(entry);
         }
 
-        size_t entrySize;
+        uint16_t entrySize;
         otableStream >> entrySize;
 
         TableRecordList::Record tableNextPos;

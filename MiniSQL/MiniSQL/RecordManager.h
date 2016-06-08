@@ -33,17 +33,17 @@ public:
         friend class RecordManager;
         friend class std::map<std::string, TableRecordList>;
     private:
-        using Record = std::pair<int, int>;
+        using Record = std::pair<uint16_t, uint16_t>;
         std::string _fileName;
         std::deque<Record> _records;
         std::set<Record> _freeRecords;
-        size_t _entrySize;
+        uint16_t _entrySize;
         Record _nextPos;
 
         TableRecordList(const std::string& tableName,
                         std::deque<Record>&& records,
                         std::set<Record>&& freeRecords,
-                        size_t entrySize,
+                        uint16_t entrySize,
                         Record nextPos)
             : _fileName(tableName + "_records")
             , _records(std::move(records))
@@ -81,12 +81,13 @@ public:
         BlockPtr operator[](size_t index) const
         {
             auto& pair = _records[index];
-            return{BufferManager::instance().check_file_index(_fileName), 0, pair.first, static_cast<int>(pair.second * _entrySize)};
+            assert((int)pair.second * (int)_entrySize <= std::numeric_limits<uint16_t>::max());
+            return{BufferManager::instance().check_file_index(_fileName), 0, pair.first, static_cast<uint16_t>(pair.second * _entrySize)};
         }
 
         void insert(byte* buffer)
         {
-            std::pair<int, int> entry;
+            Record entry;
             if (_freeRecords.size())
             {
                 entry = *_freeRecords.begin();
@@ -98,7 +99,7 @@ public:
                 _nextPos += 1;
             }
             auto& block = BufferManager::instance().find_or_alloc(_fileName, 0, entry.first);
-            assert(BufferBlock::BlockSize - _entrySize >= static_cast<size_t>(entry.second));
+            assert(BufferBlock::BlockSize - _entrySize >= (int)entry.second);
             memcpy(block.raw_ptr() + entry.second * _entrySize, buffer, _entrySize);
             block.notify_modification();
 
@@ -170,13 +171,13 @@ public:
         return find_table(tableName);
     }
 
-    void create_table(const std::string& tableName, size_t entrySize)
+    void create_table(const std::string& tableName, uint16_t entrySize)
     {
         if (table_exists(tableName))
         {
             throw TableExist(tableName.c_str());
         }
-        _tableInfos.insert({tableName,TableRecordList{tableName, std::deque<TableRecordList::Record>{}, std::set<TableRecordList::Record>{}, entrySize, {0,0}}});
+        _tableInfos.insert({tableName,TableRecordList{tableName, {}, {}, entrySize, {0,0}}});
     }
 
     void delete_table(const std::string& tableName)

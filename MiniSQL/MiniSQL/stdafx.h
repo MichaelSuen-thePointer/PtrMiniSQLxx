@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <boost/date_time.hpp>
 #include <boost/interprocess/streams/bufferstream.hpp>
+#include <boost/bimap.hpp>
 #include "Uncopyable.h"
 #include "Utils.h"
 

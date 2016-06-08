@@ -18,7 +18,7 @@ void BufferManager::drop_block(BufferBlock& block)
     _blocks[i].reset();
 }
 
-bool BufferManager::has_block(const std::string& fileName, int fileIndex, int blockIndex)
+bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     FILE* fp;
     if ((fp = fopen((fileName + std::to_string(fileIndex)).c_str(), "r")) == nullptr)
@@ -35,7 +35,7 @@ bool BufferManager::has_block(const std::string& fileName, int fileIndex, int bl
     return true;
 }
 
-void BufferManager::write_file(const byte * content, const std::string& fileName, int fileIndex, int blockIndex)
+void BufferManager::write_file(const byte * content, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     FILE* stream;
     stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
@@ -46,7 +46,7 @@ void BufferManager::write_file(const byte * content, const std::string& fileName
     fclose(stream);
 }
 
-byte* BufferManager::read_file(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex)
+byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     FILE* stream;
     stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
@@ -69,7 +69,7 @@ byte* BufferManager::read_file(byte* buffer, const std::string& fileName, int fi
     return buffer;
 }
 
-BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, int fileIndex, int blockIndex)
+BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     auto i = find_block(fileName, fileIndex, blockIndex);
     if (i != -1)
@@ -85,7 +85,7 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName)
     return alloc_block(fileName, pair.first, pair.second);
 }
 
-size_t BufferManager::find_block(const std::string& fileName, int fileIndex, int blockIndex)
+size_t BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     for (size_t i = 0; i != _blocks.size(); ++i)
     {
@@ -100,7 +100,7 @@ size_t BufferManager::find_block(const std::string& fileName, int fileIndex, int
     return -1;
 }
 
-BufferBlock& BufferManager::alloc_block(const std::string& fileName, int fileIndex, int blockIndex)
+BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     byte* buffer = new byte[BufferBlock::BlockSize];
     read_file(buffer, fileName, fileIndex, blockIndex);
@@ -116,7 +116,7 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, int fileInd
     return replace_lru_block(buffer, fileName, fileIndex, blockIndex);
 }
 
-BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex)
+BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     int lruIndex = -1;
     for (size_t i = 0; i != _blocks.size(); i++)
@@ -187,12 +187,12 @@ BufferManager::IndexPair BufferManager::allocate_index(const std::string& fileNa
     return newPair;
 }
 
-void BufferManager::deallocate_index(const std::string& fileName, int fileIndex, int blockIndex)
+void BufferManager::deallocate_index(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     _freeIndices[fileName].insert(IndexPair(fileIndex, blockIndex));
 }
 
-int BufferManager::allocate_file_name_index(const std::string& fileName)
+uint32_t BufferManager::allocate_file_name_index(const std::string& fileName)
 {
     int index;
     auto place = _nameIndexMap.find(fileName);
@@ -200,8 +200,7 @@ int BufferManager::allocate_file_name_index(const std::string& fileName)
     {
         if (_indexNameMap.size())
         {
-            auto iter = _indexNameMap.end();
-            --iter;
+            auto iter = --_indexNameMap.end();
             index = iter->first + 1;
         }
         else
@@ -218,14 +217,14 @@ int BufferManager::allocate_file_name_index(const std::string& fileName)
     return index;
 }
 
-const std::string& BufferManager::check_file_name(int index)
+const std::string& BufferManager::check_file_name(uint32_t index)
 {
     auto place = _indexNameMap.find(index);
     assert(place != _indexNameMap.end());
     return place->second;
 }
 
-int BufferManager::check_file_index(const std::string& file)
+uint32_t BufferManager::check_file_index(const std::string& file)
 {
     auto place = _nameIndexMap.find(file);
     assert(place != _nameIndexMap.end());
