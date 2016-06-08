@@ -3,10 +3,17 @@
 
 std::map<std::string, Tokenizer::Kind> Tokenizer::_keywordMap =
 {
+    { "int", Kind::Int},
+    { "float", Kind::Float},
+    { "char", Kind::Char},
+    { "table", Kind::Table},
     { "create", Kind::Create },
     { "delete", Kind::Delete },
+    { "unique", Kind::Unique },
     { "values", Kind::Values },
     { "use", Kind::Use },
+    { "primary", Kind::Primary },
+    { "key", Kind::Key },
     { "insert", Kind::Insert },
     { "from", Kind::From },
     { "like", Kind::Like },
@@ -155,7 +162,7 @@ void Tokenizer::generate_all()
             }
             default:
             {
-                push_token(Kind::Number);
+                push_token(Kind::Integer);
                 _front -= 1;
                 _column -= 1;
                 _state = None;
@@ -176,7 +183,7 @@ void Tokenizer::generate_all()
             }
             default:
             {
-                push_token(Kind::Number);
+                push_token(Kind::Single);
                 _state = None;
                 _front -= 1;
                 _column -= 1;
@@ -266,9 +273,14 @@ void Tokenizer::generate_all()
     {
         switch (_state)
         {
-        case InInt:case InFloat:
+        case InInt:
         {
-            push_token(Kind::Number);
+            push_token(Kind::Integer);
+            break;
+        }
+        case InFloat:
+        {
+            push_token(Kind::Single);
             break;
         }
         case InSingleQuote:case InDoubleQuote:
@@ -284,4 +296,5 @@ void Tokenizer::generate_all()
         }
     }
     push_token(Kind::End, '\0');
+    _nextToken = _tokens.begin();
 }

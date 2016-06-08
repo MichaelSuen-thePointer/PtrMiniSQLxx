@@ -15,7 +15,6 @@ public:
     }
 };
 
-
 class Value
 {
 public:
@@ -230,11 +229,57 @@ public:
     }
 };
 
-class API
+class TableCreater
 {
+private:
+    std::string _tableName;
+    size_t _primaryPos;
+    size_t _indexPos;
+    size_t _size;
+    std::vector<TokenField> _fields;
+public:
+    TableCreater(const std::string& name)
+        : _tableName(name)
+        , _primaryPos(-1)
+        , _indexPos(-1)
+        , _size(0)
+    {
+    }
 
+    void add_field(const std::string& name, TypeInfo type, bool isUnique)
+    {
+        assert(locate_field(name) == -1);
+        _fields.emplace_back(name, type, _size, isUnique);
+        _size += type.size();
+        if (isUnique)
+        {
+            _indexPos = _fields.size() - 1;
+        }
+    }
 
+    void set_primary(const std::string& name)
+    {
+        auto pos = locate_field(name);
+        assert(pos != -1);
+        _primaryPos = pos;
+        _indexPos = pos;
+        _fields[pos]._isUnique = true;
+    }
 
+    size_t locate_field(const std::string& fieldName)
+    {
+        for (size_t i = 0; i != _fields.size(); i++)
+        {
+            if (_fields[i].name() == fieldName)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 
-
+    TableInfo create() const
+    {
+        return TableInfo(_tableName, _primaryPos, _indexPos, _size, _fields);
+    }
 };

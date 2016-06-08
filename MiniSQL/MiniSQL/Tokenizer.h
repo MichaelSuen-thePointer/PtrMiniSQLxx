@@ -1,12 +1,10 @@
 #pragma once
 
-#include "stdafx.h"
-
-class SyntaxError : public std::runtime_error
+class LexicalError : public std::runtime_error
 {
 public:
     int line, column;
-    explicit SyntaxError(const char* msg, int line, int column)
+    explicit LexicalError(const char* msg, int line, int column)
         : std::runtime_error(msg)
         , line(line)
         , column(column)
@@ -20,7 +18,8 @@ public:
     enum class Kind
     {
         Identifier,
-        Number,
+        Integer,
+        Single,
         String,
         LBracket,
         RBracket,
@@ -32,6 +31,13 @@ public:
         Dot,
         Comma,
         SemiColon,
+        Table,
+        Int,
+        Float,
+        Char,
+        Unique,
+        Primary,
+        Key,
         Create,
         Delete,
         Values,
@@ -52,10 +58,19 @@ public:
         std::string content;
     };
 
-    Tokenizer(const std::string& str);
+    Tokenizer(const std::string& str = std::string());
 
     void reset(const std::string& str = std::string());
 
+    Token get()
+    {
+        return *_nextToken++;
+    }
+
+    Token peek() const
+    {
+        return *_nextToken;
+    }
 private:
     enum State
     {
@@ -81,11 +96,6 @@ private:
     static std::map<std::string, Kind> _keywordMap;
 
     void generate_all();
-
-    Token get()
-    {
-
-    }
 
     static Kind get_kind(const std::string& str)
     {

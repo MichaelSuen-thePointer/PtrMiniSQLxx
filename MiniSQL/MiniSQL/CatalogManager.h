@@ -96,7 +96,7 @@ class TypeInfo
 private:
     Type _type;
     size_t _size;
-    std::shared_ptr<Comparator> _comparer;
+    Comparator* _comparer;
 public:
     TypeInfo(Type type, size_t length)
         : _type(type)
@@ -110,6 +110,11 @@ public:
         , _comparer(Comparator::from_type(type))
     {
     }
+
+    Type type() const { return _type; }
+
+    size_t size() const { return _size; }
+
     bool operator==(const TypeInfo& other) const
     {
         return _type == other._type && _size == other._size;
@@ -149,6 +154,7 @@ public:
 
 class TokenField
 {
+    friend class TableCreater;
     friend class TableInfo;
     friend class Serializer<TokenField>;
 private:
@@ -196,6 +202,7 @@ public:
 
 class TableInfo
 {
+    friend class TableCreater;
     friend class Serializer<TableInfo>;
 private:
     std::string _name;
@@ -286,35 +293,6 @@ public:
         }
     };
 
-    TableInfo(const std::string& name)
-        : _name(name)
-        , _primaryPos(-1)
-        , _indexPos(-1)
-        , _size(0)
-        , _fields()
-    {
-    }
-
-    void add_field(const std::string& name, TypeInfo type, bool isUnique)
-    {
-        assert(locate_field(name) == -1);
-        _fields.emplace_back(name, type, _size, isUnique);
-        _size += type._size;
-        if (isUnique)
-        {
-            _indexPos = _fields.size() - 1;
-        }
-    }
-
-    void set_primary(const std::string& name)
-    {
-        auto pos = locate_field(name);
-        assert(pos != -1);
-        _primaryPos = pos;
-        _indexPos = pos;
-        _fields[pos]._isUnique = true;
-    }
-
     const std::string& name() const { return _name; }
 
     size_t primary_pos() const { return _primaryPos; }
@@ -331,18 +309,6 @@ public:
     TupleProxy operator[](const BufferBlock& block)
     {
         return{block.ptr(), this};
-    }
-
-    size_t locate_field(const std::string& fieldName)
-    {
-        for (size_t i = 0; i != _fields.size(); i++)
-        {
-            if (_fields[i].name() == fieldName)
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     const TokenField& field(const std::string& fieldName)
@@ -409,7 +375,10 @@ public:
 
     void add_table(const TableInfo& tableInfo)
     {
-        assert(locate_table(tableInfo.name()) == -1);
+        if(locate_table(tableInfo.name()) != -1)
+        {
+            throw SQLError(("Error: Duplicated table name '" + tableInfo.name() + "'").c_str());
+        }
         _tables.push_back(tableInfo);
     }
 

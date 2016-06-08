@@ -1,4 +1,13 @@
 #pragma once
+
+class SQLError: public std::runtime_error
+{
+public:
+    explicit SQLError(const char* msg)
+        : runtime_error(msg)
+    { }
+};
+
 using byte = unsigned char;
 
 template<size_t size>

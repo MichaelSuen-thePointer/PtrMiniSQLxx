@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="BufferManager.cpp" />
     <ClCompile Include="CatalogManager.cpp" />
+    <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="MemoryReadStream.cpp" />
     <ClCompile Include="MemoryWriteStream.cpp" />
     <ClCompile Include="MiniSQL.cpp" />
