@@ -16,6 +16,7 @@
 #include <deque>
 #include <cassert>
 #include <algorithm>
+#include <functional>
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
@@ -25,5 +26,7 @@
 #include "Uncopyable.h"
 #include "Utils.h"
 #include "Logger.h"
+#include "Errors.h"
+#include "ScopeHelper.h"
 
 // TODO:  在此处引用程序需要的其他头文件

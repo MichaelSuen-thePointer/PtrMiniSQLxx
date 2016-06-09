@@ -1,30 +1,6 @@
 #pragma once
 
 #include "BufferManager.h"
-#include "MemoryWriteStream.h"
-#include "MemoryReadStream.h"
-#include "Utils.h"
-#include <map>
-#include <deque>
-#include <set>
-#include <cassert>
-class TableNotExist : public std::runtime_error
-{
-public:
-    explicit TableNotExist(const char* msg)
-        : runtime_error(msg)
-    {
-    }
-};
-
-class TableExist : public std::runtime_error
-{
-public:
-    explicit TableExist(const char* msg)
-        : runtime_error(msg)
-    {
-    }
-};
 
 class RecordManager
 {

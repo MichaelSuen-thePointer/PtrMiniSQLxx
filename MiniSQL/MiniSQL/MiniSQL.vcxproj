@@ -154,11 +154,13 @@
     <ClInclude Include="API.h" />
     <ClInclude Include="BufferManager.h" />
     <ClInclude Include="CatalogManager.h" />
+    <ClInclude Include="Errors.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MemoryReadStream.h" />
     <ClInclude Include="MemoryWriteStream.h" />
     <ClInclude Include="RecordManager.h" />
+    <ClInclude Include="ScopeHelper.h" />
     <ClInclude Include="Serialization.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -175,6 +177,7 @@
     <ClCompile Include="MemoryWriteStream.cpp" />
     <ClCompile Include="MiniSQL.cpp" />
     <ClCompile Include="RecordManager.cpp" />
+    <ClCompile Include="ScopeHelper.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -1,30 +1,9 @@
 #pragma once
 
 #include "BufferManager.h"
-#include "Uncopyable.h"
-
 #include "MemoryWriteStream.h"
 #include "MemoryReadStream.h"
-
 #include "Serialization.h"
-
-class InvalidKey : public std::runtime_error
-{
-public:
-    explicit InvalidKey(const char* msg)
-        : std::runtime_error(msg)
-    {
-    }
-};
-
-class InvalidType : public std::runtime_error
-{
-public:
-    explicit InvalidType(const char* msg)
-        : std::runtime_error(msg)
-    {
-    }
-};
 
 enum Type
 {
@@ -233,6 +212,7 @@ public:
             , _info(info)
         {
         }
+
         ValueProxy(ValueProxy&& other)
             : _raw(other._raw)
             , _info(other._info)
@@ -240,6 +220,7 @@ public:
             other._raw = nullptr;
             other._info = nullptr;
         }
+
         int compare(const ValueProxy& other) const
         {
             if (*_info == *other._info)
@@ -248,24 +229,37 @@ public:
             }
             throw InvalidType("compare type doesn't match");
         }
+        
         bool operator==(const ValueProxy& other) const { return compare(other) == 0; }
+        
         bool operator!=(const ValueProxy& other) const { return compare(other) != 0; }
+        
         bool operator>(const ValueProxy& other) const { return compare(other) > 0; }
+        
         bool operator<(const ValueProxy& other) const { return compare(other) < 0; }
+        
         bool operator>=(const ValueProxy& other) const { return compare(other) >= 0; }
+        
         bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
+        
         const TypeInfo& type_info() const { return *_info; }
+        
         Type type() const { return _info->_type; }
+        
         size_t size() const { return _info->_size; }
+        
         int as_int() const { return *reinterpret_cast<int*>(_raw); }
+        
         float as_float() const { return *reinterpret_cast<float*>(_raw); }
+    
         std::string as_str() const { return std::string(reinterpret_cast<char*>(_raw), reinterpret_cast<char*>(_raw) + _info->_size); }
     };
+
     class TupleProxy : Uncopyable
     {
         friend class TableInfo;
     private:
-        mutable BlockPtr _block;
+        BlockPtr _block;
         TableInfo* _info;
         TupleProxy(BlockPtr block, TableInfo* info)
             : _block(block)
@@ -280,7 +274,7 @@ public:
             other._block = nullptr;
             other._info = nullptr;
         }
-        ValueProxy operator[](const std::string& keyName) const
+        ValueProxy operator[](const std::string& keyName)
         {
             auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
                 return item._name == keyName;
@@ -300,6 +294,8 @@ public:
     size_t index_pos() const { return _indexPos; }
 
     size_t entry_size() const { return _size; }
+
+    const std::vector<TokenField>& fields() const { return _fields; }
 
     TupleProxy operator[](const BlockPtr& ptr)
     {
@@ -382,7 +378,17 @@ public:
         _tables.push_back(tableInfo);
     }
 
-    size_t locate_table(const std::string& tableName)
+    const TableInfo& find_table(const std::string& tableName) const
+    {
+        size_t i = locate_table(tableName);
+        if(i == -1)
+        {
+            throw TableNotExist(tableName.c_str());
+        }
+        return _tables[i];
+    }
+
+    size_t locate_table(const std::string& tableName) const
     {
         for(size_t i = 0; i != _tables.size(); i++)
         {

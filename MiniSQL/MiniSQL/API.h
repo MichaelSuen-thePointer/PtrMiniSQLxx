@@ -6,15 +6,6 @@
 #include <memory>
 #include <vector>
 
-class InvalidComparisonType : public std::runtime_error
-{
-public:
-    InvalidComparisonType(const char* str)
-        : runtime_error(str)
-    {
-    }
-};
-
 class Value
 {
 public:
@@ -46,7 +37,8 @@ public:
     ImmediateValue(byte* value, const TypeInfo& type)
         : _value(value)
         , _type(&type)
-    { }
+    {
+    }
     TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) override
     {
         return TableInfo::ValueProxy(_value.get(), _type);
@@ -177,7 +169,7 @@ public:
         Comparison* expr;
         switch (type)
         {
-        case Comparison::ComparisonType::Eq: 
+        case Comparison::ComparisonType::Eq:
             expr = new EqComparison(lValue, rValue);
             break;
         case Comparison::ComparisonType::Ne:
@@ -189,13 +181,13 @@ public:
         case Comparison::ComparisonType::Gt:
             expr = new GtComparison(lValue, rValue);
             break;
-        case Comparison::ComparisonType::Le: 
+        case Comparison::ComparisonType::Le:
             expr = new LeComparison(lValue, rValue);
             break;
-        case Comparison::ComparisonType::Ge: 
+        case Comparison::ComparisonType::Ge:
             expr = new GeComparison(lValue, rValue);
             break;
-        default: 
+        default:
             throw InvalidComparisonType("invalid comparison type");
             break;
         }
@@ -281,5 +273,65 @@ public:
     TableInfo create() const
     {
         return TableInfo(_tableName, _primaryPos, _indexPos, _size, _fields);
+    }
+};
+
+class TupleBuilder
+{
+private:
+    std::string _tableName;
+    const TableInfo* _tableInfo;
+    std::unique_ptr<byte, BufferArrayDeleter> _raw;
+public:
+    TupleBuilder(const std::string& tableName)
+        : _tableName(tableName)
+        , _tableInfo(&CatalogManager::instance().find_table(tableName))
+        , _raw(new byte[_tableInfo->entry_size()])
+    {
+    }
+
+    void set_value(const std::string& value, Type type)
+    {
+        static int iField = 0;
+
+        if (iField >= _tableInfo->fields().size())
+        {
+            throw SQLError("Too many value");
+        }
+
+        if (type != _tableInfo->fields()[iField].type_info().type())
+        {
+            throw InvalidType(("invalid type of value" + value).c_str());
+        }
+
+        switch (type)
+        {
+        case Int:
+        {
+            int iValue;
+            std::istringstream(value) >> iValue;
+            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &iValue, sizeof(iValue));
+            break;
+        }
+        case Float:
+        {
+            float iValue;
+            std::istringstream(value) >> iValue;
+            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &iValue, sizeof(iValue));
+            break;
+        }
+        case Chars:
+        {
+            assert(value.size() >= 2);
+            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &value[1], value.size() - 2);
+            break;
+        }
+        default: assert(("invalid type", 0)); break;
+        }
+    }
+
+    byte* get_field()
+    {
+        return _raw.get();
     }
 };

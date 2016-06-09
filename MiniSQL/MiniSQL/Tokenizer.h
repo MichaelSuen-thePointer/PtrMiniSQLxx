@@ -1,16 +1,5 @@
 #pragma once
 
-class LexicalError : public std::runtime_error
-{
-public:
-    int line, column;
-    explicit LexicalError(const char* msg, int line, int column)
-        : std::runtime_error(msg)
-        , line(line)
-        , column(column)
-    {
-    }
-};
 
 class Tokenizer
 {

@@ -4,15 +4,6 @@
 #include "Tokenizer.h"
 #include "API.h"
 
-class SyntaxError : public std::runtime_error
-{
-public:
-    int line, column;
-    SyntaxError(const char* str, int line = -1, int column = -1)
-        : runtime_error(str), line(line), column(column)
-    {
-    }
-};
 
 class Interpreter
 {

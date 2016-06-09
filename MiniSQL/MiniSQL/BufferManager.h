@@ -1,14 +1,5 @@
 #pragma once
 
-class InvalidIndex : public std::runtime_error
-{
-public:
-    explicit InvalidIndex(const char* msg)
-        : runtime_error(msg)
-    {
-    }
-};
-
 struct BufferArrayDeleter
 {
     void operator()(byte* array) const
@@ -258,15 +249,6 @@ public:
     {
         log("BP: deref");
         return const_cast<BlockPtr*>(this)->operator->();
-    }
-};
-
-class InsuffcientSpace : public std::runtime_error
-{
-public:
-    explicit InsuffcientSpace(const char* msg)
-        : std::runtime_error(msg)
-    {
     }
 };
 
