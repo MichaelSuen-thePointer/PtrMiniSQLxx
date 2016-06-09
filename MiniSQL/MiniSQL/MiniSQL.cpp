@@ -5,15 +5,12 @@ int main()
 {
     auto& rm = RecordManager::instance();
 
-    char entry[33] = "++++----++++----++++----++++----";
-
-    auto& table = rm.find_table("test_table");
-
-    for(size_t i = 0; i != table.size(); i++)
-    {
-        if(strncmp(table[i]->as<char>(), entry, 32) != 0)
-        {
-            
-        }
-    }
+    //char entry[33] = "++++____++++____++++____++++____";
+    //
+    //auto& table = rm.create_table("test_table_1", 32);
+    //
+    //for(int i = 0; i < 512; i++)
+    //{
+    //    table.insert((byte*)entry);
+    //}
 }

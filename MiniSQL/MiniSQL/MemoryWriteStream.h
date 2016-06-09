@@ -52,7 +52,7 @@ public:
     }
 
     template<typename T, typename = std::enable_if_t<std::is_pod<std::decay_t<T>>::value>>
-    MemoryWriteStream& operator<<(T&& value)
+    MemoryWriteStream& operator<<(const T& value)
     {
         assert(sizeof(T) <= remain());
     

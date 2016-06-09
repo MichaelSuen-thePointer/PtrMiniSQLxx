@@ -133,8 +133,8 @@ public:
 
         void clear()
         {
+            _freeRecords.insert(_records.begin(), _records.end());
             _records.clear();
-            _freeRecords.clear();
         }
     };
 
@@ -146,8 +146,6 @@ private:
     std::map<std::string, TableRecordList> _tableInfos;
 
     RecordManager();
-
-
 
     bool table_exists(const std::string& tableName)
     {
@@ -188,7 +186,7 @@ public:
         return find_table(tableName);
     }
 
-    void create_table(const std::string& tableName, uint16_t entrySize)
+    TableRecordList& create_table(const std::string& tableName, uint16_t entrySize)
     {
         if (_tableInfos.size() > std::numeric_limits<uint16_t>::max())
         {
@@ -198,7 +196,8 @@ public:
         {
             throw TableExist(tableName.c_str());
         }
-        _tableInfos.insert({tableName,TableRecordList{tableName, {}, {}, entrySize, {0,0}}});
+        auto place = _tableInfos.insert({tableName,TableRecordList{tableName, {}, {}, entrySize, {0,0}}});
+        return place.first->second;
     }
 
     void delete_table(const std::string& tableName)

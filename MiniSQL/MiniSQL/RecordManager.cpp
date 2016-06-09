@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "RecordManager.h"
 
-using namespace std::string_literals;
-
 const char* const RecordManager::FileName = "RecordManagerConfig";
 
 RecordManager::~RecordManager()
@@ -34,7 +32,7 @@ RecordManager::~RecordManager()
 
             size_t maxRange = std::min(tableInfoPair.second._records.size(), (i + 1) * blockCnt);
 
-            for (size_t iRec = i * blockCnt; iRec < maxRange; iRec++)
+            for (size_t iRec = i * blockCnt; iRec < i * blockCnt + maxRange; iRec++)
             {
                 otableStream << tableInfoPair.second._records[iRec].first << tableInfoPair.second._records[iRec].second;
             }
@@ -61,6 +59,7 @@ RecordManager::~RecordManager()
             tableInfoBlock.notify_modification();
             tableInfoBlock.unlock();
         }
+        tableNo++;
     }
     block.notify_modification();
     block.unlock();
@@ -94,7 +93,7 @@ RecordManager::RecordManager()
         uint16_t entrySize;
         TableRecordList::Record nextPos;
 
-        ostream >> tableName >> recordCount >> freeRecordCount >> entrySize >> nextPos.first, nextPos.second;
+        ostream >> tableName >> recordCount >> freeRecordCount >> entrySize >> nextPos.first >> nextPos.second;
 
         std::deque<TableRecordList::Record> records;
 
@@ -121,7 +120,7 @@ RecordManager::RecordManager()
 
         std::set<TableRecordList::Record> freeRecords;
 
-        uint16_t freeRecordBlockCount = (unsigned short)std::ceil(freeRecordCount / static_cast<double>(entryPerBlock));
+        uint16_t freeRecordBlockCount = static_cast<uint16_t>(std::ceil(freeRecordCount / static_cast<double>(entryPerBlock)));
         uint16_t freeBlockRead = 0;
         for (uint16_t iBlk = 0; iBlk != freeRecordBlockCount; iBlk++)
         {

@@ -1,19 +1,22 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 
+const char* const BufferManager::FileName = "BufferManagerConfig";
 
 void BufferManager::save_block(BufferBlock& block)
 {
     if (block._hasModified)
     {
+        log("BM: block need to be saved");
         write_file(block._buffer.get(), block._fileName, block._fileIndex, block._blockIndex);
     }
+    log("BM: done");
 }
 
 bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     FILE* fp;
-    if ((fp = fopen((fileName + std::to_string(fileIndex)).c_str(), "r")) == nullptr)
+    if ((fp = fopen((fileName + std::to_string(fileIndex)).c_str(), "rb")) == nullptr)
     {
         return false;
     }
@@ -29,8 +32,9 @@ bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, u
 
 void BufferManager::write_file(const byte * content, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
+    log("BM: write file", fileName, fileIndex, blockIndex);
     FILE* stream;
-    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
+    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "rb+");
     fseek(stream, blockIndex * BufferBlock::BlockSize, SEEK_SET);
     auto cur = ftell(stream);
     fwrite(content, 1, BufferBlock::BlockSize, stream);
@@ -40,13 +44,14 @@ void BufferManager::write_file(const byte * content, const std::string& fileName
 
 byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
+    log("BM: read file", fileName, fileIndex, blockIndex);
     FILE* stream;
-    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
+    stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "rb+");
     if (stream == nullptr)
     {
-        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "w");
+        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "wb");
         fclose(stream);
-        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "r+");
+        stream = fopen((fileName + std::to_string(fileIndex)).c_str(), "rb+");
     }
     fseek(stream, 0, SEEK_END);
     while (ftell(stream) < (blockIndex + 1) * BufferBlock::BlockSize)
@@ -61,13 +66,49 @@ byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32
     return buffer;
 }
 
+void BufferManager::load()
+{
+    std::ifstream config{FileName};
+    if (config.good())
+    {
+        size_t fileCount;
+        config >> fileCount;
+        for (size_t i = 0; i != fileCount; i++)
+        {
+            int label;
+            std::string fileName;
+            config >> label >> fileName;
+            _indexNameMap.insert({label, fileName});
+            _nameIndexMap.insert({fileName, label});
+        }
+    }
+    log("BM: loaded");
+}
+
+void BufferManager::save()
+{
+    std::ofstream config{FileName};
+    if (config.good())
+    {
+        config << _indexNameMap.size() << "\n";
+        for (auto& pair : _indexNameMap)
+        {
+            config << pair.first << " " << pair.second << "\n";
+        }
+    }
+    log("BM: saved");
+}
+
 BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
+    log("BM: ask block", fileName, fileIndex, blockIndex);
     auto i = find_block(fileName, fileIndex, blockIndex);
     if (i != -1)
     {
+        log("BM: found");
         return *_blocks[i];
     }
+    log("BM: not found");
     return alloc_block(fileName, fileIndex, blockIndex);
 }
 
@@ -88,6 +129,7 @@ size_t BufferManager::find_block(const std::string& fileName, uint32_t fileIndex
 
 BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
+    log("BM: alloate block");
     allocate_file_name_index(fileName);
 
     byte* buffer = new byte[BufferBlock::BlockSize];
@@ -97,6 +139,7 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fi
     {
         if (block == nullptr)
         {
+            log("BM: place block at block array");
             block.reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
             return *block;
         }
@@ -128,6 +171,8 @@ BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& f
     {
         throw InsuffcientSpace("Cannot find a block to be replaced.");
     }
+    log("BM: replace lru block:", lruIndex, _blocks[lruIndex]->_fileName,
+        _blocks[lruIndex]->_fileIndex, _blocks[lruIndex]->_blockIndex);
     _blocks[lruIndex].reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
     return *_blocks[lruIndex];
 }
@@ -154,6 +199,7 @@ uint32_t BufferManager::allocate_file_name_index(const std::string& fileName)
     {
         index = place->second;
     }
+    log("BM: create token", index, "for file name", fileName);
     return index;
 }
 

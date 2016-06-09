@@ -1,0 +1,42 @@
+BM: loaded
+BM: ask block RecordManagerConfig 0 0
+BM: not found
+BM: alloate block
+BM: create token 1 for file name RecordManagerConfig
+BM: read file RecordManagerConfig 0 0
+BM: place block at block array
+BB: ctor RecordManagerConfig 0 0
+BB: lock RecordManagerConfig 0 0
+BB: content asked RecordManagerConfig 0 0
+BM: ask block RecordManagerConfig 1 0
+BM: not found
+BM: alloate block
+BM: create token 1 for file name RecordManagerConfig
+BM: read file RecordManagerConfig 1 0
+BM: place block at block array
+BB: ctor RecordManagerConfig 1 0
+BB: lock RecordManagerConfig 1 0
+BB: content asked RecordManagerConfig 1 0
+BB: unlock RecordManagerConfig 1 0
+BB: unlock RecordManagerConfig 0 0
+BM: ask block RecordManagerConfig 0 0
+BM: found
+BB: lock RecordManagerConfig 0 0
+BB: content asked RecordManagerConfig 0 0
+BM: ask block RecordManagerConfig 1 0
+BM: found
+BB: lock RecordManagerConfig 1 0
+BB: content asked RecordManagerConfig 1 0
+BB: get dirty
+BB: unlock RecordManagerConfig 1 0
+BB: get dirty
+BB: unlock RecordManagerConfig 0 0
+BM: saved
+BB: block dtor RecordManagerConfig 1 0
+BM: block need to be saved
+BM: write file RecordManagerConfig 1 0
+BM: done
+BB: block dtor RecordManagerConfig 0 0
+BM: block need to be saved
+BM: write file RecordManagerConfig 0 0
+BM: done

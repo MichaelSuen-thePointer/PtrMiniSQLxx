@@ -17,10 +17,13 @@
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
+#include <iostream>
+#include <fstream>
 #include <boost/date_time.hpp>
 #include <boost/interprocess/streams/bufferstream.hpp>
 #include <boost/bimap.hpp>
 #include "Uncopyable.h"
 #include "Utils.h"
+#include "Logger.h"
 
 // TODO:  在此处引用程序需要的其他头文件

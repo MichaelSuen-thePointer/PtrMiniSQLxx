@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cassert>
-#include <array>
-#include <boost/date_time.hpp>
-
 class InvalidIndex : public std::runtime_error
 {
 public:
@@ -40,17 +36,25 @@ private:
 
     std::map<uint32_t, std::string> _indexNameMap;
     std::map<std::string, uint32_t> _nameIndexMap;
-    
+
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
+
+    const static char* const FileName;
+
     BufferManager()
         : _blocks()
     {
-        //TODO: boostrap it
+        load();
     }
+
+    void load();
+
+    void save();
+
 public:
     ~BufferManager()
     {
-        //TODO: boostrap it
+        save();
     }
 
     static BufferManager& instance()
@@ -106,6 +110,7 @@ private:
         , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
         , _offset(0)
     {
+        log("BB: ctor", fileName, fileIndex, blockIndex);
     }
     void release()
     {
@@ -114,11 +119,13 @@ private:
 public:
     ~BufferBlock()
     {
+        log("BB: block dtor", _fileName, _fileIndex, _blockIndex);
         release();
     }
 
     void notify_modification()
     {
+        log("BB: get dirty");
         _hasModified = true;
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
@@ -132,13 +139,16 @@ public:
         _isLocked = false;
         _lastModifiedTime = boost::posix_time::special_values::not_a_date_time;
     }
+
     void update_time()
     {
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
+
     template<typename T>
     T* as()
     {
+        log("BB: content asked", _fileName, _fileIndex, _blockIndex);
         return reinterpret_cast<T*>(_buffer.get() + _offset);
     }
     BlockPtr ptr() const;
@@ -155,14 +165,15 @@ public:
     }
     void lock()
     {
+        log("BB: lock", _fileName, _fileIndex, _blockIndex);
         _isLocked = true;
     }
     void unlock()
     {
+        log("BB: unlock", _fileName, _fileIndex, _blockIndex);
         assert(_isLocked == true);
         _isLocked = false;
     }
-
 };
 
 class BlockPtr
@@ -192,6 +203,11 @@ public:
         , _blockIndex(blockIndex)
         , _offset(offset)
     {
+        log("BP: ctor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
+    }
+    ~BlockPtr()
+    {
+        log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
     }
     BlockPtr& operator=(const BlockPtr& other)
     {
@@ -221,22 +237,26 @@ public:
     }
     BufferBlock& operator*()
     {
+        log("BP: deref");
         auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return block;
     }
     const BufferBlock& operator*() const
     {
+        log("BP: deref");
         return **(const_cast<BlockPtr*>(this));
     }
     BufferBlock* operator->()
     {
+        log("BP: deref");
         auto& block = BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex);
         block._offset = _offset;
         return &block;
     }
     const BufferBlock* operator->() const
     {
+        log("BP: deref");
         return const_cast<BlockPtr*>(this)->operator->();
     }
 };
