@@ -16,6 +16,7 @@ public:
     static void main_loop()
     {
         std::string command;
+        std::cout << "> ";
         while (std::cin.peek() != -1)
         {
             command.push_back(std::cin.get());
@@ -41,15 +42,28 @@ public:
                         std::cout << "\n";
                     }
                 }
-                catch(SQLError e)
+                catch (LexicalError e)
                 {
                     std::cout << e.what();
+                    if (e.line != -1)
+                    {
+                        std::cout << "\n\tat line: " << e.line << " column: " << e.column << "\n";
+                    }
+                    else
+                    {
+                        std::cout << "\n";
+                    }
                 }
-                catch(...)
+                catch (std::exception e)
                 {
-                    std::cout << "FATAL ERROR: UNEXPECTED ERROR";
+                    std::cout << e.what() << "\n";
+                }
+                catch (...)
+                {
+                    std::cout << "UNEXPECTED ERROR";
                 }
                 command.clear();
+                std::cout << "> ";
             }
         }
     }
@@ -66,10 +80,18 @@ public:
         }
         case Kind::Delete: break;
         case Kind::Use: break;
-        case Kind::Insert: break;
+        case Kind::Insert:
+        {
+            insert();
+            break;
+        }
         case Kind::From: break;
         case Kind::Like: break;
-        case Kind::Select: break;
+        case Kind::Select:
+        {
+            select();
+            break;
+        }
         case Kind::Where: break;
         case Kind::Into: break;
         case Kind::Exit:
@@ -79,105 +101,109 @@ public:
             throw SyntaxError("Syntax error: invalid instruction");
             break;
         }
+        std::cout << "done.\n";
         return true;
     }
 
-    static void create_table()
+#define EXPECT(type, msg) check_assert(_tokenizer.get(), type, msg)
+#define ASSERT(token, type, msg) check_assert(token, type, msg)
+
+    static void create_table();
+
+    static void select();
+
+    static void insert();
+
+    static void show_select_result(const SelectStatementBuilder& builder);
+
+    static Type to_type(const Token& token)
     {
-        auto token = _tokenizer.get();
-        check_assert(token, Kind::Table, "keyword 'table'");
-        token = _tokenizer.get();
-        check_assert(token, Kind::Identifier, "identifier");
-        TableCreater creater(token.content);
-        check_assert(_tokenizer.get(), Kind::LBracket, "'('");
-        while (_tokenizer.peek().kind != Kind::SemiColon &&
-               _tokenizer.peek().kind != Kind::End)
+        switch (token.kind)
         {
-            auto fieldName = _tokenizer.get();
-            check_assert(token, Kind::Identifier, "identifier");
-            auto typeTok = _tokenizer.get();
-            Type type;
-            size_t size = 1;
-            switch (typeTok.kind) //type
-            {
-            case Kind::Int:
-                type = Int;
-                size = 4;
-                break;
-            case Kind::Float:
-                type = Float;
-                size = 4;
-                break;
-            case Kind::Char:
-                type = Chars;
-                if (_tokenizer.peek().kind == Kind::LBracket)
-                {
-                    _tokenizer.get();
-
-                    auto opSize = _tokenizer.get();
-                    int uncheckedSize;
-                    check_assert(opSize, Kind::Integer, "number");
-                    std::istringstream(opSize.content) >> uncheckedSize;
-                    if (size <= 0 || size >= 256)
-                    {
-                        throw SyntaxError("Syntax error: expected a integer range from 1 to 255", opSize.line, opSize.column);
-                    }
-                    size = static_cast<size_t>(uncheckedSize);
-                    check_assert(_tokenizer.get(), Kind::RBracket, "')'");
-                }
-                break;
-            default:
-                throw SyntaxError("Syntax error: expected a type", typeTok.line, typeTok.column);
-            }
-            bool isUnique = false;
-            if (_tokenizer.peek().kind == Kind::Unique) //unique
-            {
-                _tokenizer.get();
-                isUnique = true;
-            }
-            switch (_tokenizer.peek().kind) //, or )
-            {
-            case Kind::Comma:
-                _tokenizer.get();
-                //fall through
-            case Kind::RBracket:
-                if (type == Chars)
-                {
-                    creater.add_field(fieldName.content, TypeInfo{type, size}, isUnique);
-                }
-                else
-                {
-                    creater.add_field(fieldName.content, TypeInfo{type}, isUnique);
-                }
-                break;
-            default:
-                throw SyntaxError("Syntax error: unexpected content", _tokenizer.peek().line, _tokenizer.peek().column);
-            }
-            if (_tokenizer.peek().kind == Kind::Primary)
-            {
-                _tokenizer.get();
-                check_assert(_tokenizer.get(), Kind::Key, "keyword 'key'");
-                check_assert(_tokenizer.get(), Kind::LBracket, "'('");
-                auto primKeyTok = _tokenizer.get();
-                if (creater.locate_field(primKeyTok.content) == -1)
-                {
-                    throw SyntaxError("Syntax error: invalid primary key", primKeyTok.line, primKeyTok.column);
-                }
-                creater.set_primary(primKeyTok.content);
-                check_assert(_tokenizer.get(), Kind::RBracket, "')'");
-            }
-            if(_tokenizer.peek().kind == Kind::RBracket)
-            {
-                _tokenizer.get();
-                break;
-            }
+        case Kind::Integer:
+            return Int;
+        case Kind::Single:
+            return Float;
+        case Kind::String:
+            return Chars;
+        default:
+            throw SyntaxError("expect a value");
         }
-        if (_tokenizer.get().kind != Kind::SemiColon)
+    }
+
+    static Comparison::ComparisonType to_comparison_type(const Token& token)
+    {
+        switch (token.kind)
         {
-            throw SyntaxError("Syntax error: invalid instruction");
+        case Kind::NE:
+            return Comparison::ComparisonType::Ne;
+        case Kind::LT:
+            return Comparison::ComparisonType::Lt;
+        case Kind::GT:
+            return Comparison::ComparisonType::Gt;
+        case Kind::LE:
+            return Comparison::ComparisonType::Le;
+        case Kind::GE:
+            return Comparison::ComparisonType::Ge;
+        case Kind::EQ:
+            return Comparison::ComparisonType::Eq;
+        default:
+            throw SyntaxError("expect a comparison operator");
         }
+    }
 
-        CatalogManager::instance().add_table(creater.create());
+    static bool is_value(const Token& token)
+    {
+        switch (token.kind)
+        {
+        case Kind::Integer:
+        case Kind::Single:
+        case Kind::String:
+        {
+            return true;
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+        }
+    }
+
+    static void check_value(const Token& token)
+    {
+        if (!is_value(token))
+        {
+            throw SyntaxError("expect an error", token.line, token.column);
+        }
+    }
+
+    static bool is_operator(const Token& token)
+    {
+        switch (token.kind)
+        {
+        case Kind::LT:
+        case Kind::GT:
+        case Kind::LE:
+        case Kind::GE:
+        case Kind::EQ:
+        case Kind::NE:
+        {
+            return true;
+        }
+        default:
+        {
+            return false;
+        }
+        }
+    }
+
+    static void check_operator(const Token& token)
+    {
+        if (!is_operator(token))
+        {
+            throw SyntaxError("expected an operator", token.line, token.column);
+        }
     }
 
     static void check_assert(const Tokenizer::Token& token, Kind kind, const std::string& str)

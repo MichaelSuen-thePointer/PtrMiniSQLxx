@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RecordManager.h"
-
+#include "MemoryWriteStream.h"
+#include "MemoryReadStream.h"
 const char* const RecordManager::FileName = "RecordManagerConfig";
 
 RecordManager::~RecordManager()

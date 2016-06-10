@@ -10,6 +10,7 @@ std::map<std::string, Tokenizer::Kind> Tokenizer::_keywordMap =
     { "create", Kind::Create },
     { "delete", Kind::Delete },
     { "unique", Kind::Unique },
+    { "and", Kind::And },
     { "values", Kind::Values },
     { "use", Kind::Use },
     { "primary", Kind::Primary },
@@ -44,7 +45,7 @@ void Tokenizer::reset(const std::string& str)
     _end = _content.size();
     _state = None;
     _line = 1;
-    _column = 1;
+    _column = 0;
     _tokenLine = 1;
     _tokenColumn = 1;
     _tokens.clear();
@@ -104,6 +105,13 @@ void Tokenizer::generate_all()
                 _state = InInt;
                 break;
             }
+            case '!':
+            {
+                push_char(ch);
+                assign_pos();
+                _state = InNeq;
+                break;
+            }
             default:
             {
                 if (isspace(ch))
@@ -120,9 +128,16 @@ void Tokenizer::generate_all()
                     assign_pos();
                     _state = InWord;
                 }
+                else if (ch == '*')
+                {
+                    push_char(ch);
+                    assign_pos();
+                    push_token(Kind::Identifier);
+                    _state = None;
+                }
                 else
                 {
-                    assert(0);
+                    throw LexicalError(std::string(1, ch).c_str() , _line, _column);
                 }
                 break;
             }
@@ -144,6 +159,20 @@ void Tokenizer::generate_all()
             }
             break;
         } //case InWord
+        case InNeq:
+        {
+            if (ch == '=')
+            {
+                push_char(ch);
+                push_token(Kind::NE);
+                _state = None;
+            }
+            else
+            {
+                throw LexicalError("expect !=", _line, _column);
+            }
+            break;
+        }
         case InInt:
         {
             switch (ch)
@@ -217,7 +246,7 @@ void Tokenizer::generate_all()
             }
             else
             {
-                push_token(Kind::LT);
+                push_token(Kind::GT);
                 _front -= 1;
                 _column -= 1;
             }

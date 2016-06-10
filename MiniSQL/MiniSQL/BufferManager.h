@@ -1,6 +1,6 @@
 #pragma once
 
-struct BufferArrayDeleter
+struct ArrayDeleter
 {
     void operator()(byte* array) const
     {
@@ -78,7 +78,7 @@ class BufferBlock : Uncopyable
 public:
     const static int BlockSize = 4096;
 private:
-    std::unique_ptr<byte, BufferArrayDeleter> _buffer;
+    std::unique_ptr<byte, ArrayDeleter> _buffer;
     std::string _fileName;
     uint32_t _fileIndex;
     uint16_t _blockIndex;

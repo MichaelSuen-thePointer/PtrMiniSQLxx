@@ -1,5 +1,7 @@
 #pragma once
 
+using namespace std::string_literals;
+
 class SQLError : public std::runtime_error
 {
 public:
@@ -13,7 +15,7 @@ class InvalidKey : public std::runtime_error
 {
 public:
     explicit InvalidKey(const char* msg)
-        : std::runtime_error(msg)
+        : std::runtime_error(("invalid key: " + std::string(msg)).c_str())
     {
     }
 };
@@ -22,7 +24,7 @@ class InvalidType : public std::runtime_error
 {
 public:
     explicit InvalidType(const char* msg)
-        : std::runtime_error(msg)
+        : std::runtime_error(("invalid type: " + std::string(msg)).c_str())
     {
     }
 };
@@ -30,8 +32,8 @@ public:
 class InvalidComparisonType : public std::runtime_error
 {
 public:
-    InvalidComparisonType(const char* str)
-        : runtime_error(str)
+    InvalidComparisonType(const char* msg)
+        : runtime_error(("invalid comparison type: " + std::string(msg)).c_str())
     {
     }
 };
@@ -41,7 +43,7 @@ class InvalidIndex : public std::runtime_error
 {
 public:
     explicit InvalidIndex(const char* msg)
-        : runtime_error(msg)
+        : runtime_error(("invalid index: " + std::string(msg)).c_str())
     {
     }
 };
@@ -50,7 +52,7 @@ class InsuffcientSpace : public std::runtime_error
 {
 public:
     explicit InsuffcientSpace(const char* msg)
-        : std::runtime_error(msg)
+        : std::runtime_error(("not enough space: " + std::string(msg)).c_str())
     {
     }
 };
@@ -81,7 +83,7 @@ class TableNotExist : public std::runtime_error
 {
 public:
     explicit TableNotExist(const char* msg)
-        : runtime_error(msg)
+        : runtime_error(("table not exist: " + std::string(msg)).c_str())
     {
     }
 };
@@ -90,7 +92,7 @@ class TableExist : public std::runtime_error
 {
 public:
     explicit TableExist(const char* msg)
-        : runtime_error(msg)
+        : runtime_error(("table already exist: " + std::string(msg)).c_str())
     {
     }
 };
@@ -99,7 +101,7 @@ class InvalidField : public std::runtime_error
 {
 public:
     explicit InvalidField(const char* msg)
-        : runtime_error(msg)
+        : runtime_error(("invalid field: " + std::string(msg)).c_str())
     {
     }
 };

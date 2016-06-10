@@ -77,6 +77,10 @@ private:
     size_t _size;
     Comparator* _comparer;
 public:
+    static bool is_convertible(Type from, Type to)
+    {
+        return (from == to) || (from == Int && to == Float);
+    }
     TypeInfo(Type type, size_t length)
         : _type(type)
         , _size(length)
@@ -98,6 +102,7 @@ public:
     {
         return _type == other._type && _size == other._size;
     }
+
     bool operator!=(const TypeInfo& other) const
     {
         return !(*this == other);
@@ -221,6 +226,25 @@ public:
             other._info = nullptr;
         }
 
+        std::string to_string() const
+        {
+            switch (_info->type())
+            {
+            case Int:
+                return std::to_string(*reinterpret_cast<int*>(_raw));
+                break;
+            case Float:
+                return std::to_string(*reinterpret_cast<float*>(_raw));
+                break;
+            case Chars:
+                return{_raw, _raw + _info->size()};
+                break;
+            default:
+                return "invalid type";
+                break;
+            }
+        }
+
         int compare(const ValueProxy& other) const
         {
             if (*_info == *other._info)
@@ -229,29 +253,29 @@ public:
             }
             throw InvalidType("compare type doesn't match");
         }
-        
+
         bool operator==(const ValueProxy& other) const { return compare(other) == 0; }
-        
+
         bool operator!=(const ValueProxy& other) const { return compare(other) != 0; }
-        
+
         bool operator>(const ValueProxy& other) const { return compare(other) > 0; }
-        
+
         bool operator<(const ValueProxy& other) const { return compare(other) < 0; }
-        
+
         bool operator>=(const ValueProxy& other) const { return compare(other) >= 0; }
-        
+
         bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
-        
+
         const TypeInfo& type_info() const { return *_info; }
-        
+
         Type type() const { return _info->_type; }
-        
+
         size_t size() const { return _info->_size; }
-        
+
         int as_int() const { return *reinterpret_cast<int*>(_raw); }
-        
+
         float as_float() const { return *reinterpret_cast<float*>(_raw); }
-    
+
         std::string as_str() const { return std::string(reinterpret_cast<char*>(_raw), reinterpret_cast<char*>(_raw) + _info->_size); }
     };
 
@@ -260,8 +284,8 @@ public:
         friend class TableInfo;
     private:
         BlockPtr _block;
-        TableInfo* _info;
-        TupleProxy(BlockPtr block, TableInfo* info)
+        const TableInfo* _info;
+        TupleProxy(BlockPtr block, const TableInfo* info)
             : _block(block)
             , _info(info)
         {
@@ -297,17 +321,17 @@ public:
 
     const std::vector<TokenField>& fields() const { return _fields; }
 
-    TupleProxy operator[](const BlockPtr& ptr)
+    TupleProxy operator[](const BlockPtr& ptr) const
     {
         return{ptr, this};
     }
 
-    TupleProxy operator[](const BufferBlock& block)
+    TupleProxy operator[](const BufferBlock& block) const
     {
         return{block.ptr(), this};
     }
 
-    const TokenField& field(const std::string& fieldName)
+    const TokenField& field(const std::string& fieldName) const
     {
         for (auto& entry : _fields)
         {
@@ -371,7 +395,7 @@ public:
 
     void add_table(const TableInfo& tableInfo)
     {
-        if(locate_table(tableInfo.name()) != -1)
+        if (locate_table(tableInfo.name()) != -1)
         {
             throw SQLError(("Error: Duplicated table name '" + tableInfo.name() + "'").c_str());
         }
@@ -381,7 +405,7 @@ public:
     const TableInfo& find_table(const std::string& tableName) const
     {
         size_t i = locate_table(tableName);
-        if(i == -1)
+        if (i == -1)
         {
             throw TableNotExist(tableName.c_str());
         }
@@ -390,9 +414,9 @@ public:
 
     size_t locate_table(const std::string& tableName) const
     {
-        for(size_t i = 0; i != _tables.size(); i++)
+        for (size_t i = 0; i != _tables.size(); i++)
         {
-            if(_tables[i].name() == tableName)
+            if (_tables[i].name() == tableName)
             {
                 return i;
             }
@@ -402,7 +426,7 @@ public:
 
 private:
     std::vector<TableInfo> _tables;
-    
+
     CatalogManager();
 };
 

@@ -10,7 +10,7 @@ class Value
 {
 public:
     virtual ~Value() {}
-    virtual TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) = 0;
+    virtual TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) = 0;
 };
 
 class TokenFieldValue : public Value
@@ -22,24 +22,48 @@ public:
         : _fieldName(fieldName)
     {
     }
-    TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
     {
         return info[block][_fieldName];
     }
 };
 
-class ImmediateValue : public Value
+class LiteralValue : public Value
 {
 private:
-    std::unique_ptr<byte, BufferArrayDeleter> _value;
+    std::unique_ptr<byte, ArrayDeleter> _value;
     const TypeInfo* _type;
 public:
-    ImmediateValue(byte* value, const TypeInfo& type)
-        : _value(value)
+    LiteralValue(const std::string& value, const TypeInfo& type)
+        : _value(new byte[type.size()])
         , _type(&type)
     {
+        switch (_type->type())
+        {
+        case Int:
+        {
+            int iValue;
+            std::istringstream(value) >> iValue;
+            memcpy(_value.get(), &iValue, 4);
+            break;
+        }
+        case Float:
+        {
+            float iValue;
+            std::istringstream(value) >> iValue;
+            memcpy(_value.get(), &iValue, 4);
+            break;
+        }
+        case Chars:
+        {
+            memcpy(_value.get(), &value[0], std::min(_type->size(), value.size()));
+            break;
+        }
+        default: break;
+        }
     }
-    TableInfo::ValueProxy value(TableInfo& info, const BufferBlock& block) override
+
+    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
     {
         return TableInfo::ValueProxy(_value.get(), _type);
     }
@@ -61,7 +85,7 @@ public:
         , _rhs(rhs)
     {
     }
-    virtual bool evaluate(TableInfo& info, const BufferBlock& block) const = 0;
+    virtual bool evaluate(const TableInfo& info, const BufferBlock& block) const = 0;
     virtual ComparisonType type() const = 0;
 };
 
@@ -72,7 +96,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) == _rhs->value(info, block);
     }
@@ -86,7 +110,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) != _rhs->value(info, block);
     }
@@ -100,7 +124,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) > _rhs->value(info, block);
     }
@@ -114,7 +138,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) < _rhs->value(info, block);
     }
@@ -128,7 +152,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) >= _rhs->value(info, block);
     }
@@ -142,7 +166,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) <= _rhs->value(info, block);
     }
@@ -152,20 +176,24 @@ public:
 class QueryList
 {
 private:
+    const TableInfo* _info;
     std::vector<std::unique_ptr<Comparison>> _comparisonNodes;
-    TableInfo* _info;
 
 public:
-    explicit QueryList(TableInfo* info)
-        : _comparisonNodes{}
-        , _info(info)
+    QueryList()
+        : _info()
+        , _comparisonNodes()
     {
     }
-    void add_query(Comparison::ComparisonType type, const std::string& fieldName, byte* value)
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void add_query(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
         std::unique_ptr<Comparison> comparison;
         auto lValue = new TokenFieldValue(fieldName);
-        auto rValue = new ImmediateValue(value, _info->field(fieldName).type_info());
+        auto rValue = new LiteralValue(value, _info->field(fieldName).type_info());
         Comparison* expr;
         switch (type)
         {
@@ -193,7 +221,7 @@ public:
         }
         _comparisonNodes.emplace_back(expr);
     }
-    std::vector<BlockPtr> execute_linearly()
+    std::vector<BlockPtr> execute_linearly() const
     {
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
@@ -221,6 +249,43 @@ public:
     }
 };
 
+class QueryResult
+{
+private:
+    std::vector<std::string> _fields;
+    std::vector<size_t> _field_width;
+    boost::multi_array<std::string, 2> _results;
+    size_t _size;
+public:
+    QueryResult(const TableInfo& info, std::vector<std::string> fields, std::vector<BlockPtr> results)
+        : _fields(fields)
+        , _field_width(3)
+        , _results(boost::extents[results.size()][fields.size()])
+        , _size(results.size())
+    {
+        for (size_t j = 0; j != fields.size(); j++)
+        {
+            _field_width[j] = fields[j].size();
+        }
+        for (size_t i = 0; i != results.size(); i++)
+        {
+            for (size_t j = 0; j != fields.size(); j++)
+            {
+                auto str = info[results[i]][fields[j]].to_string();
+                _results[i][j] = str;
+                if (_field_width[j] < str.size())
+                {
+                    _field_width[j] = str.size();
+                }
+            }
+        }
+    }
+    const std::vector<std::string>& fields() const { return _fields; }
+    const std::vector<size_t>& field_width() const { return _field_width; }
+    const boost::multi_array<std::string, 2>& results() const { return _results; }
+    size_t size() const { return _size; }
+};
+
 class TableCreater
 {
 private:
@@ -238,11 +303,19 @@ public:
     {
     }
 
+    uint16_t size() const { return (uint16_t)_size; }
+
+    const std::string& table_name() const { return _tableName; }
+
     void add_field(const std::string& name, TypeInfo type, bool isUnique)
     {
         assert(locate_field(name) == -1);
         _fields.emplace_back(name, type, _size, isUnique);
         _size += type.size();
+        if (_size > std::numeric_limits<uint16_t>::max())
+        {
+            throw InsuffcientSpace("too much fields");
+        }
         if (isUnique)
         {
             _indexPos = _fields.size() - 1;
@@ -279,30 +352,30 @@ public:
 class TupleBuilder
 {
 private:
-    std::string _tableName;
     const TableInfo* _tableInfo;
-    std::unique_ptr<byte, BufferArrayDeleter> _raw;
+    std::unique_ptr<byte, ArrayDeleter> _raw;
+    size_t _iField;
 public:
     TupleBuilder(const std::string& tableName)
-        : _tableName(tableName)
-        , _tableInfo(&CatalogManager::instance().find_table(tableName))
+        : _tableInfo(&CatalogManager::instance().find_table(tableName))
         , _raw(new byte[_tableInfo->entry_size()])
+        , _iField(0)
     {
     }
 
     void set_value(const std::string& value, Type type)
     {
-        static int iField = 0;
-
-        if (iField >= _tableInfo->fields().size())
+        if (_iField >= _tableInfo->fields().size())
         {
-            throw SQLError("Too many value");
+            throw SQLError("too many value");
         }
 
-        if (type != _tableInfo->fields()[iField].type_info().type())
+        if (!TypeInfo::is_convertible(type, _tableInfo->fields()[_iField].type_info().type()))
         {
-            throw InvalidType(("invalid type of value" + value).c_str());
+            throw InvalidType("invalid type");
         }
+
+        type = _tableInfo->fields()[_iField].type_info().type();
 
         switch (type)
         {
@@ -310,28 +383,97 @@ public:
         {
             int iValue;
             std::istringstream(value) >> iValue;
-            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &iValue, sizeof(iValue));
+            memcpy(_raw.get() + _tableInfo->fields()[_iField].offset(), &iValue, sizeof(iValue));
             break;
         }
         case Float:
         {
             float iValue;
             std::istringstream(value) >> iValue;
-            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &iValue, sizeof(iValue));
+            memcpy(_raw.get() + _tableInfo->fields()[_iField].offset(), &iValue, sizeof(iValue));
             break;
         }
         case Chars:
         {
-            assert(value.size() >= 2);
-            memcpy(_raw.get() + _tableInfo->fields()[iField].offset(), &value[1], value.size() - 2);
+            memset(_raw.get() + _tableInfo->fields()[_iField].offset(), 0, _tableInfo->fields()[_iField].type_info().size());
+            memcpy(_raw.get() + _tableInfo->fields()[_iField].offset(), &value[0], value.size());
             break;
         }
-        default: assert(("invalid type", 0)); break;
+        default:
+        {
+            assert(("invalid type", 0));
+            break;
+        }
+        }
+
+        _iField++;
+    }
+
+    const std::string& table_name() const
+    {
+        return _tableInfo->name();
+    }
+
+    byte* get_field() const
+    {
+        return _raw.get();
+    }
+};
+
+class SelectStatementBuilder
+{
+private:
+    const TableInfo* _info;
+    std::vector<std::string> _fields;
+    std::string _tableName;
+    QueryList _queries;
+public:
+    SelectStatementBuilder()
+        : _info(nullptr)
+        , _fields()
+        , _tableName()
+        , _queries()
+    {
+    }
+
+    void add_select_field(const std::string& fieldName)
+    {
+        _fields.push_back(fieldName);
+    }
+
+    void set_table(const std::string& tableName)
+    {
+        _info = &CatalogManager::instance().find_table(tableName);
+        _tableName = tableName;
+        _queries.set_table(tableName);
+        if (_fields.size() == 0)
+        {
+            for (const auto& elm : _info->fields())
+            {
+                _fields.push_back(elm.name());
+            }
+        }
+        else
+        {
+            for (auto& fieldName : _fields)
+            {
+                if (std::find_if(_info->fields().begin(), _info->fields().end(), [&fieldName](const TokenField& field) {
+                    return field.name() == fieldName;
+                }) == _info->fields().end())
+                {
+                    throw InvalidField(fieldName.c_str());
+                }
+            }
         }
     }
 
-    byte* get_field()
+    void add_condition(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
-        return _raw.get();
+        _queries.add_query(type, fieldName, value);
+    }
+
+    QueryResult get_result() const
+    {
+        return{*_info, _fields, _queries.execute_linearly()};
     }
 };
