@@ -131,11 +131,6 @@ public:
         _lastModifiedTime = boost::posix_time::special_values::not_a_date_time;
     }
 
-    void update_time()
-    {
-        _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
-    }
-
     template<typename T>
     T* as()
     {

@@ -58,10 +58,6 @@ public:
                 {
                     std::cout << e.what() << "\n";
                 }
-                catch (...)
-                {
-                    std::cout << "UNEXPECTED ERROR";
-                }
                 command.clear();
                 std::cout << "> ";
             }
@@ -78,22 +74,21 @@ public:
             create_table();
             break;
         }
-        case Kind::Delete: break;
-        case Kind::Use: break;
+        case Kind::Delete:
+        {
+
+            break;
+        }
         case Kind::Insert:
         {
             insert();
             break;
         }
-        case Kind::From: break;
-        case Kind::Like: break;
         case Kind::Select:
         {
             select();
             break;
         }
-        case Kind::Where: break;
-        case Kind::Into: break;
         case Kind::Exit:
             return false;
             break;
@@ -113,6 +108,8 @@ public:
     static void select();
 
     static void insert();
+
+    static void delete_entry();
 
     static void show_select_result(const SelectStatementBuilder& builder);
 

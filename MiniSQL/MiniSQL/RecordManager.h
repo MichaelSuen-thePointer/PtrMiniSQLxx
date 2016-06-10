@@ -114,7 +114,7 @@ public:
         }
     };
 
-    const static char* const FileName; /*= "RecordManagerConfig";*/
+    const static char* const FileName; /*= "RecordManagerMeta";*/
 
     ~RecordManager();
 

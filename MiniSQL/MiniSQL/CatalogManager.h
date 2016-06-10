@@ -389,7 +389,7 @@ public:
         return instance;
     }
 
-    const static char* const FileName; /*= "CatalogManagerConfig"*/
+    const static char* const FileName; /*= "CatalogManagerMeta"*/
 
     ~CatalogManager();
 

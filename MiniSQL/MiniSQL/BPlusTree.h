@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BufferManager.h"
-#include <tuple>
+
 class BPlusTreeBase
 {
 public:
@@ -11,7 +11,7 @@ public:
     virtual void insert(byte* pkey, const BlockPtr& ptr) = 0;
 };
 
-//template<typename TKey>
+template<typename TKey>
 class BPlusTree : public BPlusTreeBase
 {
 public:

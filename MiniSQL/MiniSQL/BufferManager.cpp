@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 
-const char* const BufferManager::FileName = "BufferManagerConfig";
+const char* const BufferManager::FileName = "BufferManagerMeta";
 
 void BufferManager::save_block(BufferBlock& block)
 {

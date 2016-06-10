@@ -173,14 +173,13 @@ public:
     ComparisonType type() const override { return ComparisonType::Le; }
 };
 
-class QueryList
+class QueryListBase
 {
-private:
+protected:
     const TableInfo* _info;
     std::vector<std::unique_ptr<Comparison>> _comparisonNodes;
-
 public:
-    QueryList()
+    QueryListBase()
         : _info()
         , _comparisonNodes()
     {
@@ -221,15 +220,21 @@ public:
         }
         _comparisonNodes.emplace_back(expr);
     }
-    std::vector<BlockPtr> execute_linearly() const
+    std::vector<BlockPtr> execute_linearly() const = 0;
+};
+
+class DeleteList : public QueryListBase
+{
+    DeleteList()
+        : QueryListBase()
+    {
+    }
+    void execute_linearly() const
     {
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
-        auto listSize = recList.size();
 
-        std::vector<BlockPtr> queryResult;
-
-        for (size_t i = 0; i != listSize; i++)
+        for (size_t i = 0; i != recList.size(); i++)
         {
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
@@ -242,10 +247,10 @@ public:
             }
             if (success)
             {
-                queryResult.push_back(recList[i]);
+                recList.erase(i);
+                i--;
             }
         }
-        return queryResult;
     }
 };
 
@@ -420,25 +425,20 @@ public:
     }
 };
 
-class SelectStatementBuilder
+class StatementBuilder
 {
-private:
+protected:
     const TableInfo* _info;
     std::vector<std::string> _fields;
     std::string _tableName;
-    QueryList _queries;
+    QueryListBase* base;
 public:
-    SelectStatementBuilder()
+    StatementBuilder()
         : _info(nullptr)
         , _fields()
         , _tableName()
         , _queries()
     {
-    }
-
-    void add_select_field(const std::string& fieldName)
-    {
-        _fields.push_back(fieldName);
     }
 
     void set_table(const std::string& tableName)
@@ -470,6 +470,36 @@ public:
     void add_condition(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
         _queries.add_query(type, fieldName, value);
+    }
+
+};
+
+class SelectStatementBuilder : public StatementBuilder
+{
+protected:
+public:
+    SelectStatementBuilder()
+        : StatementBuilder()
+    {
+    }
+
+    void add_select_field(const std::string& fieldName)
+    {
+        _fields.push_back(fieldName);
+    }
+
+    QueryResult get_result() const
+    {
+        return{*_info, _fields, _queries.execute_linearly()};
+    }
+};
+
+class DeleteStatementBuilder: public StatementBuilder
+{
+public:
+    DeleteStatementBuilder()
+        : StatementBuilder()
+    {
     }
 
     QueryResult get_result() const

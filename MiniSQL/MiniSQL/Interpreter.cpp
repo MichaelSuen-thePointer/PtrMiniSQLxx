@@ -202,6 +202,44 @@ void Interpreter::insert()
     RecordManager::instance().insert_entry(builder.table_name(), builder.get_field());
 }
 
+void Interpreter::delete_entry()
+{
+    DeleteStatementBuilder builder;
+    EXPECT(Kind::From, "keyword 'from'");
+    auto tokTableName = _tokenizer.get();
+    check_assert(tokTableName, Kind::Identifier, "table name");
+    builder.set_table(tokTableName.content);
+    EXPECT(Kind::Where, "keyword 'where'");
+    for (;;)
+    {
+        auto tokLhs = _tokenizer.get();
+        auto tokOperator = _tokenizer.get();
+        auto tokRhs = _tokenizer.get();
+        check_operator(tokOperator);
+        if (tokLhs.kind == Kind::Identifier)
+        {
+            check_value(tokRhs);
+
+            builder.add_condition(to_comparison_type(tokOperator), tokLhs.content, tokRhs.content);
+        }
+        auto tokAndOrSemi = _tokenizer.get();
+        if (tokAndOrSemi.kind == Kind::And)
+        {
+            continue;
+        }
+        else if (tokAndOrSemi.kind == Kind::SemiColon)
+        {
+            break;
+        }
+        else
+        {
+            throw SyntaxError("expected 'and' or ';'", tokAndOrSemi.line, tokAndOrSemi.column);
+        }
+    }
+
+    builder.get_result();
+}
+
 void Interpreter::show_select_result(const SelectStatementBuilder& builder)
 {
     auto result = builder.get_result();
