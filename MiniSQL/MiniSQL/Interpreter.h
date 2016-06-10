@@ -76,7 +76,7 @@ public:
         }
         case Kind::Delete:
         {
-
+            delete_entry();
             break;
         }
         case Kind::Insert:

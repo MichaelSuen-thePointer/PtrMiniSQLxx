@@ -138,34 +138,42 @@ void Interpreter::select()
     auto tokTableName = _tokenizer.get();
     check_assert(tokTableName, Kind::Identifier, "table name");
     builder.set_table(tokTableName.content);
-    EXPECT(Kind::Where, "keyword 'where'");
-    for (;;)
-    {
-        auto tokLhs = _tokenizer.get();
-        auto tokOperator = _tokenizer.get();
-        auto tokRhs = _tokenizer.get();
-        check_operator(tokOperator);
-        if (tokLhs.kind == Kind::Identifier)
-        {
-            check_value(tokRhs);
 
-            builder.add_condition(to_comparison_type(tokOperator), tokLhs.content, tokRhs.content);
-        }
-        auto tokAndOrSemi = _tokenizer.get();
-        if (tokAndOrSemi.kind == Kind::And)
+    auto tokMaybeWhere = _tokenizer.peek();
+    if (tokMaybeWhere.kind == Kind::Where)
+    {
+        _tokenizer.get();
+        for (;;)
         {
-            continue;
-        }
-        else if (tokAndOrSemi.kind == Kind::SemiColon)
-        {
-            break;
-        }
-        else
-        {
-            throw SyntaxError("expected 'and' or ';'", tokAndOrSemi.line, tokAndOrSemi.column);
+            auto tokLhs = _tokenizer.get();
+            auto tokOperator = _tokenizer.get();
+            auto tokRhs = _tokenizer.get();
+            check_operator(tokOperator);
+            if (tokLhs.kind == Kind::Identifier)
+            {
+                check_value(tokRhs);
+
+                builder.add_condition(to_comparison_type(tokOperator), tokLhs.content, tokRhs.content);
+            }
+            auto tokAndOrSemi = _tokenizer.get();
+            if (tokAndOrSemi.kind == Kind::And)
+            {
+                continue;
+            }
+            else if (tokAndOrSemi.kind == Kind::SemiColon)
+            {
+                break;
+            }
+            else
+            {
+                throw SyntaxError("expected 'and' or ';'", tokAndOrSemi.line, tokAndOrSemi.column);
+            }
         }
     }
-
+    else
+    {
+        EXPECT(Kind::SemiColon, "';'");
+    }
     show_select_result(builder);
 }
 
@@ -209,34 +217,42 @@ void Interpreter::delete_entry()
     auto tokTableName = _tokenizer.get();
     check_assert(tokTableName, Kind::Identifier, "table name");
     builder.set_table(tokTableName.content);
-    EXPECT(Kind::Where, "keyword 'where'");
-    for (;;)
-    {
-        auto tokLhs = _tokenizer.get();
-        auto tokOperator = _tokenizer.get();
-        auto tokRhs = _tokenizer.get();
-        check_operator(tokOperator);
-        if (tokLhs.kind == Kind::Identifier)
-        {
-            check_value(tokRhs);
 
-            builder.add_condition(to_comparison_type(tokOperator), tokLhs.content, tokRhs.content);
-        }
-        auto tokAndOrSemi = _tokenizer.get();
-        if (tokAndOrSemi.kind == Kind::And)
+    auto tokMaybeWhere = _tokenizer.peek();
+    if (tokMaybeWhere.kind == Kind::Where)
+    {
+        _tokenizer.get();
+        for (;;)
         {
-            continue;
-        }
-        else if (tokAndOrSemi.kind == Kind::SemiColon)
-        {
-            break;
-        }
-        else
-        {
-            throw SyntaxError("expected 'and' or ';'", tokAndOrSemi.line, tokAndOrSemi.column);
+            auto tokLhs = _tokenizer.get();
+            auto tokOperator = _tokenizer.get();
+            auto tokRhs = _tokenizer.get();
+            check_operator(tokOperator);
+            if (tokLhs.kind == Kind::Identifier)
+            {
+                check_value(tokRhs);
+
+                builder.add_condition(to_comparison_type(tokOperator), tokLhs.content, tokRhs.content);
+            }
+            auto tokAndOrSemi = _tokenizer.get();
+            if (tokAndOrSemi.kind == Kind::And)
+            {
+                continue;
+            }
+            else if (tokAndOrSemi.kind == Kind::SemiColon)
+            {
+                break;
+            }
+            else
+            {
+                throw SyntaxError("expected 'and' or ';'", tokAndOrSemi.line, tokAndOrSemi.column);
+            }
         }
     }
-
+    else
+    {
+        EXPECT(Kind::SemiColon, "';'");
+    }
     builder.get_result();
 }
 
@@ -245,24 +261,24 @@ void Interpreter::show_select_result(const SelectStatementBuilder& builder)
     auto result = builder.get_result();
     size_t totalWidth = 0;
     std::cout << "|";
-    for (size_t i = 0; i != result.fields().size(); i++)
+    for (size_t i = 0; i != result->fields().size(); i++)
     {
-        std::cout << std::setw(result.field_width()[i]) << result.fields()[i] << '|';
-        totalWidth += result.field_width()[i];
+        std::cout << std::setw(result->field_width()[i]) << result->fields()[i] << '|';
+        totalWidth += result->field_width()[i];
     }
-    totalWidth += result.fields().size() + 1;
+    totalWidth += result->fields().size() + 1;
     std::cout << "\n";
     for (auto i = 0; i != totalWidth; i++)
     {
         std::cout << "-";
     }
     std::cout << "\n";
-    for (auto iResult = 0; iResult != result.size(); iResult++)
+    for (auto iResult = 0; iResult != result->size(); iResult++)
     {
         std::cout << "|";
-        for (size_t i = 0; i < result.fields().size(); i++)
+        for (size_t i = 0; i < result->fields().size(); i++)
         {
-            std::cout << std::setw(result.field_width()[i]) << result.results()[iResult][i] << "|";
+            std::cout << std::setw(result->field_width()[i]) << result->results()[iResult][i] << "|";
         }
         std::cout << std::endl;
     }

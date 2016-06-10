@@ -184,6 +184,9 @@ public:
         , _comparisonNodes()
     {
     }
+    virtual ~QueryListBase()
+    {
+    }
     void set_table(const std::string& table)
     {
         _info = &CatalogManager::instance().find_table(table);
@@ -220,21 +223,58 @@ public:
         }
         _comparisonNodes.emplace_back(expr);
     }
-    std::vector<BlockPtr> execute_linearly() const = 0;
+    virtual std::vector<BlockPtr> execute_linearly() const = 0;
+};
+
+class QueryList : public QueryListBase
+{
+public:
+    QueryList()
+        : QueryListBase()
+    {
+    }
+
+    virtual std::vector<BlockPtr> execute_linearly() const override
+    {
+        auto& recMgr = RecordManager::instance();
+        auto& recList = recMgr[_info->name()];
+        auto listSize = recList.size();
+        std::vector<BlockPtr> result;
+
+        for (size_t i = 0; i != listSize; i++)
+        {
+            bool success = true;
+            for (auto& cmpEntry : _comparisonNodes)
+            {
+                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                {
+                    success = false;
+                    break;
+                }
+            }
+            if (success)
+            {
+                result.push_back(recList[i]);
+            }
+        }
+
+        return result;
+    }
 };
 
 class DeleteList : public QueryListBase
 {
+public:
     DeleteList()
         : QueryListBase()
     {
     }
-    void execute_linearly() const
+    virtual std::vector<BlockPtr> execute_linearly() const override
     {
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
 
-        for (size_t i = 0; i != recList.size(); i++)
+        for (size_t i = 0; i != recList.size();)
         {
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
@@ -248,13 +288,31 @@ class DeleteList : public QueryListBase
             if (success)
             {
                 recList.erase(i);
-                i--;
+            }
+            else
+            {
+                i++;
             }
         }
+
+        return{};
     }
 };
 
-class QueryResult
+class QueryResult : Uncopyable
+{
+public:
+    virtual ~QueryResult()
+    {
+    }
+    virtual const std::vector<std::string>& fields() const = 0;
+    virtual const std::vector<size_t>& field_width() const = 0;
+    virtual const boost::multi_array<std::string, 2>& results() const = 0;
+    virtual size_t size() const = 0;
+
+};
+
+class SelectQueryResult : public QueryResult
 {
 private:
     std::vector<std::string> _fields;
@@ -262,7 +320,7 @@ private:
     boost::multi_array<std::string, 2> _results;
     size_t _size;
 public:
-    QueryResult(const TableInfo& info, std::vector<std::string> fields, std::vector<BlockPtr> results)
+    SelectQueryResult(const TableInfo& info, std::vector<std::string> fields, std::vector<BlockPtr> results)
         : _fields(fields)
         , _field_width(3)
         , _results(boost::extents[results.size()][fields.size()])
@@ -285,10 +343,10 @@ public:
             }
         }
     }
-    const std::vector<std::string>& fields() const { return _fields; }
-    const std::vector<size_t>& field_width() const { return _field_width; }
-    const boost::multi_array<std::string, 2>& results() const { return _results; }
-    size_t size() const { return _size; }
+    virtual size_t size() const override { return _size; }
+    virtual const std::vector<std::string>& fields() const override { return _fields; }
+    virtual const std::vector<size_t>& field_width() const override { return _field_width; }
+    virtual const boost::multi_array<std::string, 2>& results() const override { return _results; }
 };
 
 class TableCreater
@@ -431,21 +489,23 @@ protected:
     const TableInfo* _info;
     std::vector<std::string> _fields;
     std::string _tableName;
-    QueryListBase* base;
+    std::unique_ptr<QueryListBase> _query;
 public:
-    StatementBuilder()
+    StatementBuilder(QueryListBase* query)
         : _info(nullptr)
         , _fields()
         , _tableName()
-        , _queries()
+        , _query(query)
     {
     }
-
+    virtual ~StatementBuilder()
+    {
+    }
     void set_table(const std::string& tableName)
     {
         _info = &CatalogManager::instance().find_table(tableName);
         _tableName = tableName;
-        _queries.set_table(tableName);
+        _query->set_table(tableName);
         if (_fields.size() == 0)
         {
             for (const auto& elm : _info->fields())
@@ -469,17 +529,18 @@ public:
 
     void add_condition(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
-        _queries.add_query(type, fieldName, value);
+        _query->add_query(type, fieldName, value);
     }
+
+    virtual std::shared_ptr<QueryResult> get_result() const = 0;
 
 };
 
 class SelectStatementBuilder : public StatementBuilder
 {
-protected:
 public:
     SelectStatementBuilder()
-        : StatementBuilder()
+        : StatementBuilder(new QueryList())
     {
     }
 
@@ -488,22 +549,23 @@ public:
         _fields.push_back(fieldName);
     }
 
-    QueryResult get_result() const
+    virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        return{*_info, _fields, _queries.execute_linearly()};
+        return std::make_shared<SelectQueryResult>(*_info, _fields, _query->execute_linearly());
     }
 };
 
-class DeleteStatementBuilder: public StatementBuilder
+class DeleteStatementBuilder : public StatementBuilder
 {
 public:
     DeleteStatementBuilder()
-        : StatementBuilder()
+        : StatementBuilder(new DeleteList())
     {
     }
 
-    QueryResult get_result() const
+    virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        return{*_info, _fields, _queries.execute_linearly()};
+        _query->execute_linearly();
+        return nullptr;
     }
 };
