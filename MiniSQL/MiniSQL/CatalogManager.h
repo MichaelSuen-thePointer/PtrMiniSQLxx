@@ -380,7 +380,7 @@ public:
         return{ptr, this};
     }
 
-    TupleProxy operator[](const OffsetBlockProxy& block) const
+    TupleProxy operator[](const BufferBlock& block) const
     {
         return{block.ptr(), this};
     }

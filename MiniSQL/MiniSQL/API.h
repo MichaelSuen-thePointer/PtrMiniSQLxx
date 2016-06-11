@@ -10,7 +10,7 @@ class Value
 {
 public:
     virtual ~Value() {}
-    virtual TableInfo::ValueProxy value(const TableInfo& info, const OffsetBlockProxy& block) = 0;
+    virtual TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) = 0;
 };
 
 class TokenFieldValue : public Value
@@ -22,7 +22,7 @@ public:
         : _fieldName(fieldName)
     {
     }
-    TableInfo::ValueProxy value(const TableInfo& info, const OffsetBlockProxy& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
     {
         return info[block][_fieldName];
     }
@@ -63,7 +63,7 @@ public:
         }
     }
 
-    TableInfo::ValueProxy value(const TableInfo& info, const OffsetBlockProxy& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
     {
         return TableInfo::ValueProxy(_value.get(), _type);
     }
@@ -85,7 +85,7 @@ public:
         , _rhs(rhs)
     {
     }
-    virtual bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const = 0;
+    virtual bool evaluate(const TableInfo& info, const BufferBlock& block) const = 0;
     virtual ComparisonType type() const = 0;
 };
 
@@ -96,7 +96,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) == _rhs->value(info, block);
     }
@@ -110,7 +110,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) != _rhs->value(info, block);
     }
@@ -124,7 +124,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) > _rhs->value(info, block);
     }
@@ -138,7 +138,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) < _rhs->value(info, block);
     }
@@ -152,7 +152,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) >= _rhs->value(info, block);
     }
@@ -166,7 +166,7 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const OffsetBlockProxy& block) const override
+    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
     {
         return _lhs->value(info, block) <= _rhs->value(info, block);
     }

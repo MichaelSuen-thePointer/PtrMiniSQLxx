@@ -135,7 +135,9 @@ public:
     T* as()
     {
         log("BB: content asked", _fileName, _fileIndex, _blockIndex);
-        return reinterpret_cast<T*>(_buffer.get() + _offset);
+        int tempOffset = _offset;
+        _offset = 0;
+        return reinterpret_cast<T*>(_buffer.get() + tempOffset);
     }
     BlockPtr ptr() const;
 
@@ -193,6 +195,7 @@ public:
     }
     ~BlockPtr()
     {
+        assert(BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex)._offset == 0);
         log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
     }
     BlockPtr& operator=(const BlockPtr& other)
