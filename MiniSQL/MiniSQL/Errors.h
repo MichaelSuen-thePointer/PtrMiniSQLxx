@@ -106,11 +106,3 @@ public:
     }
 };
 
-class NotUnique : public std::runtime_error
-{
-public:
-    explicit NotUnique(const char* msg)
-        : runtime_error(("value not unique in field: " + std::string(msg)).c_str())
-    {
-    }
-};

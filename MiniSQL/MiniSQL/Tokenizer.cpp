@@ -3,10 +3,10 @@
 
 std::map<std::string, Tokenizer::Kind> Tokenizer::_keywordMap =
 {
-    { "int", Kind::Int },
-    { "float", Kind::Float },
-    { "char", Kind::Char },
-    { "table", Kind::Table },
+    { "int", Kind::Int},
+    { "float", Kind::Float},
+    { "char", Kind::Char},
+    { "table", Kind::Table},
     { "create", Kind::Create },
     { "delete", Kind::Delete },
     { "unique", Kind::Unique },
@@ -31,9 +31,6 @@ std::map<std::string, Tokenizer::Kind> Tokenizer::_keywordMap =
     { "=", Kind::EQ },
     { "<", Kind::LT },
     { ">", Kind::GT },
-    { "show", Kind::Show },
-    { "tables", Kind::Tables },
-    { "desc", Kind::Desc },
 };
 
 Tokenizer::Tokenizer(const std::string& str)
@@ -49,7 +46,7 @@ void Tokenizer::reset(const std::string& str)
     _end = _content.size();
     _state = None;
     _line = 1;
-    _column = 1;
+    _column = 0;
     _tokenLine = 1;
     _tokenColumn = 1;
     _tokens.clear();
@@ -141,7 +138,7 @@ void Tokenizer::generate_all()
                 }
                 else
                 {
-                    throw LexicalError(std::string(1, ch).c_str(), _line, _column);
+                    throw LexicalError(std::string(1, ch).c_str() , _line, _column);
                 }
                 break;
             }

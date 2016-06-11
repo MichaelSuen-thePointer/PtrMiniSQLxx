@@ -11,7 +11,7 @@ public:
     virtual void insert(byte* pkey, const BlockPtr& ptr) = 0;
 };
 
-//template<typename TKey>
+template<typename TKey>
 class BPlusTree : public BPlusTreeBase
 {
 public:
@@ -20,12 +20,12 @@ public:
     const static size_t key_size = sizeof(key_type);
     const static size_t ptr_size = sizeof(ptr_type);
     const static size_t key_count = (BufferBlock::BlockSize
-        - ptr_size
-        - sizeof(size_t)
-        - sizeof(size_t)
-        - sizeof(bool)
-        - sizeof(BlockPtr)
-        ) / (key_size + ptr_size);
+                                     - ptr_size
+                                     - sizeof(size_t)
+                                     - sizeof(size_t)
+                                     - sizeof(bool)
+                                     - sizeof(BlockPtr)
+                                     ) / (key_size + ptr_size);
     const static size_t ptr_count = key_count + 1;
     const static size_t next_index = ptr_count - 1;
     struct BTreeNodeModel
@@ -60,70 +60,6 @@ private:
         size_t capacity() const { return _capacity; }
         size_t& size() { return *_psize; }
         const size_t& size() const { return *_psize; }
-
-        T& front()
-        {
-            assert(size());
-            return *_array;
-        }
-
-        T& back()
-        {
-            assert(size());
-            return _array[size()];
-        }
-
-        void replace(const T& oldOne, const T& newVal)
-        {
-            for (auto& elm : *this)
-            {
-                if (elm == oldOne)
-                {
-                    elm = newVal;
-                    return;
-                }
-            }
-        }
-
-        void append(T value)
-        {
-            assert(size() < capacity());
-            _array[size()] = value;
-            (*_psize)++;
-        }
-
-        void append(T* from, T* to)
-        {
-            insert(end(), from, to);
-        }
-
-        void insert(T* where, T* from, T* to)
-        {
-            int length = to - from;
-            assert(capacity() - size() >= (size_t)(to - from));
-            std::copy(where, end(), where + length);
-            std::copy(from, to, where);
-            size() += length;
-        }
-
-        void erase(size_t where)
-        {
-            assert(where >= 0 && where < size());
-            std::move(_array + where + 1, _array + size(), _array + where);
-            size()--;
-        }
-
-        void pop_back()
-        {
-            assert(size() > 0);
-            size()--;
-        }
-
-        void pop_back_n(size_t n)
-        {
-            assert(size() >= n);
-            size() -= n;
-        }
     };
 
     class TreeNode
@@ -165,9 +101,9 @@ private:
             assert(selfPos != -1);
             if (selfPos < parent().ptr_count() - 1)
             {
-                return{parent().keys()[selfPos], parent().ptrs()[selfPos + 1]};
+                return{ parent().keys()[selfPos], parent().ptrs()[selfPos + 1] };
             }
-            return{key_type(), nullptr};
+            return{ key_type(), nullptr };
         }
 
         std::pair<key_type, ptr_type> left_key_and_sibling()
@@ -177,9 +113,9 @@ private:
             assert(selfPos != -1);
             if (selfPos > 1)
             {
-                return{parent().keys()[selfPos - 1], parent().ptrs()[selfPos - 1]};
+                return{ parent().keys()[selfPos - 1], parent().ptrs()[selfPos - 1] };
             }
-            return{key_type(), nullptr};
+            return{ key_type(), nullptr };
         }
 
         ptr_type self_ptr() const { return _selfPtr; }
@@ -244,8 +180,9 @@ private:
         }
         void remove_entry(const key_type& key)
         {
-            auto iterEntry = std::find(keys().begin(), keys().end(), key);
-
+            auto iterEntry = std::find(keys().begin(), keys().end(), [&key](const key_type& ckey) {
+                return ckey == key;
+            });
             if (iterEntry != keys().end())
             {
                 auto offset = iterEntry - keys().begin();
@@ -272,8 +209,8 @@ private:
             if (iterFirstGTKey == node.keys().end()) //iFirstGTKey == end
             {
                 auto iLastNonNullptr = std::find_if(std::make_reverse_iterator(node.ptrs().end()),
-                    std::make_reverse_iterator(node.ptrs().begin()),
-                    [](const ptr_type& cptr) {
+                                                    std::make_reverse_iterator(node.ptrs().begin()),
+                                                    [](const ptr_type& cptr) {
                     return cptr != ptr_type(nullptr);
                 });
                 node = TreeNode(*iLastNonNullptr);
@@ -393,96 +330,29 @@ private:
         }
     }
 
-    void remove_entry(TreeNode node, const key_type& key)
+    void remove_entry(TreeNode& node, const key_type& key)
     {
         node.remove_entry(key);
         if (node.parent_ptr() == nullptr && node.ptr_count() == 1) //is root and only one child
         {
             _root = node.ptrs()[0];
-            BufferManager::instance().drop_block(node.self_ptr());
         }
         else if (node.ptr_count() < ptr_count / 2)
         {
-            bool nodeIsPredecessor = true;
             auto psibling = node.right_key_and_sibling();
             if (psibling.second == nullptr)
             {
-                nodeIsPredecessor = false;
                 psibling = node.left_key_and_sibling();
             }
             assert(psibling.second != nullptr);
             TreeNode sibling(psibling.second);
             key_type sideKey = psibling.first;
-            if (sibling.key_count() + node.key_count() <= key_count &&
-                sibling.ptr_count() + node.ptr_count() <= ptr_count)
+            if(sibling.key_count() + node.key_count() <= key_count &&
+               sibling.ptr_count() + node.ptr_count() <= ptr_count)
             {
-                TreeNode* left = &sibling;
-                TreeNode* right = &node;
-                if (nodeIsPredecessor)
-                {
-                    left = &node;
-                    right = &sibling;
-                }
-                if (!right->is_leaf())
-                {
-                    left->keys().append(sideKey);
-                    left->keys().append(right->keys().begin(), right->keys().end());
-                    left->ptrs().append(right->ptrs().begin(), right->ptrs().end());
-                }
-                else
-                {
-                    left->keys().append(right->keys().begin(), right->keys().end());
-                    left->ptrs().append(right->ptrs().begin(), right->ptrs().end() - 1);
-                    left->next_ptr() = right->next_ptr();
-                    remove_entry(right->parent(), sideKey);
-                    BufferManager::instance().drop_block(right->self_ptr());
-                }
+                // TODO: 
             }
-            else //redistribution
-            {
-                if (!nodeIsPredecessor)
-                {
-                    if (!node.is_leaf())
-                    {
-                        auto ptr = sibling.ptrs().back();
-                        sibling.ptrs().pop_back();
-                        auto skey = sibling.keys().back();
-                        sibling.keys().pop_back();
-                        node.insert_before_ptr(0, ptr, sideKey);
-                        node.parent().keys().replace(sideKey, skey);
-                    }
-                    else
-                    {
-                        auto lastKey = sibling.keys().back();
-                        auto preLastPtr = sibling.ptrs()[sibling.keys().size() - 1];
-                        sibling.keys().pop_back();
-                        sibling.ptrs().erase(sibling.keys().size() - 1);
-                        node.insert_before_ptr(0, preLastPtr, lastKey);
-                        node.parent().keys().replace(sideKey, lastKey);
-                    }
-                }
-                else
-                {
-                    if (!sibling.is_leaf())
-                    {
-                        auto ptr = node.ptrs().back();
-                        node.ptrs().pop_back();
-                        auto skey = node.keys().back();
-                        node.keys().pop_back();
-                        sibling.insert_before_ptr(0, ptr, sideKey);
-                        sibling.parent().keys().replace(sideKey, skey);
-                    }
-                    else
-                    {
-                        auto lastKey = node.keys().back();
-                        auto preLastPtr = node.ptrs()[node.keys().size() - 1];
-                        node.keys().pop_back();
-                        node.ptrs().erase(node.keys().size() - 1);
-                        sibling.insert_before_ptr(0, preLastPtr, lastKey);
-                        sibling.parent().keys().replace(sideKey, lastKey);
-                    }
-                }
-            }
+
         }
     }
 
@@ -590,7 +460,9 @@ public:
     {
         TreeNode targetLeaf = find_leaf(key);
 
-        auto iterValue = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), key);
+        auto iterValue = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), [&key](const key_type& ckey) {
+            return key == ckey;
+        });
         auto iValue = iterValue - targetLeaf.keys().begin();
         if (iterValue != targetLeaf.keys().end())
         {

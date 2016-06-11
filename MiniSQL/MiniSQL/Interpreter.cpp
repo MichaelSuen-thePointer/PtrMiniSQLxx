@@ -207,9 +207,6 @@ void Interpreter::insert()
     }
     EXPECT(Kind::SemiColon, "';'");
 
-    UniqueChecker checker{builder.table_name(), builder.get_field()};
-    checker.linearly_check();
-
     RecordManager::instance().insert_entry(builder.table_name(), builder.get_field());
 }
 
