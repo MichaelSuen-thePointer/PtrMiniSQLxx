@@ -1,10 +1,6 @@
 #pragma once
 #include "CatalogManager.h"
 #include "RecordManager.h"
-#include "Utils.h"
-#include <string>
-#include <memory>
-#include <vector>
 
 class Value
 {
@@ -567,5 +563,36 @@ public:
     {
         _query->execute_linearly();
         return nullptr;
+    }
+};
+
+class UniqueChecker
+{
+    const TableInfo& _tableInfo;
+    TableInfo::RawTupleProxy _tuple;
+public:
+    UniqueChecker(const std::string& tableInfo, byte* raw)
+        : _tableInfo(CatalogManager::instance().find_table(tableInfo))
+        , _tuple(_tableInfo[raw])
+    {
+    }
+    
+    void linearly_check() const
+    {
+        auto& table = RecordManager::instance().find_table(_tuple.table_info().name());
+        auto recCount = table.size();
+        for(size_t i = 0; i != recCount; i++)
+        {
+            for(const auto& fieldInfo : _tuple.table_info().fields())
+            {
+                if(fieldInfo.is_unique())
+                {
+                    if (_tableInfo[table[i]][fieldInfo.name()] == _tuple[fieldInfo.name()])
+                    {
+                        throw NotUnique(fieldInfo.name().c_str());
+                    }
+                }
+            }
+        }
     }
 };

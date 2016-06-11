@@ -98,6 +98,25 @@ public:
 
     size_t size() const { return _size; }
 
+    std::string name() const
+    {
+        switch(_type)
+        {
+        case Int:
+            return "int";
+            break;
+        case Float: 
+            return "float";
+            break;
+        case Chars: 
+            return "char(" + std::to_string(_size)+ ")";
+            break;
+        default: 
+            return "invalid";
+            break;
+        }
+    }
+
     bool operator==(const TypeInfo& other) const
     {
         return _type == other._type && _size == other._size;
@@ -311,6 +330,41 @@ public:
         }
     };
 
+    class RawTupleProxy : Uncopyable
+    {
+        friend class TableInfo;
+    private:
+        byte* _raw;
+        const TableInfo* _info;
+        RawTupleProxy(byte* block, const TableInfo* info)
+            : _raw(block)
+            , _info(info)
+        {
+        }
+    public:
+        RawTupleProxy(RawTupleProxy&& other)
+            : _raw(other._raw)
+            , _info(other._info)
+        {
+            other._raw = nullptr;
+            other._info = nullptr;
+        }
+
+        const TableInfo& table_info() const { return *_info; }
+        
+        ValueProxy operator[](const std::string& keyName) const
+        {
+            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
+                return item._name == keyName;
+            });
+            if (place == _info->_fields.end())
+            {
+                throw InvalidKey(("invalid key name: " + keyName).c_str());
+            }
+            return{_raw + place->_offset, &place->_info};
+        }
+    };
+
     const std::string& name() const { return _name; }
 
     size_t primary_pos() const { return _primaryPos; }
@@ -329,6 +383,11 @@ public:
     TupleProxy operator[](const BufferBlock& block) const
     {
         return{block.ptr(), this};
+    }
+
+    RawTupleProxy operator[](byte* raw) const
+    {
+        return RawTupleProxy{raw, this};
     }
 
     const TokenField& field(const std::string& fieldName) const
@@ -423,6 +482,8 @@ public:
         }
         return -1;
     }
+
+    const std::vector<TableInfo>& tables() const { return _tables; }
 
 private:
     std::vector<TableInfo> _tables;

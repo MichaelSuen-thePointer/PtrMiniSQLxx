@@ -2,7 +2,7 @@ BM: loaded
 BM: ask block CatalogManagerMeta 0 0
 BM: not found
 BM: alloate block
-BM: create token 2 for file name CatalogManagerMeta
+BM: token 2 for file name CatalogManagerMeta
 BM: read file CatalogManagerMeta 0 0
 BM: place block at block array
 BB: ctor CatalogManagerMeta 0 0
@@ -10,15 +10,47 @@ BB: content asked CatalogManagerMeta 0 0
 BM: ask block CatalogManagerMeta 0 1
 BM: not found
 BM: alloate block
-BM: create token 2 for file name CatalogManagerMeta
+BM: token 2 for file name CatalogManagerMeta
 BM: read file CatalogManagerMeta 0 1
 BM: place block at block array
 BB: ctor CatalogManagerMeta 0 1
 BB: content asked CatalogManagerMeta 0 1
+BM: ask block CatalogManagerMeta 0 2
+BM: not found
+BM: alloate block
+BM: token 2 for file name CatalogManagerMeta
+BM: read file CatalogManagerMeta 0 2
+BM: place block at block array
+BB: ctor CatalogManagerMeta 0 2
+BB: content asked CatalogManagerMeta 0 2
+BM: ask block CatalogManagerMeta 0 3
+BM: not found
+BM: alloate block
+BM: token 2 for file name CatalogManagerMeta
+BM: read file CatalogManagerMeta 0 3
+BM: place block at block array
+BB: ctor CatalogManagerMeta 0 3
+BB: content asked CatalogManagerMeta 0 3
+BM: ask block CatalogManagerMeta 0 4
+BM: not found
+BM: alloate block
+BM: token 2 for file name CatalogManagerMeta
+BM: read file CatalogManagerMeta 0 4
+BM: place block at block array
+BB: ctor CatalogManagerMeta 0 4
+BB: content asked CatalogManagerMeta 0 4
+BM: ask block CatalogManagerMeta 0 5
+BM: not found
+BM: alloate block
+BM: token 2 for file name CatalogManagerMeta
+BM: read file CatalogManagerMeta 0 5
+BM: place block at block array
+BB: ctor CatalogManagerMeta 0 5
+BB: content asked CatalogManagerMeta 0 5
 BM: ask block RecordManagerMeta 0 0
 BM: not found
 BM: alloate block
-BM: create token 1 for file name RecordManagerMeta
+BM: token 1 for file name RecordManagerMeta
 BM: read file RecordManagerMeta 0 0
 BM: place block at block array
 BB: ctor RecordManagerMeta 0 0
@@ -27,7 +59,7 @@ BB: content asked RecordManagerMeta 0 0
 BM: ask block RecordManagerMeta 1 0
 BM: not found
 BM: alloate block
-BM: create token 1 for file name RecordManagerMeta
+BM: token 1 for file name RecordManagerMeta
 BM: read file RecordManagerMeta 1 0
 BM: place block at block array
 BB: ctor RecordManagerMeta 1 0
@@ -37,22 +69,89 @@ BB: unlock RecordManagerMeta 1 0
 BM: ask block RecordManagerMeta 1 1
 BM: not found
 BM: alloate block
-BM: create token 1 for file name RecordManagerMeta
+BM: token 1 for file name RecordManagerMeta
 BM: read file RecordManagerMeta 1 1
 BM: place block at block array
 BB: ctor RecordManagerMeta 1 1
 BB: lock RecordManagerMeta 1 1
 BB: content asked RecordManagerMeta 1 1
 BB: unlock RecordManagerMeta 1 1
+BM: ask block RecordManagerMeta 2 0
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 2 0
+BM: place block at block array
+BB: ctor RecordManagerMeta 2 0
+BB: lock RecordManagerMeta 2 0
+BB: content asked RecordManagerMeta 2 0
+BB: unlock RecordManagerMeta 2 0
+BM: ask block RecordManagerMeta 2 1
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 2 1
+BM: place block at block array
+BB: ctor RecordManagerMeta 2 1
+BB: lock RecordManagerMeta 2 1
+BB: content asked RecordManagerMeta 2 1
+BB: unlock RecordManagerMeta 2 1
+BM: ask block RecordManagerMeta 3 0
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 3 0
+BM: place block at block array
+BB: ctor RecordManagerMeta 3 0
+BB: lock RecordManagerMeta 3 0
+BB: content asked RecordManagerMeta 3 0
+BB: unlock RecordManagerMeta 3 0
+BM: ask block RecordManagerMeta 3 1
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 3 1
+BM: place block at block array
+BB: ctor RecordManagerMeta 3 1
+BB: lock RecordManagerMeta 3 1
+BB: content asked RecordManagerMeta 3 1
+BB: unlock RecordManagerMeta 3 1
+BM: ask block RecordManagerMeta 4 0
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 4 0
+BM: place block at block array
+BB: ctor RecordManagerMeta 4 0
+BB: lock RecordManagerMeta 4 0
+BB: content asked RecordManagerMeta 4 0
+BB: unlock RecordManagerMeta 4 0
+BM: ask block RecordManagerMeta 5 0
+BM: not found
+BM: alloate block
+BM: token 1 for file name RecordManagerMeta
+BM: read file RecordManagerMeta 5 0
+BM: place block at block array
+BB: ctor RecordManagerMeta 5 0
+BB: lock RecordManagerMeta 5 0
+BB: content asked RecordManagerMeta 5 0
+BB: unlock RecordManagerMeta 5 0
 BB: unlock RecordManagerMeta 0 0
 BP: ctor 0 0 0 0
 BP: dtor 0 0 0 0
+BP: ctor 0 0 0 28
+BP: dtor 0 0 0 0
+BP: dtor 0 0 0 28
+BP: ctor 0 0 0 56
+BP: dtor 0 0 0 0
+BP: dtor 0 0 0 28
+BP: dtor 0 0 0 56
 BP: dtor 0 0 0 0
 BP: deref
 BM: ask block t1_records 0 0
 BM: not found
 BM: alloate block
-BM: create token 0 for file name t1_records
+BM: token 0 for file name t1_records
 BM: read file t1_records 0 0
 BM: place block at block array
 BB: ctor t1_records 0 0
@@ -70,417 +169,6 @@ BM: ask block t1_records 0 0
 BM: found
 BB: content asked t1_records 0 0
 BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 84
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BP: ctor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 84
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BB: get dirty
-BP: ctor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 28
-BP: dtor 0 0 0 56
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
-BP: dtor 0 0 0 0
-BP: deref
-BM: ask block t1_records 0 0
-BM: found
-BB: content asked t1_records 0 0
-BP: dtor 0 0 0 0
 BP: dtor 0 0 0 28
 BP: deref
 BM: ask block t1_records 0 0
@@ -520,6 +208,78 @@ BP: dtor 0 0 0 56
 BP: dtor 0 0 0 0
 BP: dtor 0 0 0 28
 BP: dtor 0 0 0 56
+BP: ctor 3 0 0 0
+BP: dtor 3 0 0 0
+BP: dtor 3 0 0 0
+BP: deref
+BM: ask block tt_records 0 0
+BM: not found
+BM: alloate block
+BM: token 3 for file name tt_records
+BM: read file tt_records 0 0
+BM: place block at block array
+BB: ctor tt_records 0 0
+BB: content asked tt_records 0 0
+BP: dtor 3 0 0 0
+BP: dtor 3 0 0 0
+BP: deref
+BM: ask block tt_records 0 0
+BM: found
+BB: content asked tt_records 0 0
+BP: dtor 3 0 0 0
+BP: dtor 3 0 0 0
+BP: deref
+BM: ask block tt_records 0 0
+BM: found
+BB: content asked tt_records 0 0
+BP: dtor 3 0 0 0
+BP: dtor 3 0 0 0
+BP: ctor 4 0 0 0
+BP: dtor 4 0 0 0
+BP: dtor 4 0 0 0
+BP: deref
+BM: ask block ttt_records 0 0
+BM: not found
+BM: alloate block
+BM: token 4 for file name ttt_records
+BM: read file ttt_records 0 0
+BM: place block at block array
+BB: ctor ttt_records 0 0
+BB: content asked ttt_records 0 0
+BP: dtor 4 0 0 0
+BP: dtor 4 0 0 0
+BP: deref
+BM: ask block ttt_records 0 0
+BM: found
+BB: content asked ttt_records 0 0
+BP: dtor 4 0 0 0
+BP: dtor 4 0 0 0
+BP: deref
+BM: ask block ttt_records 0 0
+BM: found
+BB: content asked ttt_records 0 0
+BP: dtor 4 0 0 0
+BP: dtor 4 0 0 0
+BP: ctor 6 0 0 0
+BP: dtor 6 0 0 0
+BP: dtor 6 0 0 0
+BP: deref
+BM: ask block ttt4_records 0 0
+BM: not found
+BM: alloate block
+BM: token 6 for file name ttt4_records
+BM: read file ttt4_records 0 0
+BM: place block at block array
+BB: ctor ttt4_records 0 0
+BB: content asked ttt4_records 0 0
+BP: dtor 6 0 0 0
+BP: dtor 6 0 0 0
+BP: deref
+BM: ask block ttt4_records 0 0
+BM: found
+BB: content asked ttt4_records 0 0
+BP: dtor 6 0 0 0
+BP: dtor 6 0 0 0
 BM: ask block RecordManagerMeta 0 0
 BM: found
 BB: lock RecordManagerMeta 0 0
@@ -536,6 +296,42 @@ BB: lock RecordManagerMeta 1 1
 BB: content asked RecordManagerMeta 1 1
 BB: get dirty
 BB: unlock RecordManagerMeta 1 1
+BM: ask block RecordManagerMeta 2 0
+BM: found
+BB: lock RecordManagerMeta 2 0
+BB: content asked RecordManagerMeta 2 0
+BB: get dirty
+BB: unlock RecordManagerMeta 2 0
+BM: ask block RecordManagerMeta 2 1
+BM: found
+BB: lock RecordManagerMeta 2 1
+BB: content asked RecordManagerMeta 2 1
+BB: get dirty
+BB: unlock RecordManagerMeta 2 1
+BM: ask block RecordManagerMeta 3 0
+BM: found
+BB: lock RecordManagerMeta 3 0
+BB: content asked RecordManagerMeta 3 0
+BB: get dirty
+BB: unlock RecordManagerMeta 3 0
+BM: ask block RecordManagerMeta 3 1
+BM: found
+BB: lock RecordManagerMeta 3 1
+BB: content asked RecordManagerMeta 3 1
+BB: get dirty
+BB: unlock RecordManagerMeta 3 1
+BM: ask block RecordManagerMeta 4 0
+BM: found
+BB: lock RecordManagerMeta 4 0
+BB: content asked RecordManagerMeta 4 0
+BB: get dirty
+BB: unlock RecordManagerMeta 4 0
+BM: ask block RecordManagerMeta 5 0
+BM: found
+BB: lock RecordManagerMeta 5 0
+BB: content asked RecordManagerMeta 5 0
+BB: get dirty
+BB: unlock RecordManagerMeta 5 0
 BB: get dirty
 BB: unlock RecordManagerMeta 0 0
 BM: ask block CatalogManagerMeta 0 0
@@ -546,10 +342,54 @@ BM: ask block CatalogManagerMeta 0 1
 BM: found
 BB: content asked CatalogManagerMeta 0 1
 BB: get dirty
+BM: ask block CatalogManagerMeta 0 2
+BM: found
+BB: content asked CatalogManagerMeta 0 2
+BB: get dirty
+BM: ask block CatalogManagerMeta 0 3
+BM: found
+BB: content asked CatalogManagerMeta 0 3
+BB: get dirty
+BM: ask block CatalogManagerMeta 0 4
+BM: found
+BB: content asked CatalogManagerMeta 0 4
+BB: get dirty
+BM: ask block CatalogManagerMeta 0 5
+BM: found
+BB: content asked CatalogManagerMeta 0 5
+BB: get dirty
 BM: saved
+BB: block dtor ttt4_records 0 0
+BM: done
+BB: block dtor ttt_records 0 0
+BM: done
+BB: block dtor tt_records 0 0
+BM: done
 BB: block dtor t1_records 0 0
+BM: done
+BB: block dtor RecordManagerMeta 5 0
 BM: block need to be saved
-BM: write file t1_records 0 0
+BM: write file RecordManagerMeta 5 0
+BM: done
+BB: block dtor RecordManagerMeta 4 0
+BM: block need to be saved
+BM: write file RecordManagerMeta 4 0
+BM: done
+BB: block dtor RecordManagerMeta 3 1
+BM: block need to be saved
+BM: write file RecordManagerMeta 3 1
+BM: done
+BB: block dtor RecordManagerMeta 3 0
+BM: block need to be saved
+BM: write file RecordManagerMeta 3 0
+BM: done
+BB: block dtor RecordManagerMeta 2 1
+BM: block need to be saved
+BM: write file RecordManagerMeta 2 1
+BM: done
+BB: block dtor RecordManagerMeta 2 0
+BM: block need to be saved
+BM: write file RecordManagerMeta 2 0
 BM: done
 BB: block dtor RecordManagerMeta 1 1
 BM: block need to be saved
@@ -562,6 +402,22 @@ BM: done
 BB: block dtor RecordManagerMeta 0 0
 BM: block need to be saved
 BM: write file RecordManagerMeta 0 0
+BM: done
+BB: block dtor CatalogManagerMeta 0 5
+BM: block need to be saved
+BM: write file CatalogManagerMeta 0 5
+BM: done
+BB: block dtor CatalogManagerMeta 0 4
+BM: block need to be saved
+BM: write file CatalogManagerMeta 0 4
+BM: done
+BB: block dtor CatalogManagerMeta 0 3
+BM: block need to be saved
+BM: write file CatalogManagerMeta 0 3
+BM: done
+BB: block dtor CatalogManagerMeta 0 2
+BM: block need to be saved
+BM: write file CatalogManagerMeta 0 2
 BM: done
 BB: block dtor CatalogManagerMeta 0 1
 BM: block need to be saved

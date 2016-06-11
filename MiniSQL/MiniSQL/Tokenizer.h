@@ -40,6 +40,9 @@ public:
         Where,
         Into,
         Exit,
+        Show,
+        Tables,
+        Desc,
         End,
     };
     struct Token

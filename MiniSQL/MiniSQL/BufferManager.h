@@ -30,11 +30,17 @@ private:
 
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
 
+    std::map<std::string, std::set<IndexPair>> _freeIndexPairs;
+
     const static char* const FileName;
 
     BufferManager()
         : _blocks()
     {
+        for(auto& block : _blocks)
+        {
+            block.reset();
+        }
         load();
     }
 
@@ -55,6 +61,10 @@ public:
     }
 
     BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+
+    BufferBlock& alloc_block(const std::string& fileName);
+    void drop_block(BufferBlock& block);
+    void drop_block(const BlockPtr& block);
 
     uint32_t allocate_file_name_index(const std::string& fileName);
     const std::string& check_file_name(uint32_t index);
@@ -165,6 +175,7 @@ public:
 class BlockPtr
 {
     friend class BufferBlock;
+    friend class BufferManager;
 private:
     uint32_t _fileNameIndex;
     uint32_t _fileIndex;

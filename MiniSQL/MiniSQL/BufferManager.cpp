@@ -81,6 +81,21 @@ void BufferManager::load()
             _indexNameMap.insert({label, fileName});
             _nameIndexMap.insert({fileName, label});
         }
+        size_t managedFileCount;
+        config >> managedFileCount;
+        for (size_t i = 0; i != managedFileCount; i++)
+        {
+            std::string fileName;
+            config >> fileName;
+            size_t freeIndexCount;
+            config >> freeIndexCount;
+            for (size_t j = 0; j != freeIndexCount; j++)
+            {
+                IndexPair pair;
+                config >> pair.first >> pair.second;
+                _freeIndexPairs[fileName].insert(pair);
+            }
+        }
     }
     log("BM: loaded");
 }
@@ -94,6 +109,16 @@ void BufferManager::save()
         for (auto& pair : _indexNameMap)
         {
             config << pair.first << " " << pair.second << "\n";
+        }
+
+        config << _freeIndexPairs.size() << "\n";
+        for (const auto& file : _freeIndexPairs)
+        {
+            config << file.first << " " << file.second.size() << "\n";
+            for (const auto& pair : file.second)
+            {
+                config << pair.first << " " << pair.second << "\n";
+            }
         }
     }
     log("BM: saved");
@@ -110,6 +135,36 @@ BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t 
     }
     log("BM: not found");
     return alloc_block(fileName, fileIndex, blockIndex);
+}
+
+BufferBlock& BufferManager::alloc_block(const std::string& fileName)
+{
+    log("alloc block for", fileName);
+    if(_freeIndexPairs[fileName].size() == 0)
+    {
+        _freeIndexPairs[fileName].insert({0,0});
+    }
+    auto& managedFileIndices = _freeIndexPairs[fileName];
+
+    auto iterPair = managedFileIndices.begin();
+    auto pair = *iterPair;
+    managedFileIndices.erase(iterPair);
+    if(managedFileIndices.size() == 0)
+    {
+        managedFileIndices.insert(pair + 1);
+    }
+    log("choose pair", pair.first, pair.second);
+    return find_or_alloc(fileName, pair.first, pair.second);
+}
+
+void BufferManager::drop_block(BufferBlock& block)
+{
+    _freeIndexPairs[block._fileName].insert({block._fileIndex, block._blockIndex});
+}
+
+void BufferManager::drop_block(const BlockPtr& block)
+{
+    _freeIndexPairs[check_file_name(block._fileNameIndex)].insert({block._fileIndex, block._blockIndex});
 }
 
 size_t BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
@@ -199,7 +254,7 @@ uint32_t BufferManager::allocate_file_name_index(const std::string& fileName)
     {
         index = place->second;
     }
-    log("BM: create token", index, "for file name", fileName);
+    log("BM: token", index, "for file name", fileName);
     return index;
 }
 

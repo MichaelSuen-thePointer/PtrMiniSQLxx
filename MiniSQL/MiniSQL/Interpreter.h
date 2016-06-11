@@ -22,9 +22,9 @@ public:
             command.push_back(std::cin.get());
             if (command.back() == ';')
             {
-                _tokenizer.reset(command);
                 try
                 {
+                    _tokenizer.reset(command);
                     if (!execute_command())
                     {
                         return;
@@ -89,6 +89,16 @@ public:
             select();
             break;
         }
+        case Kind::Desc:
+        {
+            desc_table();
+            break;
+        }
+        case Kind::Show:
+        {
+            show_table();
+            break;
+        }
         case Kind::Exit:
             return false;
             break;
@@ -112,6 +122,39 @@ public:
     static void delete_entry();
 
     static void show_select_result(const SelectStatementBuilder& builder);
+
+    static void desc_table()
+    {
+        auto tokTableName = _tokenizer.get();
+        ASSERT(tokTableName, Kind::Identifier, "table name");
+        EXPECT(Kind::SemiColon, "';'");
+
+        auto& table = CatalogManager::instance().find_table(tokTableName.content);
+
+        std::cout << table.name() << std::endl;
+
+        for (auto& field : table.fields())
+        {
+            std::cout << field.name() << " : " << field.type_info().name() << (field.is_unique() ? " unique" : "") << std::endl;
+        }
+
+        if (table.primary_pos() != -1)
+        {
+            std::cout << "primary key: " << table.fields()[table.primary_pos()].name() << std::endl;
+        }
+
+    }
+
+    static void show_table()
+    {
+        EXPECT(Kind::Tables, "keyword 'tables'");
+        EXPECT(Kind::SemiColon, "';'");
+        auto& cm = CatalogManager::instance();
+        for (auto& tables : cm.tables())
+        {
+            std::cout << tables.name() << "\n";
+        }
+    }
 
     static Type to_type(const Token& token)
     {
