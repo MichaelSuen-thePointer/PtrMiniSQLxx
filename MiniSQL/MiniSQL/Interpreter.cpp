@@ -286,3 +286,13 @@ void Interpreter::show_select_result(const SelectStatementBuilder& builder)
         std::cout << std::endl;
     }
 }
+
+void Interpreter::drop_table()
+{
+    auto tokTableName = _tokenizer.get();
+    ASSERT(tokTableName, Kind::Identifier, "table name");
+    EXPECT(Kind::SemiColon, "';'");
+
+    CatalogManager::instance().remove_table(tokTableName.content);
+    RecordManager::instance().remove_table(tokTableName.content);
+}

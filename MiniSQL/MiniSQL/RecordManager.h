@@ -176,7 +176,7 @@ public:
         return place.first->second;
     }
 
-    void delete_table(const std::string& tableName)
+    void remove_table(const std::string& tableName)
     {
         if (!table_exists(tableName))
         {

@@ -7,8 +7,8 @@ Comparator* Comparator::from_type(Type type, size_t length)
 {
     static std::array<std::unique_ptr<Comparator>, 255> comparers;
     assert(type == Chars);
-    
-    if(comparers[length - 1] == nullptr)
+
+    if (comparers[length - 1] == nullptr)
     {
         comparers[length - 1].reset(new CharsComparator(length));
     }
@@ -20,11 +20,11 @@ Comparator* Comparator::from_type(Type type)
     static std::unique_ptr<IntComparator> intComparer(new IntComparator());
     static std::unique_ptr<FloatComparator> floatComparer(new FloatComparator());
     assert(type != Chars);
-    if(type == Int)
+    if (type == Int)
     {
         return intComparer.get();
     }
-    if(type == Float)
+    if (type == Float)
     {
         return floatComparer.get();
     }

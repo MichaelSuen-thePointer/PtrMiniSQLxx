@@ -21,6 +21,7 @@ public:
         EQ,
         Dot,
         Comma,
+        Drop,
         SemiColon,
         Table,
         Int,

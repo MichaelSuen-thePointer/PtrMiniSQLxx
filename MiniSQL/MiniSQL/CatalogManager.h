@@ -326,7 +326,7 @@ public:
             {
                 throw InvalidKey(("invalid key name: " + keyName).c_str());
             }
-            return{_block->raw_ptr() + place->_offset, &place->_info};
+            return{(*_block).raw_ptr() + place->_offset, &place->_info};
         }
     };
 
@@ -380,7 +380,7 @@ public:
         return{ptr, this};
     }
 
-    TupleProxy operator[](const BufferBlock& block) const
+    TupleProxy operator[](const OffsetBlockProxy& block) const
     {
         return{block.ptr(), this};
     }
@@ -481,6 +481,12 @@ public:
             }
         }
         return -1;
+    }
+
+    void remove_table(const std::string& tableName)
+    {
+        size_t i = locate_table(tableName);
+        _tables.erase(_tables.begin() + i);
     }
 
     const std::vector<TableInfo>& tables() const { return _tables; }

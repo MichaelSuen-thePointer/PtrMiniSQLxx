@@ -79,6 +79,11 @@ public:
             delete_entry();
             break;
         }
+        case Kind::Drop:
+        {
+            drop_table();
+            break;
+        }
         case Kind::Insert:
         {
             insert();
@@ -122,6 +127,8 @@ public:
     static void delete_entry();
 
     static void show_select_result(const SelectStatementBuilder& builder);
+
+    static void drop_table();
 
     static void desc_table()
     {

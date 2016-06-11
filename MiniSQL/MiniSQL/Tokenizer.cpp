@@ -21,6 +21,7 @@ std::map<std::string, Tokenizer::Kind> Tokenizer::_keywordMap =
     { "select", Kind::Select },
     { "where", Kind::Where },
     { "into", Kind::Into },
+    { "drop", Kind::Drop },
     { "exit", Kind::Exit },
     { ",", Kind::Comma },
     { ";", Kind::SemiColon },
