@@ -2,14 +2,7 @@
 
 #include "BPlusTree.h"
 #include "MemoryReadStream.h"
-
-enum Type
-{
-    Int,
-    Float,
-    Chars
-};
-
+#include "TypeInfo.h"
 
 template<size_t l, size_t r>
 class CharTreeCreater
@@ -88,6 +81,39 @@ public:
     }
 };
 
+class IndexInfo
+{
+private:
+    std::string _fieldName;
+    Comparator* _comparator;
+    std::unique_ptr<BPlusTreeBase> _tree;
+public:
+    IndexInfo(const std::string& cs, Comparator* comparator, BPlusTreeBase* tree)
+        : _fieldName(cs)
+        , _comparator(comparator)
+        , _tree(tree)
+    {
+    }
+    IndexInfo(IndexInfo&& rhs)
+        : _fieldName(std::move(rhs._fieldName))
+        , _comparator(rhs._comparator)
+        , _tree(rhs._tree.release())
+    {
+    }
+
+    const std::string& field_name() const { return _fieldName; }
+    Comparator* comaprator() const { return _comparator; }
+    BPlusTreeBase* tree() const { return _tree.get(); }
+};
+
+
+template<>
+class Serializer<IndexInfo>
+{
+public:
+    static IndexInfo deserialize(MemoryReadStream& mrs);
+    static void serialize(MemoryWriteStream& mws, const IndexInfo& value);
+};
 
 class IndexManager : Uncopyable
 {
@@ -99,7 +125,7 @@ public:
     }
 
 private:
-    std::map<std::string, std::unique_ptr<BPlusTreeBase>> _tables;
+    std::map<std::string, IndexInfo> _tables;
 
     const static char* const FileName;
 public:
@@ -116,27 +142,25 @@ public:
         byte* rawMem = block.as<byte>();
 
         MemoryReadStream ostream(rawMem, BufferBlock::BlockSize);
-        uint16_t usedBlocks;
-        ostream >> usedBlocks;
 
-        for (uint16_t iBlock = 0; iBlock != usedBlocks; iBlock++)
+        uint16_t iBlock = 0;
+        for(;;)
         {
             uint16_t totalEntry;
             ostream >> totalEntry;
+            if(totalEntry == -1)
+            {
+                break;
+            }
             auto& entryBlock = BufferManager::instance().find_or_alloc(FileName, 0, iBlock + 1);
             MemoryReadStream blockStream(entryBlock.as<byte>(), BufferBlock::BlockSize);
             for (uint16_t iEntry = 0; iEntry != totalEntry; iEntry++)
             {
                 std::string tableName;
-                BlockPtr rootPtr;
-                Type type;
-                size_t size;
                 blockStream >> tableName;
-                rootPtr = Serializer<BlockPtr>::deserialize(blockStream);
-                blockStream >> type;
-                blockStream >> size;
-                _tables.insert({tableName, TreeCreater::create(type, size, rootPtr, tableName + "_index")});
+                _tables.insert({tableName, Serializer<IndexInfo>::deserialize(blockStream)});
             }
+            iBlock++;
         }
         block.unlock();
     }
@@ -152,7 +176,7 @@ public:
 
         ostream << (uint16_t)_tables.size();
 
-        size_t iBlock = 0;
+        uint16_t iBlock = 0;
         for (const auto& pair : _tables)
         {
             uint16_t totalEntry = 0;
@@ -162,14 +186,15 @@ public:
             while(blockStream.remain() > pair.first.size() + sizeof(BlockPtr) + sizeof(Type) + sizeof(size_t))
             {
                 blockStream << pair.first;
-                Serializer<BlockPtr>::serialize(blockStream, pair.second->root());
-                blockStream << pair.
+                Serializer<IndexInfo>::serialize(blockStream, pair.second);
 
                 totalEntry++;
             }
+            entryBlock.notify_modification();
             ostream << totalEntry;
             iBlock++;
         }
+        ostream << (uint16_t)-1;
 
         block.notify_modification();
         block.unlock();
