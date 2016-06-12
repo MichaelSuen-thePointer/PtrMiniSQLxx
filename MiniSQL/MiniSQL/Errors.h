@@ -2,6 +2,15 @@
 
 using namespace std::string_literals;
 
+class KeyExist : public std::runtime_error
+{
+public:
+    explicit KeyExist(const char* msg)
+        : runtime_error(("key exists: " + std::string(msg)).c_str())
+    {
+    }
+};
+
 class SQLError : public std::runtime_error
 {
 public:
