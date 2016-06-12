@@ -61,3 +61,43 @@ std::pair<T, T> operator+(const std::pair<T, T>& lhs, U value)
     }
     return result;
 }
+
+template<typename T1, typename T2, typename U, std::enable_if_t<
+    std::is_integral<T1>::value &&
+    std::is_integral<T2>::value &&
+    std::is_convertible<U, T1>::value &&
+    std::is_convertible<U, T2>::value>* = nullptr>
+    std::pair<T1, T2>& operator+=(std::pair<T1, T2>& lhs, U value)
+{
+    if (lhs.second <= (T2)(std::numeric_limits<T2>::max() - (T2)value))
+    {
+        lhs.second += value;
+    }
+    else
+    {
+        lhs.first += 1;
+        lhs.second = (T2)value - (T2)(std::numeric_limits<T2>::max() - lhs.second);
+    }
+    return lhs;
+}
+
+template<typename T1, typename T2, typename U, std::enable_if_t<
+    std::is_integral<T1>::value &&
+    std::is_integral<T2>::value &&
+    std::is_convertible<U, T1>::value &&
+    std::is_convertible<U, T2>::value>* = nullptr>
+    std::pair<T1, T2> operator+(const std::pair<T1, T2>& lhs, U value)
+{
+    std::pair<T1, T2> result = lhs;
+
+    if (result.second <= (T2)(std::numeric_limits<T2>::max() - (T2)value))
+    {
+        result.second += value;
+    }
+    else
+    {
+        result.first += 1;
+        result.second = (T2)value - (T2)(std::numeric_limits<T2>::max() - result.second);
+    }
+    return result;
+}

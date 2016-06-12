@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Serialization.h"
+
 struct ArrayDeleter
 {
     void operator()(byte* array) const
@@ -29,12 +31,17 @@ private:
     std::map<std::string, uint32_t> _nameIndexMap;
 
     std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
+    std::map<std::string, std::set<IndexPair>> _freeIndexPairs;
 
     const static char* const FileName;
 
     BufferManager()
         : _blocks()
     {
+        for (auto& block : _blocks)
+        {
+            block.reset();
+        }
         load();
     }
 
@@ -59,6 +66,10 @@ public:
     uint32_t allocate_file_name_index(const std::string& fileName);
     const std::string& check_file_name(uint32_t index);
     uint32_t check_file_index(const std::string& file);
+
+    BufferBlock& alloc_block(const std::string& fileName);
+    void drop_block(BufferBlock& block);
+    void drop_block(const BlockPtr& block);
 
     bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:
@@ -167,6 +178,8 @@ public:
 class BlockPtr
 {
     friend class BufferBlock;
+    friend class BufferManager;
+    friend class Serializer<BlockPtr>;
 private:
     uint32_t _fileNameIndex;
     uint32_t _fileIndex;
@@ -247,6 +260,23 @@ public:
     {
         log("BP: deref");
         return const_cast<BlockPtr*>(this)->operator->();
+    }
+};
+
+template<>
+class Serializer<BlockPtr>
+{
+public:
+    static BlockPtr deserialize(MemoryReadStream& mrs)
+    {
+        BlockPtr t;
+        mrs >> t._fileNameIndex >> t._fileIndex >> t._blockIndex >> t._offset;
+        return t;
+    }
+
+    static void serialize(MemoryWriteStream& mws, const BlockPtr& value)
+    {
+        mws << value._fileNameIndex << value._fileIndex << value._blockIndex << value._offset;
     }
 };
 
