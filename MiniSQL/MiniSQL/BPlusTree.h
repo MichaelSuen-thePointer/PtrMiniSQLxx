@@ -9,41 +9,6 @@ public:
     virtual BlockPtr find(byte* pkey) = 0;
     virtual void remove(byte* key) = 0;
     virtual void insert(byte* pkey, const BlockPtr& ptr) = 0;
-
-    virtual BlockPtr root() const = 0;
-private:
-    virtual byte* get_leaf_ptr(const BlockPtr& pLeaf, size_t i) = 0;
-    virtual void add_leaf_ptr(BlockPtr& pLeaf, size_t& i) = 0;
-
-    class TreeIterator
-    {
-    private:
-        BPlusTreeBase* _this;
-        BlockPtr _pBTreeNodeModel;
-        size_t _currentPtr;
-    public:
-        byte* operator*() const
-        {
-            return _this->get_leaf_ptr(_pBTreeNodeModel, _currentPtr);
-        }
-        TreeIterator& operator++()
-        {
-            _this->add_leaf_ptr(_pBTreeNodeModel, _currentPtr);
-            return *this;
-        }
-        bool valid() const
-        {
-            return _pBTreeNodeModel != nullptr;
-        }
-        bool operator==(const TreeIterator& rhs) const
-        {
-            return _this == rhs._this && _pBTreeNodeModel == rhs._pBTreeNodeModel && _currentPtr == rhs._currentPtr;
-        }
-        bool operator!=(const TreeIterator& rhs) const
-        {
-            return !(*this == rhs);
-        }
-    };
 };
 
 template<typename TKey>
@@ -55,12 +20,12 @@ public:
     const static size_t key_size = sizeof(key_type);
     const static size_t ptr_size = sizeof(ptr_type);
     const static size_t key_count = (BufferBlock::BlockSize
-        - ptr_size
-        - sizeof(size_t)
-        - sizeof(size_t)
-        - sizeof(bool)
-        - sizeof(BlockPtr)
-        ) / (key_size + ptr_size);
+                                     - ptr_size
+                                     - sizeof(size_t)
+                                     - sizeof(size_t)
+                                     - sizeof(bool)
+                                     - sizeof(BlockPtr)
+                                     ) / (key_size + ptr_size);
     const static size_t ptr_count = key_count + 1;
     const static size_t next_index = ptr_count - 1;
     struct BTreeNodeModel
@@ -74,12 +39,6 @@ public:
     };
     static_assert(sizeof(BTreeNodeModel) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
 
-
-    explicit BPlusTree(const BlockPtr& ptr, const std::string& fileName)
-        : _root(ptr)
-        , _fileName(fileName)
-    {
-    }
 private:
     template<typename T>
     class OberservableArray
@@ -142,9 +101,9 @@ private:
             assert(selfPos != -1);
             if (selfPos < parent().ptr_count() - 1)
             {
-                return{parent().keys()[selfPos], parent().ptrs()[selfPos + 1]};
+                return{ parent().keys()[selfPos], parent().ptrs()[selfPos + 1] };
             }
-            return{key_type(), nullptr};
+            return{ key_type(), nullptr };
         }
 
         std::pair<key_type, ptr_type> left_key_and_sibling()
@@ -154,9 +113,9 @@ private:
             assert(selfPos != -1);
             if (selfPos > 1)
             {
-                return{parent().keys()[selfPos - 1], parent().ptrs()[selfPos - 1]};
+                return{ parent().keys()[selfPos - 1], parent().ptrs()[selfPos - 1] };
             }
-            return{key_type(), nullptr};
+            return{ key_type(), nullptr };
         }
 
         ptr_type self_ptr() const { return _selfPtr; }
@@ -221,7 +180,9 @@ private:
         }
         void remove_entry(const key_type& key)
         {
-            auto iterEntry = std::find(keys().begin(), keys().end(), key);
+            auto iterEntry = std::find(keys().begin(), keys().end(), [&key](const key_type& ckey) {
+                return ckey == key;
+            });
             if (iterEntry != keys().end())
             {
                 auto offset = iterEntry - keys().begin();
@@ -236,7 +197,6 @@ private:
     BlockPtr _root;
     std::string _fileName;
 
-
     TreeNode find_leaf(const key_type& key)
     {
         TreeNode node(_root);
@@ -249,8 +209,8 @@ private:
             if (iterFirstGTKey == node.keys().end()) //iFirstGTKey == end
             {
                 auto iLastNonNullptr = std::find_if(std::make_reverse_iterator(node.ptrs().end()),
-                    std::make_reverse_iterator(node.ptrs().begin()),
-                    [](const ptr_type& cptr) {
+                                                    std::make_reverse_iterator(node.ptrs().begin()),
+                                                    [](const ptr_type& cptr) {
                     return cptr != ptr_type(nullptr);
                 });
                 node = TreeNode(*iLastNonNullptr);
@@ -387,8 +347,8 @@ private:
             assert(psibling.second != nullptr);
             TreeNode sibling(psibling.second);
             key_type sideKey = psibling.first;
-            if (sibling.key_count() + node.key_count() <= key_count &&
-                sibling.ptr_count() + node.ptr_count() <= ptr_count)
+            if(sibling.key_count() + node.key_count() <= key_count &&
+               sibling.ptr_count() + node.ptr_count() <= ptr_count)
             {
                 // TODO: 
             }
@@ -500,7 +460,9 @@ public:
     {
         TreeNode targetLeaf = find_leaf(key);
 
-        auto iterValue = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), key);
+        auto iterValue = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), [&key](const key_type& ckey) {
+            return key == ckey;
+        });
         auto iValue = iterValue - targetLeaf.keys().begin();
         if (iterValue != targetLeaf.keys().end())
         {
@@ -571,30 +533,5 @@ public:
         insert(*reinterpret_cast<const key_type*>(pkey), ptr);
     }
 
-private:
-    byte* get_leaf_ptr(const BlockPtr& pLeaf, size_t i) override
-    {
-        assert(i < TreeNode{pLeaf}.ptr_count() - 1);
-        TreeNode{pLeaf}.ptrs()[i]->raw_ptr();
-    }
-
-    void add_leaf_ptr(BlockPtr& pLeaf, size_t& i) override
-    {
-        if (TreeNode{pLeaf}.ptr_count() - 1 == i)
-        {
-            i = 0;
-            pLeaf = TreeNode{pLeaf}.next_ptr();
-        }
-        else
-        {
-            i++;
-        }
-    }
-
-public:
-    BlockPtr root() const override
-    {
-        return _root;
-    }
 };
 
