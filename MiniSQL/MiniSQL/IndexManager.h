@@ -190,7 +190,8 @@ public:
 
     std::vector<BlockPtr> search(const std::string& tableName, byte* lower, byte* upper)
     {
-
+        auto& indexInfo = check_index(tableName);
+        
     }
 
     IndexManager()
