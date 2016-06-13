@@ -10,6 +10,7 @@ public:
     virtual void remove(byte* key) = 0;
     virtual void insert(byte* pkey, const BlockPtr& ptr) = 0;
 
+    virtual void drop_tree() = 0;
     virtual BlockPtr root() const = 0;
 private:
     virtual byte* get_leaf_ptr(const BlockPtr& pLeaf, size_t i) = 0;
@@ -595,6 +596,11 @@ public:
     BlockPtr root() const override
     {
         return _root;
+    }
+
+    virtual void drop_tree() override
+    {
+        BufferManager::instance().drop_block(_fileName);
     }
 };
 

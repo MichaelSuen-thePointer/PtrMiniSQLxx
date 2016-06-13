@@ -38,6 +38,14 @@ public:
     }
 };
 
+class NoIndex : public std::runtime_error
+{
+public:
+    explicit NoIndex(const char* msg)
+        : runtime_error(("no index: " + std::string(msg)).c_str())
+    {
+    }
+}; 
 
 class InvalidIndex : public std::runtime_error
 {

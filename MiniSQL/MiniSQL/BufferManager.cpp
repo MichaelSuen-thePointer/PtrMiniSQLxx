@@ -154,6 +154,11 @@ void BufferManager::drop_block(const BlockPtr& block)
     _freeIndexPairs[check_file_name(block._fileNameIndex)].insert({block._fileIndex, block._blockIndex});
 }
 
+void BufferManager::drop_block(const std::string & name)
+{
+    _freeIndexPairs.erase(name);
+}
+
 
 BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {

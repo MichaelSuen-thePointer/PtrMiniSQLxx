@@ -74,7 +74,7 @@ class TypeInfo
 private:
     Type _type;
     size_t _size;
-    Comparator* _comparer;
+    Comparator* _comparator;
 public:
     static bool is_convertible(Type from, Type to)
     {
@@ -83,19 +83,21 @@ public:
     TypeInfo(Type type, size_t length)
         : _type(type)
         , _size(length)
-        , _comparer(Comparator::from_type(type, length))
+        , _comparator(Comparator::from_type(type, length))
     {
     }
     explicit TypeInfo(Type type)
         : _type(type)
         , _size(sizeof(int))
-        , _comparer(Comparator::from_type(type))
+        , _comparator(Comparator::from_type(type))
     {
     }
 
     Type type() const { return _type; }
 
     size_t size() const { return _size; }
+
+    Comparator* comparator() const { return _comparator; }
 
     std::string name() const
     {

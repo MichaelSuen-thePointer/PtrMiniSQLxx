@@ -70,6 +70,7 @@ public:
     BufferBlock& alloc_block(const std::string& fileName);
     void drop_block(BufferBlock& block);
     void drop_block(const BlockPtr& block);
+    void drop_block(const std::string& name);
 
     bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:

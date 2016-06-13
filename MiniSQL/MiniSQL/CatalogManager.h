@@ -116,7 +116,7 @@ public:
         {
             if (*_info == *other._info)
             {
-                return (*_info->_comparer)(_raw, other._raw);
+                return (*_info->_comparator)(_raw, other._raw);
             }
             throw InvalidType("compare type doesn't match");
         }

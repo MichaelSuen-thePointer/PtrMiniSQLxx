@@ -8,7 +8,7 @@ template<size_t l, size_t r>
 class CharTreeCreater
 {
 public:
-    static std::unique_ptr<BPlusTreeBase> create(size_t size, const BlockPtr& ptr, const std::string& name)
+    static BPlusTreeBase* create(size_t size, const BlockPtr& ptr, const std::string& name)
     {
         if (size > (l + r) / 2)
         {
@@ -20,7 +20,7 @@ public:
         }
         else
         {
-            return std::make_unique<BPlusTree<std::array<char, (l + r) / 2>>>(ptr, name);
+            return new BPlusTree<std::array<char, (l + r) / 2>>(ptr, name);
         }
     }
 };
@@ -30,7 +30,7 @@ class CharTreeCreater<1, 1>
 {
 public:
 
-    static std::unique_ptr<BPlusTreeBase> create(size_t size, const BlockPtr& ptr, const std::string& name)
+    static BPlusTreeBase* create(size_t size, const BlockPtr& ptr, const std::string& name)
     {
         if (size != 1)
         {
@@ -38,7 +38,7 @@ public:
         }
         else
         {
-            return std::make_unique<BPlusTree<std::array<char, 1>>>(ptr, name);
+            return new BPlusTree<std::array<char, 1>>(ptr, name);
         }
     }
 };
@@ -47,7 +47,7 @@ template<>
 class CharTreeCreater<255, 255>
 {
 public:
-    static std::unique_ptr<BPlusTreeBase> create(size_t size, const BlockPtr& ptr, const std::string& name)
+    static BPlusTreeBase* create(size_t size, const BlockPtr& ptr, const std::string& name)
     {
         if (size != 1)
         {
@@ -55,7 +55,7 @@ public:
         }
         else
         {
-            return std::make_unique<BPlusTree<std::array<char, 255>>>(ptr, name);
+            return new BPlusTree<std::array<char, 255>>(ptr, name);
         }
     }
 };
@@ -64,15 +64,15 @@ public:
 class TreeCreater
 {
 public:
-    static std::unique_ptr<BPlusTreeBase> create(Type type, size_t size, const BlockPtr& ptr, const std::string& name)
+    static BPlusTreeBase* create(Type type, size_t size, const BlockPtr& ptr, const std::string& name)
     {
         if (type == Int)
         {
-            return std::make_unique<BPlusTree<int>>(ptr, name);
+            return new BPlusTree<int>(ptr, name);
         }
         else if (type == Float)
         {
-            return std::make_unique<BPlusTree<float>>(ptr, name);
+            return new BPlusTree<float>(ptr, name);
         }
         else
         {
@@ -115,7 +115,7 @@ public:
     static void serialize(MemoryWriteStream& mws, const IndexInfo& value);
 };
 
-class IndexManager : Uncopyable
+class IndexManager: Uncopyable
 {
 public:
     static IndexManager& instance()
@@ -129,6 +129,70 @@ private:
 
     const static char* const FileName;
 public:
+
+    void create_index(const std::string& tableName, const std::string& fieldName,
+                      const TypeInfo& type)
+    {
+        auto iterPrev = _tables.find(tableName);
+        if (iterPrev != _tables.end())
+        {
+            iterPrev->second.tree()->drop_tree();
+        }
+        _tables.insert({tableName, IndexInfo{fieldName, type.comparator(),
+                       TreeCreater::create(type.type(), type.size(), 
+                                           BufferManager::instance().alloc_block(tableName + "_record").ptr(),
+                                           tableName + "_record")}});
+    }
+
+    void drop_index(const std::string& tableName)
+    {
+        auto iterPrev = _tables.find(tableName);
+        if (iterPrev != _tables.end())
+        {
+            iterPrev->second.tree()->drop_tree();
+        }
+        else
+        {
+            throw NoIndex(tableName.c_str());
+        }
+    }
+
+    bool has_index(const std::string& tableName)
+    {
+        return _tables.find(tableName) != _tables.end();
+    }
+
+    const IndexInfo& check_index(const std::string& tableName)
+    {
+        auto iter = _tables.find(tableName);
+        if (iter != _tables.end())
+        {
+            return iter->second;
+        }
+        throw NoIndex(tableName.c_str());
+    }
+
+    void insert(const std::string& tableName, byte* key, const BlockPtr& ptr)
+    {
+        auto iter = _tables.find(tableName);
+        if (iter == _tables.end())
+        {
+            throw NoIndex(tableName.c_str());
+        }
+        iter->second.tree()->insert(key, ptr);
+    }
+
+    void remove(const std::string& tableName, byte* key)
+    {
+        auto& indexInfo = check_index(tableName);
+        indexInfo.tree()->remove(key);
+    }
+
+    std::vector<BlockPtr> search(const std::string& tableName, byte* lower, byte* upper)
+    {
+
+    }
+
     IndexManager()
         : _tables()
     {
@@ -144,11 +208,11 @@ public:
         MemoryReadStream ostream(rawMem, BufferBlock::BlockSize);
 
         uint16_t iBlock = 0;
-        for(;;)
+        for (;;)
         {
             uint16_t totalEntry;
             ostream >> totalEntry;
-            if(totalEntry == -1)
+            if (totalEntry == -1)
             {
                 break;
             }
@@ -183,7 +247,7 @@ public:
 
             auto& entryBlock = BufferManager::instance().find_or_alloc(FileName, 0, iBlock + 1);
             MemoryWriteStream blockStream(entryBlock.as<byte>(), BufferBlock::BlockSize);
-            while(blockStream.remain() > pair.first.size() + sizeof(BlockPtr) + sizeof(Type) + sizeof(size_t))
+            while (blockStream.remain() > pair.first.size() + sizeof(BlockPtr) + sizeof(Type) + sizeof(size_t))
             {
                 blockStream << pair.first;
                 Serializer<IndexInfo>::serialize(blockStream, pair.second);
