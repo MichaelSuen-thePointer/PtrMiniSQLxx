@@ -152,7 +152,7 @@ public:
     private:
         BlockPtr _block;
         const TableInfo* _info;
-        TupleProxy(BlockPtr block, const TableInfo* info)
+        TupleProxy(const BlockPtr& block, const TableInfo* info)
             : _block(block)
             , _info(info)
         {
@@ -174,7 +174,7 @@ public:
             {
                 throw InvalidKey(("invalid key name: " + keyName).c_str());
             }
-            return{(*_block).raw_ptr() + place->_offset, &place->_info};
+            return{_block->raw_ptr() + place->_offset, &place->_info};
         }
     };
 

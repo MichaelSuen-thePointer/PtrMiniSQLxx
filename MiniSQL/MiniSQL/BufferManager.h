@@ -96,7 +96,7 @@ private:
     uint16_t _blockIndex;
     bool _isLocked;
     bool _hasModified;
-    boost::posix_time::ptime _lastModifiedTime;
+    mutable boost::posix_time::ptime _lastModifiedTime;
     uint16_t _offset;
 
     BufferBlock()
@@ -130,6 +130,11 @@ public:
     {
         log("BB: get dirty");
         _hasModified = true;
+        update_time();
+    }
+
+    void update_time() const
+    {
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
 
@@ -146,6 +151,7 @@ public:
     template<typename T>
     T* as()
     {
+        update_time();
         log("BB: content asked", _fileName, _fileIndex, _blockIndex);
         int tempOffset = _offset;
         _offset = 0;
@@ -283,5 +289,6 @@ public:
 
 inline BlockPtr BufferBlock::ptr() const
 {
+    update_time();
     return BlockPtr(BufferManager::instance().check_file_index(_fileName), _fileIndex, _blockIndex, _offset);
 }

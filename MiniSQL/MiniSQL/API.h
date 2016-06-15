@@ -10,7 +10,7 @@ class Value
 {
 public:
     virtual ~Value() {}
-    virtual TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) = 0;
+    virtual TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) = 0;
 };
 
 class TokenFieldValue : public Value
@@ -22,9 +22,9 @@ public:
         : _fieldName(fieldName)
     {
     }
-    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) override
     {
-        return info[block][_fieldName];
+        return info[ptr][_fieldName];
     }
 };
 
@@ -38,6 +38,7 @@ public:
         : _value(new byte[type.size()])
         , _type(&type)
     {
+        memset(_value.get(), 0, type.size());
         switch (_type->type())
         {
         case Int:
@@ -63,7 +64,7 @@ public:
         }
     }
 
-    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) override
     {
         return TableInfo::ValueProxy(_value.get(), _type);
     }
@@ -85,7 +86,7 @@ public:
         , _rhs(rhs)
     {
     }
-    virtual bool evaluate(const TableInfo& info, const BufferBlock& block) const = 0;
+    virtual bool evaluate(const TableInfo& info, const BlockPtr& ptr) const = 0;
     virtual ComparisonType type() const = 0;
 };
 
@@ -96,9 +97,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) == _rhs->value(info, block);
+        return _lhs->value(info, ptr) == _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Eq; }
 };
@@ -110,9 +111,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) != _rhs->value(info, block);
+        return _lhs->value(info, ptr) != _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Ne; }
 };
@@ -124,9 +125,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) > _rhs->value(info, block);
+        return _lhs->value(info, ptr) > _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Gt; }
 };
@@ -138,9 +139,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) < _rhs->value(info, block);
+        return _lhs->value(info, ptr) < _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Lt; }
 };
@@ -152,9 +153,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) >= _rhs->value(info, block);
+        return _lhs->value(info, ptr) >= _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Gt; }
 };
@@ -166,9 +167,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) <= _rhs->value(info, block);
+        return _lhs->value(info, ptr) <= _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Le; }
 };
@@ -246,7 +247,7 @@ public:
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                if (cmpEntry->evaluate(*_info, recList[i]) == false)
                 {
                     success = false;
                     break;
@@ -279,7 +280,7 @@ public:
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                if (cmpEntry->evaluate(*_info, recList[i]) == false)
                 {
                     success = false;
                     break;

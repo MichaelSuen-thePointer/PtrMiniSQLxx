@@ -4,7 +4,7 @@
 class Tokenizer
 {
 public:
-    enum class Kind
+    enum class Kind : int
     {
         Identifier,
         Integer,
