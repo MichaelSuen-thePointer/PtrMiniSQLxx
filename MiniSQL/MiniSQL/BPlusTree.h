@@ -641,18 +641,20 @@ private:
 
     TreeNode insert_split_leaf(TreeNode& node, const key_type& key, const ptr_type& ptr)
     {
-        assert(node.ptr_count() == ptr_count);
-        assert(node.key_count() == key_count);
+        assert(node.ptr_count() == node.ptrs().capacity());
+        assert(node.key_count() == node.keys().capacity());
+
+        size_t leafPtrCount = node.ptrs().capacity();
 
         key_type* temp_keys = new key_type[key_count + 1];
-        ptr_type* temp_ptrs = new ptr_type[ptr_count];
+        ptr_type* temp_ptrs = new ptr_type[leafPtrCount + 1];
         std::copy(node.keys().begin(), node.keys().end(), temp_keys);
-        std::copy(node.ptrs().begin(), node.ptrs().end() - 1, temp_ptrs);
+        std::copy(node.ptrs().begin(), node.ptrs().end(), temp_ptrs);
 
         if (key < temp_keys[0])
         {
             std::move(temp_keys, temp_keys + key_count, temp_keys + 1);
-            std::move(temp_ptrs, temp_ptrs + ptr_count - 1, temp_ptrs + 1);
+            std::move(temp_ptrs, temp_ptrs + leafPtrCount, temp_ptrs + 1);
             temp_keys[0] = key;
             temp_ptrs[0] = ptr;
         }
@@ -663,11 +665,11 @@ private:
             });
             auto iInsertAfter = place - temp_keys - 1;
 
-            std::move(temp_keys + iInsertAfter, temp_keys + key_count, temp_keys + iInsertAfter + 1);
-            std::move(temp_ptrs + iInsertAfter, temp_ptrs + ptr_count - 1, temp_ptrs + iInsertAfter + 1);
+            std::move(temp_keys + iInsertAfter + 1, temp_keys + key_count, temp_keys + iInsertAfter + 2);
+            std::move(temp_ptrs + iInsertAfter + 1, temp_ptrs + leafPtrCount, temp_ptrs + iInsertAfter + 2);
 
-            temp_keys[iInsertAfter] = key;
-            temp_ptrs[iInsertAfter] = ptr;
+            temp_keys[iInsertAfter + 1] = key;
+            temp_ptrs[iInsertAfter + 1] = ptr;
         }
 
         BufferBlock& newBlock = BufferManager::instance().alloc_block(_fileName);
@@ -675,18 +677,18 @@ private:
         newNode.reset(true);
         newNode.next_ptr() = node.next_ptr();
         node.next_ptr() = newNode.self_ptr();
-        node.key_count() = ptr_count / 2;
-        node.ptr_count() = ptr_count / 2;
-        std::copy(temp_ptrs, temp_ptrs + ptr_count / 2, node.ptrs().begin());
-        std::copy(temp_keys, temp_keys + ptr_count / 2, node.keys().begin());
+        node.key_count() = leafPtrCount / 2;
+        node.ptr_count() = leafPtrCount / 2;
+        std::copy(temp_ptrs, temp_ptrs + leafPtrCount / 2, node.ptrs().begin());
+        std::copy(temp_keys, temp_keys + leafPtrCount / 2, node.keys().begin());
 
-        newNode.key_count() = ptr_count - ptr_count / 2;
-        newNode.key_count() = ptr_count - ptr_count / 2;
-        std::copy(temp_ptrs + ptr_count / 2, temp_ptrs + ptr_count, newNode.ptrs().begin());
-        std::copy(temp_keys + ptr_count / 2, temp_keys + ptr_count, newNode.keys().begin());
+        newNode.key_count() = leafPtrCount - leafPtrCount / 2;
+        newNode.ptr_count() = leafPtrCount - leafPtrCount / 2;
+        std::copy(temp_ptrs + leafPtrCount / 2, temp_ptrs + leafPtrCount, newNode.ptrs().begin());
+        std::copy(temp_keys + leafPtrCount / 2, temp_keys + leafPtrCount, newNode.keys().begin());
 
-        delete[] temp_keys;
         delete[] temp_ptrs;
+        delete[] temp_keys;
 
         return newNode;
     }

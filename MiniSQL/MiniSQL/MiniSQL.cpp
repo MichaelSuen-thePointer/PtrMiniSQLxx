@@ -8,9 +8,9 @@ int main()
                             BufferManager::instance().alloc_block("test_btree_record").ptr(),
                             "test_btree_record", true));
 
-    int arr[] = {1,2,3,4,5,6,7,8,9,10};
-    for (auto& i : arr)
+    BlockPtr placeholder{255,255,255,0};
+    for (int i = 0; i != 255; i++)
     {
-        tree->insert((byte*)&i, nullptr);
+        tree->insert((byte*)&i, placeholder);
     }
 }

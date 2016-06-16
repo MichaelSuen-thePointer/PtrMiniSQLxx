@@ -1,49 +1,3534 @@
 BM: loaded
 alloc block for test_btree_record
-choose pair 0 0
-BM: ask block test_btree_record 0 0
+choose pair 0 1
+BM: ask block test_btree_record 0 1
 BM: not found
 BM: alloate block
 BM: create token 3 for file name test_btree_record
-BM: read file test_btree_record 0 0
+BM: read file test_btree_record 0 1
 BM: place block at block array
-BB: ctor test_btree_record 0 0
-BP: ctor 3 0 0 0
+BB: ctor test_btree_record 0 1
+BP: ctor 3 0 1 0
 BP: deref
-BM: ask block test_btree_record 0 0
+BM: ask block test_btree_record 0 1
 BM: found
-BB: content asked test_btree_record 0 0
-BM: ask block test_btree_record 0 0
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
 BM: found
-BP: dtor 3 0 0 0
-BM: ask block test_btree_record 0 0
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
 BM: found
-BP: dtor 3 0 0 0
-BM: ask block test_btree_record 0 0
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
 BM: found
-BP: dtor 3 0 0 0
+BP: dtor 3 0 1 0
+BP: ctor 255 255 255 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BP: deref
+BM: ask block test_btree_record 0 1
+BM: found
+BB: content asked test_btree_record 0 1
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
+BM: ask block test_btree_record 0 1
+BM: found
+BP: dtor 3 0 1 0
 BP: ctor 4294967295 4294967295 65535 65535
-BP: deref
-BM: ask block test_btree_record 0 0
-BM: found
-BB: content asked test_btree_record 0 0
-BM: ask block test_btree_record 0 0
-BM: found
-BP: dtor 3 0 0 0
-BM: ask block test_btree_record 0 0
-BM: found
-BP: dtor 3 0 0 0
-BM: ask block test_btree_record 0 0
-BM: found
-BP: dtor 3 0 0 0
 BP: ctor 4294967295 4294967295 65535 65535
-BP: deref
-BM: ask block test_btree_record 0 0
-BM: found
-BB: content asked test_btree_record 0 0
-BM: ask block test_btree_record 0 0
-BM: found
-BP: dtor 3 0 0 0
-BM: ask block test_btree_record 0 0
-BM: found
-BP: dtor 3 0 0 0
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP: ctor 4294967295 4294967295 65535 65535
+BP:
