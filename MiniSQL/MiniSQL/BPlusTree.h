@@ -264,8 +264,8 @@ private:
 
         void insert_after_ptr(size_t i, const key_type& key, const ptr_type& ptr)
         {
-            assert(ptr_count() < BPlusTree/*<TKey>*/::ptr_count);
-            assert(key_count() < BPlusTree/*<TKey>*/::key_count);
+            assert(ptr_count() < BPlusTree<TKey>::ptr_count);
+            assert(key_count() < BPlusTree<TKey>::key_count);
             assert(i + 1 >= 0 && i + 1 < ptr_count());
             assert(i >= 0 && i < key_count());
 
@@ -279,8 +279,8 @@ private:
         }
         void insert_before_ptr(size_t i, const ptr_type& ptr, const key_type& key)
         {
-            assert(ptr_count() < BPlusTree/*<TKey>*/::ptr_count);
-            assert(key_count() < BPlusTree/*<TKey>*/::key_count);
+            assert(ptr_count() < BPlusTree<TKey>::ptr_count);
+            assert(key_count() < BPlusTree<TKey>::key_count);
             assert(i >= 0 && i < ptr_count());
             assert(i >= 0 && i < key_count());
 
@@ -694,7 +694,7 @@ public:
         {
             return{targetLeaf.self_ptr(), iValue};
         }
-        return{nullptr, -1};
+        return{targetLeaf.next_ptr(), 0};
     }
 
     void remove(const key_type& key)
@@ -778,8 +778,17 @@ public:
     {
         auto left = find(lower);
         auto right = find(upper);
-
-        
+        std::vector<BlockPtr> result;
+        if (left)
+        {
+            while (left != right)
+            {
+                result.push_back(*left);
+                ++left;
+            }
+            result.push_back(*right);
+        }
+        return result;
     }
 
     void remove(byte* pkey) override
@@ -792,7 +801,6 @@ public:
     }
 
 public:
-
     virtual void drop_tree() override
     {
         BufferManager::instance().drop_block(_fileName);
