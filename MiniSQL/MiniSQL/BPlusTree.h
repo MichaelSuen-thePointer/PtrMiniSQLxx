@@ -41,10 +41,11 @@ public:
                                      - sizeof(size_t)
                                      - sizeof(size_t)
                                      - sizeof(bool)
-                                     - sizeof(BlockPtr)
+                                     - sizeof(ptr_type)
                                      ) / (key_size + ptr_size);
     const static size_t ptr_count = key_count + 1;
     const static size_t next_index = ptr_count - 1;
+#pragma pack(1)
     struct BTreeNodeModel
     {
         bool is_leaf;
@@ -54,6 +55,7 @@ public:
         key_type keys[key_count];
         ptr_type ptrs[ptr_count];
     };
+#pragma pack()
     static_assert(sizeof(BTreeNodeModel) <= BufferBlock::BlockSize, "sizeof(BTreeNode) > BufferBlock::BlockSize");
 
     explicit BPlusTree(const BlockPtr& ptr, const std::string& fileName, bool isNew)
@@ -111,7 +113,7 @@ private:
             }
         }
 
-        void append(T value)
+        void append(const T& value)
         {
             assert(size() < capacity());
             _array[size()] = value;
@@ -215,8 +217,8 @@ private:
         void reset(bool is_leaf = false)
         {
             _base->is_leaf = is_leaf;
-            _base->total_key = 0;
-            _base->total_ptr = 0;
+            _base->total_key = BPlusTree::key_count;
+            _base->total_ptr = BPlusTree::ptr_count;
             _base->parent = nullptr;
 
             for (size_t i = 0; i != BPlusTree::ptr_count; i++)
@@ -231,6 +233,8 @@ private:
             {
                 keys()[i] = key_type{};
             }
+            _base->total_key = 0;
+            _base->total_ptr = 0;
         }
         explicit TreeNode(ptr_type blockPtr)
             : _selfPtr(blockPtr)
@@ -281,8 +285,8 @@ private:
         {
             assert(ptr_count() < BPlusTree<TKey>::ptr_count);
             assert(key_count() < BPlusTree<TKey>::key_count);
-            assert(i >= 0 && i < ptr_count());
-            assert(i >= 0 && i < key_count());
+            assert(i >= 0 && i <= ptr_count());
+            assert(i >= 0 && i <= key_count());
 
             ptr_count() += 1;
             std::move(ptrs().begin() + i, ptrs().end(), ptrs().begin() + i + 1);
@@ -334,7 +338,7 @@ private:
                 _ptr = TreeNode{_ptr}.next_ptr();
             }
             _i++;
-            return;
+            return *this;
         }
         operator bool() const
         {
@@ -404,7 +408,13 @@ private:
         ++leaf.keys().count();
         ++leaf.ptrs().count();
         */
-        if (key < leaf.keys()[0])
+        if (leaf.key_count() == 0)
+        {
+            assert(leaf.ptr_count() == 0);
+            leaf.ptrs().append(ptr);
+            leaf.keys().append(key);
+        }
+        else if (key < leaf.keys()[0])
         {
             leaf.insert_before_ptr(0, ptr, key);
         }
@@ -690,9 +700,10 @@ public:
             return ckey >= key;
         });
         auto iValue = iterValue - targetLeaf.keys().begin();
+        assert(iValue >= 0);
         if (iterValue != targetLeaf.keys().end())
         {
-            return{targetLeaf.self_ptr(), iValue};
+            return{targetLeaf.self_ptr(), (size_t)iValue};
         }
         return{targetLeaf.next_ptr(), 0};
     }
@@ -727,7 +738,7 @@ public:
         }
         if (node.ptr_count() == 0)
         {
-            return{nullptr, -1};
+            return{nullptr, (size_t)-1};
         }
         return TreeIterator{node.self_ptr(), 0};
     }
@@ -776,8 +787,8 @@ public:
     }
     virtual std::vector<BlockPtr> find_range(byte* lower, byte* upper) override
     {
-        auto left = find(lower);
-        auto right = find(upper);
+        auto left = find(*reinterpret_cast<key_type*>(lower));
+        auto right = find(*reinterpret_cast<key_type*>(upper));
         std::vector<BlockPtr> result;
         if (left)
         {

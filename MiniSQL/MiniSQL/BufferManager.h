@@ -13,7 +13,7 @@ struct ArrayDeleter
 class BufferBlock;
 class BlockPtr;
 
-class BufferManager : Uncopyable
+class BufferManager: Uncopyable
 {
     friend class BufferBlock;
     friend class BlockPtr;
@@ -83,7 +83,7 @@ private:
 
 };
 
-class BufferBlock : Uncopyable
+class BufferBlock: Uncopyable
 {
     friend class BufferManager;
     friend class BlockPtr;
@@ -215,8 +215,11 @@ public:
     }
     ~BlockPtr()
     {
-        assert(BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex)._offset == 0);
-        log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
+        if (_fileIndex != -1)
+        {
+            assert(BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex)._offset == 0);
+            log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
+        }
     }
     BlockPtr& operator=(const BlockPtr& other)
     {

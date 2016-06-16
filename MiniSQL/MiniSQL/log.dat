@@ -1,311 +1,49 @@
 BM: loaded
-BM: ask block CatalogManagerMeta 0 0
+alloc block for test_btree_record
+choose pair 0 0
+BM: ask block test_btree_record 0 0
 BM: not found
 BM: alloate block
-BM: create token 2 for file name CatalogManagerMeta
-BM: read file CatalogManagerMeta 0 0
+BM: create token 3 for file name test_btree_record
+BM: read file test_btree_record 0 0
 BM: place block at block array
-BB: ctor CatalogManagerMeta 0 0
-BB: content asked CatalogManagerMeta 0 0
-BM: ask block CatalogManagerMeta 0 1
-BM: not found
-BM: alloate block
-BM: create token 2 for file name CatalogManagerMeta
-BM: read file CatalogManagerMeta 0 1
-BM: place block at block array
-BB: ctor CatalogManagerMeta 0 1
-BB: content asked CatalogManagerMeta 0 1
-BM: ask block RecordManagerMeta 0 0
-BM: not found
-BM: alloate block
-BM: create token 1 for file name RecordManagerMeta
-BM: read file RecordManagerMeta 0 0
-BM: place block at block array
-BB: ctor RecordManagerMeta 0 0
-BB: lock RecordManagerMeta 0 0
-BB: content asked RecordManagerMeta 0 0
-BM: ask block RecordManagerMeta 1 0
-BM: not found
-BM: alloate block
-BM: create token 1 for file name RecordManagerMeta
-BM: read file RecordManagerMeta 1 0
-BM: place block at block array
-BB: ctor RecordManagerMeta 1 0
-BB: lock RecordManagerMeta 1 0
-BB: content asked RecordManagerMeta 1 0
-BB: unlock RecordManagerMeta 1 0
-BB: unlock RecordManagerMeta 0 0
-BP: ctor 0 0 0 0
+BB: ctor test_btree_record 0 0
+BP: ctor 3 0 0 0
 BP: deref
-BM: ask block test_table_records 0 0
-BM: not found
-BM: alloate block
-BM: create token 0 for file name test_table_records
-BM: read file test_table_records 0 0
-BM: place block at block array
-BB: ctor test_table_records 0 0
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 0
-BM: ask block test_table_records 0 0
+BB: content asked test_btree_record 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
+BP: dtor 3 0 0 0
+BM: ask block test_btree_record 0 0
+BM: found
+BP: dtor 3 0 0 0
+BM: ask block test_btree_record 0 0
+BM: found
+BP: dtor 3 0 0 0
+BP: ctor 4294967295 4294967295 65535 65535
 BP: deref
-BM: ask block test_table_records 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
+BB: content asked test_btree_record 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 28
-BM: ask block test_table_records 0 0
+BP: dtor 3 0 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
+BP: dtor 3 0 0 0
+BM: ask block test_btree_record 0 0
+BM: found
+BP: dtor 3 0 0 0
+BP: ctor 4294967295 4294967295 65535 65535
 BP: deref
-BM: ask block test_table_records 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
+BB: content asked test_btree_record 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
+BP: dtor 3 0 0 0
+BM: ask block test_btree_record 0 0
 BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BP: ctor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BP: ctor 0 0 0 0
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 0
-BP: ctor 0 0 0 28
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 28
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 28
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 84
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 84
-BP: ctor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BP: ctor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BP: ctor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 112
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BP: deref
-BM: ask block test_table_records 0 0
-BM: found
-BB: content asked test_table_records 0 0
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block test_table_records 0 0
-BM: found
-BP: dtor 0 0 0 56
-BM: ask block RecordManagerMeta 0 0
-BM: found
-BB: lock RecordManagerMeta 0 0
-BB: content asked RecordManagerMeta 0 0
-BM: ask block RecordManagerMeta 1 0
-BM: found
-BB: lock RecordManagerMeta 1 0
-BB: content asked RecordManagerMeta 1 0
-BB: get dirty
-BB: unlock RecordManagerMeta 1 0
-BB: get dirty
-BB: unlock RecordManagerMeta 0 0
-BM: ask block CatalogManagerMeta 0 0
-BM: found
-BB: content asked CatalogManagerMeta 0 0
-BB: get dirty
-BM: ask block CatalogManagerMeta 0 1
-BM: found
-BB: content asked CatalogManagerMeta 0 1
-BB: get dirty
-BM: saved
-BB: block dtor test_table_records 0 0
-BM: done
-BB: block dtor RecordManagerMeta 1 0
-BM: block need to be saved
-BM: write file RecordManagerMeta 1 0
-BM: done
-BB: block dtor RecordManagerMeta 0 0
-BM: block need to be saved
-BM: write file RecordManagerMeta 0 0
-BM: done
-BB: block dtor CatalogManagerMeta 0 1
-BM: block need to be saved
-BM: write file CatalogManagerMeta 0 1
-BM: done
-BB: block dtor CatalogManagerMeta 0 0
-BM: block need to be saved
-BM: write file CatalogManagerMeta 0 0
-BM: done
+BP: dtor 3 0 0 0
