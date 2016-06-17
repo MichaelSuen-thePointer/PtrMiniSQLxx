@@ -193,6 +193,11 @@
     <ClCompile Include="Tokenizer.cpp" />
     <ClCompile Include="TypeInfo.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="MiniSQL.natvis">
+      <SubType>Designer</SubType>
+    </Natvis>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

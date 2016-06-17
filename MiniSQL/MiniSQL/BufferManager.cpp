@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "BufferManager.h"
+#include <algorithm>
 
 const char* const BufferManager::FileName = "BufferManagerMeta";
 
@@ -159,33 +160,32 @@ void BufferManager::drop_block(const std::string & name)
     _freeIndexPairs.erase(name);
 }
 
-
 BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
     log("BM: ask block", fileName, fileIndex, blockIndex);
-    auto i = find_block(fileName, fileIndex, blockIndex);
-    if (i != -1)
+    auto iter = find_block(fileName, fileIndex, blockIndex);
+    if (iter != _blocks.end())
     {
         log("BM: found");
-        return *_blocks[i];
+        if (_blocks.size() > 5 && iter != _blocks.begin())
+        {
+            log("BM: move block to first place");
+            _blocks.splice(_blocks.begin(), _blocks, iter, std::next(iter));
+            return *_blocks.front();
+        }
+        return **iter;
     }
     log("BM: not found");
     return alloc_block(fileName, fileIndex, blockIndex);
 }
 
-size_t BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
+BufferManager::ListIter BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
-    for (size_t i = 0; i != _blocks.size(); ++i)
-    {
-        if (_blocks[i] != nullptr &&
-            _blocks[i]->_fileName == fileName &&
-            _blocks[i]->_fileIndex == fileIndex &&
-            _blocks[i]->_blockIndex == blockIndex)
-        {
-            return i;
-        }
-    }
-    return -1;
+    return std::find_if(_blocks.begin(), _blocks.end(), [&](const auto& elm) {
+        return elm->_fileName == fileName &&
+            elm->_fileIndex == fileIndex &&
+            elm->_blockIndex == blockIndex;
+    });
 }
 
 BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
@@ -196,46 +196,49 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fi
     byte* buffer = new byte[BufferBlock::BlockSize];
     read_file(buffer, fileName, fileIndex, blockIndex);
 
-    for (auto& block : _blocks)
+    if (_blocks.size() < BlockCount)
     {
-        if (block == nullptr)
-        {
-            log("BM: place block at block array");
-            block.reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
-            return *block;
-        }
+        log("BM: place block at block array");
+        _blocks.emplace_front(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
+        return *_blocks.front();
     }
     return replace_lru_block(buffer, fileName, fileIndex, blockIndex);
 }
 
 BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex)
 {
-    int lruIndex = -1;
-    for (size_t i = 0; i != _blocks.size(); i++)
+    ListIter lruIter = _blocks.end();
+    for (auto iter = _blocks.begin(); iter != _blocks.end(); ++iter)
     {
-        if (_blocks[i] != nullptr && !_blocks[i]->_isLocked)
+        if (!(*iter)->is_locked())
         {
-            if (lruIndex != -1)
+            if (lruIter != _blocks.end())
             {
-                if (_blocks[lruIndex]->_lastModifiedTime < _blocks[i]->_lastModifiedTime)
+                if ((*lruIter)->_lastModifiedTime < (*iter)->_lastModifiedTime)
                 {
-                    lruIndex = i;
+                    lruIter = iter;
                 }
             }
             else
             {
-                lruIndex = i;
+                lruIter = iter;
             }
         }
     }
-    if (lruIndex == -1)
+    if (lruIter == _blocks.end())
     {
         throw InsuffcientSpace("Cannot find a block to be replaced.");
     }
-    log("BM: replace lru block:", lruIndex, _blocks[lruIndex]->_fileName,
-        _blocks[lruIndex]->_fileIndex, _blocks[lruIndex]->_blockIndex);
-    _blocks[lruIndex].reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
-    return *_blocks[lruIndex];
+    log("BM: replace lru block:", (*lruIter)->_fileName, (*lruIter)->_fileIndex, (*lruIter)->_blockIndex);
+
+    lruIter->reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
+
+    if (lruIter != _blocks.begin())
+    {
+        _blocks.splice(_blocks.begin(), _blocks, lruIter, std::next(lruIter));
+    }
+
+    return *_blocks.front();
 }
 
 uint32_t BufferManager::allocate_file_name_index(const std::string& fileName)

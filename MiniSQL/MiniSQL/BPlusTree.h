@@ -63,7 +63,8 @@ public:
     {
         if (isNew)
         {
-            TreeNode{_root}.reset(true);
+            TreeNode rootNode{_root};
+            rootNode.reset(true);
         }
     }
 private:
@@ -235,34 +236,70 @@ private:
             }
             _base->total_key = 0;
             _base->total_ptr = 0;
+
+            _selfPtr->notify_modification();
         }
         explicit TreeNode(ptr_type blockPtr)
-            : _selfPtr(blockPtr)
-            , _base(blockPtr->as<BTreeNodeModel>())
-            , _keys(_base->keys, _base->total_key, BPlusTree::key_count)
-            , _ptrs(_base->ptrs, _base->total_ptr, _base->is_leaf ? BPlusTree::ptr_count - 1 : BPlusTree::ptr_count)
+            : TreeNode(*blockPtr)
         {
         }
         explicit TreeNode(BufferBlock& block)
-            : TreeNode(block.ptr())
+            : _selfPtr(block.ptr())
+            , _base(block.as<BTreeNodeModel>())
+            , _keys(_base->keys, _base->total_key, BPlusTree::key_count)
+            , _ptrs(_base->ptrs, _base->total_ptr, _base->is_leaf ? BPlusTree::ptr_count - 1 : BPlusTree::ptr_count)
         {
+            block.lock();
         }
-
+        ~TreeNode()
+        {
+            if (_selfPtr != nullptr)
+            {
+                _selfPtr->unlock();
+            }
+        }
         TreeNode(const TreeNode& other)
             : _selfPtr(other._selfPtr)
             , _base(other._base)
             , _keys(_base->keys, _base->total_key, other._keys.capacity())
             , _ptrs(_base->ptrs, _base->total_ptr, other._ptrs.capacity())
         {
+            self_ptr()->lock();
+        }
+        TreeNode(TreeNode&& other)
+            : _selfPtr(other._selfPtr)
+            , _base(other._base)
+            , _keys(other._keys)
+            , _ptrs(other._ptrs)
+        {
+            other._selfPtr = nullptr;
+            other._base = nullptr;
         }
 
-        TreeNode& operator=(const TreeNode& other)
+        TreeNode& operator=(TreeNode&& other)
         {
+            _selfPtr->unlock();
+
             _selfPtr = other._selfPtr;
             _base = other._base;
             _keys = other._keys;
             _ptrs = other._ptrs;
 
+            other._selfPtr = nullptr;
+            other._base = nullptr;
+            return *this;
+        }
+
+        TreeNode& operator=(const TreeNode& other)
+        {
+            _selfPtr->unlock();
+
+            _selfPtr = other._selfPtr;
+            _base = other._base;
+            _keys = other._keys;
+            _ptrs = other._ptrs;
+
+            _selfPtr->lock();
             return *this;
         }
 
@@ -270,8 +307,8 @@ private:
         {
             assert(ptr_count() < BPlusTree<TKey>::ptr_count);
             assert(key_count() < BPlusTree<TKey>::key_count);
-            assert(i + 1 >= 0 && i + 1 < ptr_count());
-            assert(i >= 0 && i < key_count());
+            assert(i + 1 >= 0 && i + 1 <= ptr_count());
+            assert(i >= 0 && i <= key_count());
 
             ptr_count() += 1;
             std::move(ptrs().begin() + i + 1, ptrs().end(), ptrs().begin() + i + 2);
@@ -281,6 +318,7 @@ private:
             std::move(keys().begin() + i, keys().end(), keys().begin() + i + 1);
             keys().begin()[i] = key;
         }
+
         void insert_before_ptr(size_t i, const ptr_type& ptr, const key_type& key)
         {
             assert(ptr_count() < BPlusTree<TKey>::ptr_count);
@@ -332,15 +370,19 @@ private:
 
         TreeIterator& operator++()
         {
-            if (TreeNode{_ptr}.ptr_count() - 1 == _i)
+            TreeNode temp{_ptr};
+            if (temp.ptr_count() - 1 == _i)
             {
                 _i = 0;
-                _ptr = TreeNode{_ptr}.next_ptr();
+                _ptr = temp.next_ptr();
             }
-            _i++;
+            else
+            {
+                _i++;
+            }
             return *this;
         }
-        operator bool() const
+        explicit operator bool() const
         {
             return _ptr != nullptr;
         }
@@ -356,9 +398,11 @@ private:
             }
             return other._ptr == _ptr && other._i == _i;
         }
-
+        bool operator!=(const TreeIterator& other) const
+        {
+            return !((*this) == other);
+        }
     };
-
 
     TreeNode find_leaf(const key_type& key)
     {
@@ -371,12 +415,7 @@ private:
             auto iFirstGTKey = iterFirstGTKey - node.keys().begin();
             if (iterFirstGTKey == node.keys().end()) //iFirstGTKey == end
             {
-                auto iLastNonNullptr = std::find_if(std::make_reverse_iterator(node.ptrs().end()),
-                                                    std::make_reverse_iterator(node.ptrs().begin()),
-                                                    [](const ptr_type& cptr) {
-                    return cptr != ptr_type(nullptr);
-                });
-                node = TreeNode(*iLastNonNullptr);
+                node = TreeNode(node.ptrs().back());
             }
             else if (key == node.keys()[iFirstGTKey])
             {
@@ -426,6 +465,7 @@ private:
             auto iInsertAfter = place - leaf.keys().begin() - 1;
             leaf.insert_after_key(iInsertAfter, ptr, key);
         }
+        leaf.self_ptr()->notify_modification();
     }
     static key_type find_min_key(TreeNode& leaf)
     {
@@ -459,7 +499,7 @@ private:
         cont[place] = value;
     }
 
-    void insert_parent(TreeNode& node, const key_type& key, const BlockPtr& ptr)
+    void insert_parent(TreeNode& node, const key_type& key, TreeNode& newNode)
     {
         if (node.parent_ptr() == nullptr) //node is _root
         {
@@ -470,32 +510,41 @@ private:
             newRoot.keys()[0] = key;
             newRoot.ptr_count() = 2;
             newRoot.ptrs()[0] = node.self_ptr();
-            newRoot.ptrs()[1] = ptr;
+            newRoot.ptrs()[1] = newNode.self_ptr();
+
+            node.parent_ptr() = newRoot.self_ptr();
+            newNode.parent_ptr() = newRoot.self_ptr();
+
             _root = newBlock.ptr();
-            return;
-        }
-        //not root
-        TreeNode p = node.parent();
-        if (p.ptr_count() < ptr_count)
-        {
-
-            auto iterInsertAfter = std::find(p.ptrs().begin(), p.ptrs().end(), node.self_ptr());
-            auto iInsertAfter = iterInsertAfter - p.ptrs().begin();
-            p.insert_after_ptr(iInsertAfter, key, ptr);
-            /*
-            p.ptrs().count() += 1;
-            std::move(p.ptrs().begin() + iNode, p.ptrs().end(), p.ptrs().begin() + iNode + 1);
-            p.ptrs()[iNode] = ptr;
-
-            p.keys().count() += 1;
-            std::move(p.keys().begin() + iNode, p.keys().end(), p.keys().begin() + iNode + 1);
-            p.keys()[iNode] = key;
-            */
+            newBlock.notify_modification();
+            node.self_ptr()->notify_modification();
         }
         else
         {
-            auto pair = insert_split_node(p, key, ptr);
-            insert_parent(p, pair.second, pair.first.self_ptr());
+            //not root
+            TreeNode p = node.parent();
+            if (p.ptr_count() < p.ptrs().capacity())
+            {
+
+                auto iterInsertAfter = std::find(p.ptrs().begin(), p.ptrs().end(), node.self_ptr());
+                auto iInsertAfter = iterInsertAfter - p.ptrs().begin();
+                p.insert_after_ptr(iInsertAfter, key, newNode.self_ptr());
+                /*
+                p.ptrs().count() += 1;
+                std::move(p.ptrs().begin() + iNode, p.ptrs().end(), p.ptrs().begin() + iNode + 1);
+                p.ptrs()[iNode] = ptr;
+
+                p.keys().count() += 1;
+                std::move(p.keys().begin() + iNode, p.keys().end(), p.keys().begin() + iNode + 1);
+                p.keys()[iNode] = key;
+                */
+            }
+            else
+            {
+                auto pair = insert_split_node(p, key, newNode.self_ptr());
+                insert_parent(p, pair.second, pair.first);
+            }
+            p.self_ptr()->notify_modification();
         }
     }
 
@@ -690,6 +739,9 @@ private:
         delete[] temp_ptrs;
         delete[] temp_keys;
 
+        newBlock.notify_modification();
+        node.self_ptr()->notify_modification();
+
         return newNode;
     }
 
@@ -705,7 +757,9 @@ public:
         assert(iValue >= 0);
         if (iterValue != targetLeaf.keys().end())
         {
-            return{targetLeaf.self_ptr(), (size_t)iValue};
+            TreeIterator iter{targetLeaf.self_ptr(), (size_t)iValue};
+            ++iter;
+            return iter;
         }
         return{targetLeaf.next_ptr(), 0};
     }
@@ -726,11 +780,11 @@ public:
         else
         {
             TreeNode newNode = insert_split_leaf(targetLeaf, key, ptr);
-            insert_parent(targetLeaf, newNode.keys()[0], newNode.self_ptr());
+            insert_parent(targetLeaf, newNode.keys()[0], newNode);
         }
     }
 
-    TreeIterator left_most() const
+    TreeIterator begin() const
     {
         TreeNode node{_root};
         while (!node.is_leaf())
@@ -745,25 +799,15 @@ public:
         return TreeIterator{node.self_ptr(), 0};
     }
 
-    TreeIterator right_most() const
+    TreeIterator end() const
     {
-        TreeNode node{_root};
-        while (!node.is_leaf())
-        {
-            assert(node.ptr_count() > 0);
-            node = TreeNode{node.ptrs().back()};
-        }
-        if (node.ptr_count() == 0)
-        {
-            return{nullptr, -1};
-        }
-        return TreeIterator{node.ptrs().back(), node.ptrs().size() - 1};
+        return TreeIterator{nullptr, (size_t)-1};
     }
 
     virtual std::vector<BlockPtr> find_le(byte* pkey) override
     {
         std::vector<BlockPtr> result;
-        TreeIterator left = left_most();
+        TreeIterator left = begin();
         TreeIterator right = find(*reinterpret_cast<key_type*>(pkey));
         if (left && right)
         {

@@ -117,4 +117,7 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="MiniSQL.natvis" />
+  </ItemGroup>
 </Project>
