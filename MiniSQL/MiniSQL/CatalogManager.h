@@ -184,12 +184,12 @@ public:
     private:
         byte* _raw;
         const TableInfo* _info;
+    public:
         RawTupleProxy(byte* block, const TableInfo* info)
             : _raw(block)
             , _info(info)
         {
         }
-    public:
         RawTupleProxy(RawTupleProxy&& other)
             : _raw(other._raw)
             , _info(other._info)
@@ -199,7 +199,7 @@ public:
         }
 
         const TableInfo& table_info() const { return *_info; }
-        
+
         ValueProxy operator[](const std::string& keyName) const
         {
             auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
@@ -218,6 +218,8 @@ public:
     size_t primary_pos() const { return _primaryPos; }
 
     size_t index_pos() const { return _indexPos; }
+
+    void index_pos(size_t v) { _indexPos = v; }
 
     size_t entry_size() const { return _size; }
 
@@ -300,6 +302,14 @@ public:
 
     ~CatalogManager();
 
+    void drop_info(const std::string& tableName)
+    {
+        auto iter = std::find_if(_tables.begin(), _tables.end(), [&](const auto& elm) {
+            return elm.name() == tableName;
+        });
+        _tables.erase(iter);
+    }
+
     void add_table(const TableInfo& tableInfo)
     {
         if (locate_table(tableInfo.name()) != -1)
@@ -309,7 +319,7 @@ public:
         _tables.push_back(tableInfo);
     }
 
-    const TableInfo& find_table(const std::string& tableName) const
+    TableInfo& find_table(const std::string& tableName)
     {
         size_t i = locate_table(tableName);
         if (i == -1)

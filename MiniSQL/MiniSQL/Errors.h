@@ -38,6 +38,15 @@ public:
     }
 };
 
+class AlreadyHaveIndex : public std::runtime_error
+{
+public:
+    explicit AlreadyHaveIndex(const char* msg)
+        : runtime_error(("already have index: " + std::string(msg)).c_str())
+    {
+    }
+};
+
 class NoIndex : public std::runtime_error
 {
 public:

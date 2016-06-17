@@ -352,7 +352,6 @@ public:
 
     std::vector<BlockPtr> execute() const override
     {
-
         if (_info->index_pos() == -1)
         {
             return execute_linearly();
@@ -534,20 +533,25 @@ public:
         return -1;
     }
 
-    TableInfo create() const
+    TableInfo execute() const
     {
-        return TableInfo(_tableName, _primaryPos, _indexPos, _size, _fields);
+        CatalogManager::instance().add_table({_tableName, _primaryPos, _indexPos, _size, _fields});
+        RecordManager::instance().create_table(_tableName, _size);
+        if (_primaryPos != -1)
+        {
+            IndexManager::instance().create_index(_tableName, _fields[_primaryPos].name(), _fields[_primaryPos].type_info());
+        }
     }
 };
 
-class TupleBuilder
+class TableInserter
 {
 private:
     const TableInfo* _tableInfo;
     std::unique_ptr<byte, ArrayDeleter> _raw;
     size_t _iField;
 public:
-    TupleBuilder(const std::string& tableName)
+    TableInserter(const std::string& tableName)
         : _tableInfo(&CatalogManager::instance().find_table(tableName))
         , _raw(new byte[_tableInfo->entry_size()])
         , _iField(0)
@@ -608,6 +612,45 @@ public:
     byte* get_field() const
     {
         return _raw.get();
+    }
+
+    void check_unique_field() const
+    {
+        auto& rec = RecordManager::instance().find_table(_tableInfo->name());
+        for (size_t iRec = 0; iRec != rec.size(); iRec++)
+        {
+            for (auto& field : _tableInfo->fields())
+            {
+                if (field.is_unique() && (*_tableInfo)[rec[iRec]][field.name()] == (*_tableInfo)[_raw.get()][field.name()])
+                {
+                    throw SQLError(("not unique" + field.name()).c_str());
+                }
+            }
+        }
+    }
+
+    void execute()
+    {
+        if (_tableInfo->index_pos() != -1)
+        {
+            if (IndexManager::instance().check_index_unique(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset()))
+            {
+                for (size_t i = 0; i != _tableInfo->fields().size(); i++)
+                {
+                    if (_tableInfo->fields()[i].is_unique() && i != _tableInfo->primary_pos())
+                    {
+                        check_unique_field();
+                        break;
+                    }
+                }
+                auto ptr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
+                IndexManager::instance().insert(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset(), ptr);
+            }
+            else
+            {
+                throw SQLError("not unique: primary");
+            }
+        }
     }
 };
 
@@ -679,7 +722,7 @@ public:
 
     virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        return std::make_shared<SelectQueryResult>(*_info, _fields, _query->execute_linearly());
+        return std::make_shared<SelectQueryResult>(*_info, _fields, _query->execute());
     }
 };
 
@@ -693,7 +736,90 @@ public:
 
     virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        _query->execute_linearly();
+        _query->execute();
         return nullptr;
+    }
+};
+
+class TableDroper
+{
+    const TableInfo* _info;
+public:
+    TableDroper()
+        : _info(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void execute()
+    {
+        RecordManager::instance().drop_record(_info->name());
+        CatalogManager::instance().drop_info(_info->name());
+        if (IndexManager::instance().has_index(_info->name()))
+        {
+            IndexManager::instance().drop_index(_info->name());
+        }
+    }
+};
+
+class IndexDroper
+{
+    TableInfo* _info;
+public:
+    IndexDroper()
+        : _info(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void execute()
+    {
+        IndexManager::instance().drop_index(_info->name());
+        _info->index_pos(-1);
+    }
+};
+
+class IndexCreater
+{
+    TableInfo* _info;
+    const TokenField* _field;
+public:
+    IndexCreater()
+        : _info(nullptr)
+        , _field(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void set_index(const std::string& fieldName)
+    {
+        _field = &_info->field(fieldName);
+        if (!_field->is_unique())
+        {
+            throw SQLError(("field not unique: " + _field->name()).c_str());
+        }
+    }
+    void execute()
+    {
+        auto& index = IndexManager::instance().create_index(_info->name(), _field->name(), _field->type_info());
+        auto& tableInfo = *_info;
+
+        auto iterField = std::find_if(_info->fields().begin(), _info->fields().end(), [](const auto& elm) {
+            return elm.name() == _field->name();
+        });
+
+        tableInfo.index_pos(iterField - _info->fields().begin());
+
+        auto& records = RecordManager::instance().find_table(_info->name());
+        for (size_t i = 0; i != records.size(); i++)
+        {
+            index.tree()->insert(records[i]->raw_ptr() + _field->offset(), records[i]);
+        }
     }
 };

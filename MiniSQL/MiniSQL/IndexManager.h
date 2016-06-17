@@ -121,6 +121,7 @@ class Serializer<IndexInfo>
 public:
     static IndexInfo deserialize(MemoryReadStream& mrs);
     static void serialize(MemoryWriteStream& mws, const IndexInfo& value);
+    static size_t size(const IndexInfo& value);
 };
 
 class IndexManager : Uncopyable
@@ -138,19 +139,21 @@ private:
     const static char* const FileName;
 public:
 
-    void create_index(const std::string& tableName, const std::string& fieldName,
+    IndexInfo& create_index(const std::string& tableName, const std::string& fieldName,
                       const TypeInfo& type)
     {
         auto iterPrev = _tables.find(tableName);
         if (iterPrev != _tables.end())
         {
-            iterPrev->second.tree()->drop_tree();
+            throw AlreadyHaveIndex(tableName.c_str());
         }
-        _tables.insert({tableName,
+        auto result = _tables.insert({tableName,
             IndexInfo{fieldName,
                 TreeCreater::create(type.type(), type.size(),
                     BufferManager::instance().alloc_block(tableName + "_record").ptr(),
                     tableName + "_record", true), type.type(), type.size()}});
+
+        return result.first->second;
     }
 
     void drop_index(const std::string& tableName)
@@ -159,6 +162,7 @@ public:
         if (iterPrev != _tables.end())
         {
             iterPrev->second.tree()->drop_tree();
+            _tables.erase(iterPrev);
         }
         else
         {
@@ -169,6 +173,12 @@ public:
     bool has_index(const std::string& tableName)
     {
         return _tables.find(tableName) != _tables.end();
+    }
+
+    bool check_index_unique(const std::string& tableName, byte* key)
+    {
+        auto& info = check_index(tableName);
+        return info.tree()->find_eq(key) != nullptr;
     }
 
     const IndexInfo& check_index(const std::string& tableName)
@@ -267,7 +277,7 @@ public:
 
             auto& entryBlock = BufferManager::instance().find_or_alloc(FileName, 0, iBlock + 1);
             MemoryWriteStream blockStream(entryBlock.as<byte>(), BufferBlock::BlockSize);
-            while (blockStream.remain() > pair.first.size() + sizeof(BlockPtr) + sizeof(Type) + sizeof(size_t))
+            while (blockStream.remain() >= sizeof(pair.first) + Serializer<IndexInfo>::size(pair.second))
             {
                 blockStream << pair.first;
                 Serializer<IndexInfo>::serialize(blockStream, pair.second);

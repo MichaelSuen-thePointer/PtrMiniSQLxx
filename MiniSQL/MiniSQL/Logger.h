@@ -25,7 +25,7 @@ public:
     }
 };
 
-#if defined _DEBUG || defined DEBUG
+#if !defined _DEBUG && !defined DEBUG
 
 #define log(...) logger(__VA_ARGS__)
 #define log_enum(enum_val) (__TEXT(enum_val), enum_val) 

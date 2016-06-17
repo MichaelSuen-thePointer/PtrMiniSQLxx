@@ -64,7 +64,7 @@ public:
             return{BufferManager::instance().check_file_index(_fileName), 0, pair.first, static_cast<uint16_t>(pair.second * _entrySize)};
         }
 
-        void insert(byte* buffer)
+        BlockPtr insert(byte* buffer)
         {
             Record entry;
             if (_freeRecords.size())
@@ -95,6 +95,8 @@ public:
             block.notify_modification();
 
             _records.push_back(entry);
+
+            return{BufferManager::instance().check_file_index(_fileName), 0, entry.first, static_cast<uint16_t>(entry.second * _entrySize)};
         }
 
         void erase(size_t i)
@@ -135,6 +137,11 @@ public:
         return instance;
     }
 
+    void drop_record(const std::string& tableName)
+    {
+        _tableInfos.erase(tableName);
+    }
+
     TableRecordList& find_table(const std::string& tableName)
     {
         auto tableInfo = _tableInfos.find(tableName);
@@ -145,10 +152,10 @@ public:
         return tableInfo->second;
     }
 
-    void insert_entry(const std::string& tableName, byte* entry)
+    BlockPtr insert_entry(const std::string& tableName, byte* entry)
     {
         auto& table = find_table(tableName);
-        table.insert(entry);
+        return table.insert(entry);
     }
 
     void remove_entry(const std::string& tableName, size_t i)

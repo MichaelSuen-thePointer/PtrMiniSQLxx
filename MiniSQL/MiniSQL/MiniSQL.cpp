@@ -9,15 +9,24 @@ int main()
         "test_btree_record", true));
 
     int counter = 0;
-    for (int i = 0; i != 512; i += 2)
-    {
-        tree->insert((byte*)&i, BufferManager::instance().find_or_alloc("placeholderblock", 0, counter++).ptr());
-    }
-    for (int i = 1; i < 1024; i += 2)
-    {
-        tree->insert((byte*)&i, BufferManager::instance().find_or_alloc("placeholderblock", 0, counter++).ptr());
-    }
-    int upper = 512;
-    auto result = tree->find_le((byte*)&upper);
 
+    for (int i = 0; i < 10000; i ++)
+    {
+        tree->insert((byte*)&i, BufferManager::instance().find_or_alloc("placeholderblock", 0, counter++).ptr());
+    }
+
+    int x = 200;
+    tree->remove((byte*)&x);
+    x++;
+    tree->remove((byte*)&x);
+    x++;
+    tree->remove((byte*)&x);
+
+    x = 0;
+    tree->remove((byte*)&x);
+    x++;
+    tree->remove((byte*)&x);
+    x++;
+    tree->remove((byte*)&x);
+    
 }

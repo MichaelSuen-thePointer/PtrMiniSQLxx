@@ -9,6 +9,7 @@ public:
     virtual std::vector<BlockPtr> find_le(byte* pkey) = 0;
     virtual std::vector<BlockPtr> find_ge(byte* pkey) = 0;
     virtual std::vector<BlockPtr> find_range(byte* lower, byte* upper) = 0;
+    virtual BlockPtr find_eq(byte* key) = 0;
 
     virtual void remove(byte* key) = 0;
     virtual void insert(byte* pkey, const BlockPtr& ptr) = 0;
@@ -112,6 +113,15 @@ private:
                     return;
                 }
             }
+            assert(0);
+        }
+
+        void default_initialize()
+        {
+            for (size_t i = 0; i != capacity(); i++)
+            {
+                _array[i] = T();
+            }
         }
 
         void append(const T& value)
@@ -130,7 +140,7 @@ private:
         {
             int length = to - from;
             assert(capacity() - size() >= (size_t)(to - from));
-            std::copy(where, end(), where + length);
+            std::move_backward(where, end(), end() + length);
             std::copy(from, to, where);
             size() += length;
         }
@@ -178,7 +188,6 @@ private:
 
         size_t self_pos()
         {
-            assert(!is_root());
             auto selfPos = std::find(parent().ptrs().begin(), parent().ptrs().end(), self_ptr());
             if (selfPos != parent().ptrs().end())
             {
@@ -218,24 +227,18 @@ private:
         void reset(bool is_leaf = false)
         {
             _base->is_leaf = is_leaf;
-            _base->total_key = BPlusTree::key_count;
-            _base->total_ptr = BPlusTree::ptr_count;
             _base->parent = nullptr;
+            _base->total_key = 0;
+            _base->total_ptr = 0;
 
-            for (size_t i = 0; i != BPlusTree::ptr_count; i++)
-            {
-                ptrs()[i] = nullptr;
-            }
+#ifdef _DEBUG
+            ptrs().default_initialize();
+            keys().default_initialize();
+#endif
             if (is_leaf)
             {
                 ptrs().capacity(BPlusTree::ptr_count - 1);
             }
-            for (size_t i = 0; i != BPlusTree::key_count; i++)
-            {
-                keys()[i] = key_type{};
-            }
-            _base->total_key = 0;
-            _base->total_ptr = 0;
 
             _selfPtr->notify_modification();
         }
@@ -310,12 +313,12 @@ private:
             assert(i + 1 >= 0 && i + 1 <= ptr_count());
             assert(i >= 0 && i <= key_count());
 
+            std::move_backward(ptrs().begin() + i + 1, ptrs().end(), ptrs().end() + 1);
             ptr_count() += 1;
-            std::move(ptrs().begin() + i + 1, ptrs().end(), ptrs().begin() + i + 2);
             ptrs().begin()[i + 1] = ptr;
 
+            std::move_backward(keys().begin() + i, keys().end(), keys().end() + 1);
             key_count() += 1;
-            std::move(keys().begin() + i, keys().end(), keys().begin() + i + 1);
             keys().begin()[i] = key;
         }
 
@@ -326,12 +329,12 @@ private:
             assert(i >= 0 && i <= ptr_count());
             assert(i >= 0 && i <= key_count());
 
+            std::move_backward(ptrs().begin() + i, ptrs().end(), ptrs().end() + 1);
             ptr_count() += 1;
-            std::move(ptrs().begin() + i, ptrs().end(), ptrs().begin() + i + 1);
             ptrs().begin()[i] = ptr;
 
+            std::move_backward(keys().begin() + i, keys().end(), keys().end() + 1);
             key_count() += 1;
-            std::move(keys().begin() + i, keys().end(), keys().begin() + i + 1);
             keys().begin()[i] = key;
         }
         void insert_after_key(size_t i, const ptr_type& ptr, const key_type& key)
@@ -342,17 +345,19 @@ private:
         {
             insert_after_ptr(i, key, ptr);
         }
-        void remove_entry(const key_type& key)
+        void remove_entry(const key_type& key, const ptr_type& ptr)
         {
             auto iterEntry = std::find(keys().begin(), keys().end(), key);
-            if (iterEntry != keys().end())
+            auto offset = iterEntry - keys().begin();
+            std::move(keys().begin() + offset + 1, keys().end(), keys().begin() + offset);
+            key_count() -= 1;
+            if (ptr != nullptr)
             {
-                auto offset = iterEntry - keys().begin();
-                std::move(keys().begin() + offset + 1, keys().end(), keys().begin() + offset);
-                std::move(ptrs().begin() + offset + 1, ptrs().end(), ptrs().begin() + offset);
-                key_count() -= 1;
-                ptr_count() -= 1;
+                auto iterPtr = std::find(ptrs().begin(), ptrs().end(), ptr);
+                offset = iterPtr - ptrs().begin();
             }
+            std::move(ptrs().begin() + offset + 1, ptrs().end(), ptrs().begin() + offset);
+            ptr_count() -= 1;
         }
     };
 
@@ -370,11 +375,11 @@ private:
 
         TreeIterator& operator++()
         {
-            TreeNode temp{_ptr};
-            if (temp.ptr_count() - 1 == _i)
+            auto rawNode = _ptr->as<BTreeNodeModel>();
+            if (_i == rawNode->total_ptr)
             {
                 _i = 0;
-                _ptr = temp.next_ptr();
+                _ptr = rawNode->ptrs[BPlusTree::ptr_count - 1];
             }
             else
             {
@@ -386,9 +391,9 @@ private:
         {
             return _ptr != nullptr;
         }
-        BlockPtr operator*() const
+        BlockPtr operator*()
         {
-            return TreeNode{_ptr}.ptrs()[_i];
+            return _ptr->as<BTreeNodeModel>()->ptrs[_i];
         }
         bool operator==(const TreeIterator& other) const
         {
@@ -518,6 +523,7 @@ private:
             _root = newBlock.ptr();
             newBlock.notify_modification();
             node.self_ptr()->notify_modification();
+            newNode.self_ptr()->notify_modification();
         }
         else
         {
@@ -529,6 +535,7 @@ private:
                 auto iterInsertAfter = std::find(p.ptrs().begin(), p.ptrs().end(), node.self_ptr());
                 auto iInsertAfter = iterInsertAfter - p.ptrs().begin();
                 p.insert_after_ptr(iInsertAfter, key, newNode.self_ptr());
+                newNode.parent_ptr() = p.self_ptr();
                 /*
                 p.ptrs().count() += 1;
                 std::move(p.ptrs().begin() + iNode, p.ptrs().end(), p.ptrs().begin() + iNode + 1);
@@ -541,22 +548,27 @@ private:
             }
             else
             {
-                auto pair = insert_split_node(p, key, newNode.self_ptr());
+                auto pair = insert_split_node(p, key, newNode.self_ptr(), node.self_ptr());
                 insert_parent(p, pair.second, pair.first);
             }
             p.self_ptr()->notify_modification();
         }
     }
 
-    void remove_entry(TreeNode& node, const key_type& key)
+    void remove_entry(TreeNode& node, const key_type& key, const ptr_type& cptr)
     {
-        node.remove_entry(key);
-        if (node.parent_ptr() == nullptr && node.ptr_count() == 1) //is root and only one child
+        node.remove_entry(key, cptr);
+        if (node.parent_ptr() == nullptr)
         {
-            _root = node.ptrs()[0];
-            BufferManager::instance().drop_block(node.self_ptr());
+            if (node.ptr_count() == 1) //is root and only one child
+            {
+                _root = node.ptrs()[0];
+                node.parent_ptr() = nullptr;
+                node.self_ptr()->notify_modification();
+                BufferManager::instance().drop_block(node.self_ptr());
+            }
         }
-        else if (node.ptr_count() < ptr_count / 2)
+        else if (node.ptr_count() < node.ptrs().capacity() / 2)
         {
             bool nodeIsPredecessor = true;
             auto psibling = node.right_key_and_sibling();
@@ -569,7 +581,7 @@ private:
             TreeNode sibling(psibling.second);
             key_type sideKey = psibling.first;
             if (sibling.key_count() + node.key_count() <= key_count &&
-                sibling.ptr_count() + node.ptr_count() <= ptr_count)
+                sibling.ptr_count() + node.ptr_count() <= node.ptrs().capacity())
             {
                 TreeNode* left = &sibling;
                 TreeNode* right = &node;
@@ -587,32 +599,33 @@ private:
                 else
                 {
                     left->keys().append(right->keys().begin(), right->keys().end());
-                    left->ptrs().append(right->ptrs().begin(), right->ptrs().end() - 1);
+                    left->ptrs().append(right->ptrs().begin(), right->ptrs().end());
                     left->next_ptr() = right->next_ptr();
-                    remove_entry(right->parent(), sideKey);
+                    remove_entry(right->parent(), sideKey, right->self_ptr());
                     BufferManager::instance().drop_block(right->self_ptr());
                 }
+                left->self_ptr()->notify_modification();
             }
             else //redistribution
             {
                 if (!nodeIsPredecessor)
                 {
                     if (!node.is_leaf())
-                    {
-                        auto ptr = sibling.ptrs().back();
-                        sibling.ptrs().pop_back();
-                        auto skey = sibling.keys().back();
+                    { //correct
+                        auto lastKey = sibling.keys().back();
+                        auto lastPtr = sibling.ptrs().back();
                         sibling.keys().pop_back();
-                        node.insert_before_ptr(0, ptr, sideKey);
-                        node.parent().keys().replace(sideKey, skey);
+                        sibling.ptrs().pop_back();
+                        node.insert_before_ptr(0, lastPtr, sideKey);
+                        node.parent().keys().replace(sideKey, lastKey);
                     }
                     else
                     {
                         auto lastKey = sibling.keys().back();
-                        auto preLastPtr = sibling.ptrs()[sibling.keys().size() - 1];
+                        auto lastPtr = sibling.ptrs().back();
                         sibling.keys().pop_back();
-                        sibling.ptrs().erase(sibling.keys().size() - 1);
-                        node.insert_before_ptr(0, preLastPtr, lastKey);
+                        sibling.ptrs().pop_back();
+                        node.insert_before_ptr(0, lastPtr, lastKey);
                         node.parent().keys().replace(sideKey, lastKey);
                     }
                 }
@@ -620,29 +633,42 @@ private:
                 {
                     if (!sibling.is_leaf())
                     {
-                        auto ptr = node.ptrs().back();
-                        node.ptrs().pop_back();
-                        auto skey = node.keys().back();
-                        node.keys().pop_back();
-                        sibling.insert_before_ptr(0, ptr, sideKey);
-                        sibling.parent().keys().replace(sideKey, skey);
+                        auto firstKey = sibling.keys().front();
+                        auto firstPtr = sibling.ptrs().front();
+                        sibling.keys().erase(0);
+                        sibling.ptrs().erase(0);
+                        node.keys().append(sideKey);
+                        node.ptrs().append(firstPtr);
+
+                        sibling.parent().keys().replace(sideKey, firstKey);
                     }
                     else
-                    {
-                        auto lastKey = node.keys().back();
-                        auto preLastPtr = node.ptrs()[node.keys().size() - 1];
-                        node.keys().pop_back();
-                        node.ptrs().erase(node.keys().size() - 1);
-                        sibling.insert_before_ptr(0, preLastPtr, lastKey);
-                        sibling.parent().keys().replace(sideKey, lastKey);
+                    { //correct
+                        auto frontKey = sibling.keys().front();
+                        auto frontPtr = sibling.ptrs().front();
+                        node.keys().append(frontKey);
+                        node.ptrs().append(frontPtr);
+                        sibling.keys().erase(0);
+                        sibling.ptrs().erase(0);
+                        sibling.parent().keys().replace(sideKey, sibling.keys().front());
                     }
                 }
+                node.self_ptr()->notify_modification();
+                sibling.self_ptr()->notify_modification();
             }
         }
+
     }
 
+    void delete_adjust(const TreeNode& node)
+    {
 
-    std::pair<TreeNode, key_type> insert_split_node(TreeNode& node, const key_type& key, const ptr_type& ptr)
+    }
+
+    std::pair<TreeNode, key_type> insert_split_node(TreeNode& node,
+                                                    const key_type& key,
+                                                    const ptr_type& ptr,
+                                                    const ptr_type& nodePtr)
     {
         assert(node.ptr_count() == ptr_count);
         assert(node.key_count() == key_count);
@@ -653,14 +679,15 @@ private:
         std::copy(node.keys().begin(), node.keys().end(), temp_keys);
         std::copy(node.ptrs().begin(), node.ptrs().end(), temp_ptrs);
 
-        auto iterNodePlace = std::find(temp_ptrs, temp_ptrs + ptr_count, node.self_ptr());
+        auto iterNodePlace = std::find(temp_ptrs, temp_ptrs + ptr_count, nodePtr);
+        assert(iterNodePlace != temp_ptrs + ptr_count);
 
         auto iNodePlace = iterNodePlace - temp_ptrs;
 
-        std::move(temp_keys + iNodePlace + 1, temp_keys + key_count, temp_keys + iNodePlace + 2);
-        std::move(temp_ptrs + iNodePlace + 1, temp_ptrs + ptr_count, temp_ptrs + iNodePlace + 2);
+        std::move_backward(temp_keys + iNodePlace, temp_keys + key_count, temp_keys + key_count + 1);
+        std::move_backward(temp_ptrs + iNodePlace + 1, temp_ptrs + ptr_count, temp_ptrs + ptr_count + 1);
 
-        temp_keys[iNodePlace + 1] = key;
+        temp_keys[iNodePlace] = key;
         temp_ptrs[iNodePlace + 1] = ptr;
 
         BufferBlock& newBlock = BufferManager::instance().alloc_block(_fileName);
@@ -682,10 +709,20 @@ private:
         std::copy(temp_ptrs + ptr_count / 2, temp_ptrs + ptr_count + 1, newNode.ptrs().begin());
         std::copy(temp_keys + ptr_count / 2, temp_keys + key_count + 1, newNode.keys().begin());
 
+        for (auto& sonPtr : newNode.ptrs())
+        {
+            TreeNode son{sonPtr};
+            son.parent_ptr() = newNode.self_ptr();
+            son.self_ptr()->notify_modification();
+        }
+
         delete[] temp_keys;
         delete[] temp_ptrs;
 
-        return std::make_pair(newNode, tempKey);
+        newBlock.notify_modification();
+        node.self_ptr()->notify_modification();
+
+        return{newNode, tempKey};
     }
 
     TreeNode insert_split_leaf(TreeNode& node, const key_type& key, const ptr_type& ptr)
@@ -695,27 +732,29 @@ private:
 
         size_t leafPtrCount = node.ptrs().capacity();
 
-        key_type* temp_keys = new key_type[key_count + 1];
-        ptr_type* temp_ptrs = new ptr_type[leafPtrCount + 1];
+        size_t total = key_count + 1;
+
+        key_type* temp_keys = new key_type[total];
+        ptr_type* temp_ptrs = new ptr_type[total];
         std::copy(node.keys().begin(), node.keys().end(), temp_keys);
         std::copy(node.ptrs().begin(), node.ptrs().end(), temp_ptrs);
 
         if (key < temp_keys[0])
         {
-            std::move(temp_keys, temp_keys + key_count, temp_keys + 1);
-            std::move(temp_ptrs, temp_ptrs + leafPtrCount, temp_ptrs + 1);
+            std::move_backward(temp_keys, temp_keys + total - 1, temp_keys + total);
+            std::move_backward(temp_ptrs, temp_ptrs + total - 1, temp_ptrs + total);
             temp_keys[0] = key;
             temp_ptrs[0] = ptr;
         }
         else
         {
-            auto place = std::find_if(temp_keys, temp_keys + key_count, [&key](const key_type& ckey) {
+            auto place = std::find_if(temp_keys, temp_keys + total - 1, [&key](const key_type& ckey) {
                 return ckey > key;
             });
             auto iInsertAfter = place - temp_keys - 1;
 
-            std::move(temp_keys + iInsertAfter + 1, temp_keys + key_count, temp_keys + iInsertAfter + 2);
-            std::move(temp_ptrs + iInsertAfter + 1, temp_ptrs + leafPtrCount, temp_ptrs + iInsertAfter + 2);
+            std::move_backward(temp_keys + iInsertAfter + 1, temp_keys + total - 1, temp_keys + total);
+            std::move_backward(temp_ptrs + iInsertAfter + 1, temp_ptrs + total - 1, temp_ptrs + total);
 
             temp_keys[iInsertAfter + 1] = key;
             temp_ptrs[iInsertAfter + 1] = ptr;
@@ -726,15 +765,17 @@ private:
         newNode.reset(true);
         newNode.next_ptr() = node.next_ptr();
         node.next_ptr() = newNode.self_ptr();
-        node.key_count() = leafPtrCount / 2;
-        node.ptr_count() = leafPtrCount / 2;
-        std::copy(temp_ptrs, temp_ptrs + leafPtrCount / 2, node.ptrs().begin());
-        std::copy(temp_keys, temp_keys + leafPtrCount / 2, node.keys().begin());
 
-        newNode.key_count() = leafPtrCount - leafPtrCount / 2;
-        newNode.ptr_count() = leafPtrCount - leafPtrCount / 2;
-        std::copy(temp_ptrs + leafPtrCount / 2, temp_ptrs + leafPtrCount, newNode.ptrs().begin());
-        std::copy(temp_keys + leafPtrCount / 2, temp_keys + leafPtrCount, newNode.keys().begin());
+
+        node.key_count() = total / 2;
+        node.ptr_count() = total / 2;
+        std::copy(temp_ptrs, temp_ptrs + total / 2, node.ptrs().begin());
+        std::copy(temp_keys, temp_keys + total / 2, node.keys().begin());
+
+        newNode.key_count() = total - total / 2;
+        newNode.ptr_count() = total - total / 2;
+        std::copy(temp_ptrs + total / 2, temp_ptrs + total, newNode.ptrs().begin());
+        std::copy(temp_keys + total / 2, temp_keys + total, newNode.keys().begin());
 
         delete[] temp_ptrs;
         delete[] temp_keys;
@@ -767,7 +808,7 @@ public:
     void remove(const key_type& key)
     {
         auto leaf = find_leaf(key);
-        remove_entry(leaf, key);
+        remove_entry(leaf, key, nullptr);
     }
 
     void insert(const key_type& key, const ptr_type& ptr)
@@ -861,6 +902,17 @@ public:
     virtual void drop_tree() override
     {
         BufferManager::instance().drop_block(_fileName);
+    }
+
+    BlockPtr find_eq(byte* key) override
+    {
+        TreeNode targetLeaf = find_leaf(*reinterpret_cast<const key_type*>(key));
+        auto place = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), *reinterpret_cast<const key_type*>(key));
+        if(place == targetLeaf.keys.end())
+        {
+            return nullptr;
+        }
+        return targetLeaf.ptrs()[place - targetLeaf.keys().begin()];
     }
 };
 

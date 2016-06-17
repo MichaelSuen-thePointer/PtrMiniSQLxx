@@ -290,6 +290,12 @@ public:
     {
         mws << value._fileNameIndex << value._fileIndex << value._blockIndex << value._offset;
     }
+
+    static size_t size(const BlockPtr& value)
+    {
+        return sizeof(value._fileNameIndex) + sizeof(value._fileIndex)
+            + sizeof(value._blockIndex) + sizeof(value._offset);
+    }
 };
 
 inline BlockPtr BufferBlock::ptr() const

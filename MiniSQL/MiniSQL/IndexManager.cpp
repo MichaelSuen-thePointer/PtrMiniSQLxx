@@ -22,3 +22,10 @@ void Serializer<IndexInfo>::serialize(MemoryWriteStream& mws, const IndexInfo& v
     Serializer<BlockPtr>::serialize(mws, value.tree()->root());
     mws << value._type << value._size;
 }
+
+size_t Serializer<IndexInfo>::size(const IndexInfo& value)
+{
+    return value.field_name().size() + 1 + value.tree()->file_name().size() + 1
+        + Serializer<BlockPtr>::size(value.tree()->root())
+        + sizeof(value._type) + sizeof(value._size);
+}

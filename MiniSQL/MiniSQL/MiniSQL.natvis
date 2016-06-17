@@ -19,7 +19,7 @@
       <Item Name="[parent ptr]">_base->parent</Item>
       <Item Name="[ptrs]">_ptrs</Item>
       <Item Name="[keys]">_keys</Item>
-      <Item Condition="_base->is_leaf" Name="[next ptr]">_ptrs._array[_ptrs._capacity-1]</Item>
+      <Item Condition="_base->is_leaf" Name="[next ptr]">_ptrs._array[_ptrs._capacity]</Item>
     </Expand>
   </Type>
 
