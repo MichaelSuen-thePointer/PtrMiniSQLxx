@@ -4,7 +4,7 @@
 class Tokenizer
 {
 public:
-    enum class Kind
+    enum class Kind : int
     {
         Identifier,
         Integer,
@@ -27,6 +27,7 @@ public:
         SemiColon,
         Table,
         Tables,
+        Index,
         Int,
         Float,
         Char,
@@ -44,6 +45,8 @@ public:
         Where,
         Into,
         Exit,
+        Exec,
+        On,
         End,
     };
     struct Token

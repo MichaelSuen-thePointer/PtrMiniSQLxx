@@ -1,159 +1,7 @@
 #pragma once
 
 #include "BufferManager.h"
-#include "MemoryWriteStream.h"
-#include "MemoryReadStream.h"
-#include "Serialization.h"
-
-enum Type
-{
-    Int,
-    Float,
-    Chars
-};
-
-struct Comparator
-{
-    virtual int operator()(const byte* a, const byte* b) = 0;
-    virtual ~Comparator() = default;
-    static Comparator* from_type(Type type, size_t length);
-    static Comparator* from_type(Type type);
-};
-
-struct IntComparator : Comparator
-{
-    friend struct Comparator;
-    int operator()(const byte* a, const byte* b) override
-    {
-        return *reinterpret_cast<const int*>(a) - *reinterpret_cast<const int*>(b);
-    }
-protected:
-    IntComparator() = default;
-};
-
-struct FloatComparator : Comparator
-{
-    friend struct Comparator;
-
-    int operator()(const byte* a, const byte* b) override
-    {
-        auto v1 = *reinterpret_cast<const float*>(a);
-        auto v2 = *reinterpret_cast<const float*>(b);
-        if (v1 > v2)
-        {
-            return 1;
-        }
-        if (v1 < v2)
-        {
-            return -1;
-        }
-        return 0;
-    }
-protected:
-    FloatComparator() = default;
-};
-
-struct CharsComparator : Comparator
-{
-    friend struct Comparator;
-    size_t size;
-    virtual int operator()(const byte* a, const byte* b) override
-    {
-        return strncmp(reinterpret_cast<const char*>(a), reinterpret_cast<const char*>(b), size);
-    }
-protected:
-    explicit CharsComparator(size_t _size)
-        : size(_size)
-    {
-    }
-};
-
-class TypeInfo
-{
-    friend class TableInfo;
-    friend class Serializer<TypeInfo>;
-private:
-    Type _type;
-    size_t _size;
-    Comparator* _comparer;
-public:
-    static bool is_convertible(Type from, Type to)
-    {
-        return (from == to) || (from == Int && to == Float);
-    }
-    TypeInfo(Type type, size_t length)
-        : _type(type)
-        , _size(length)
-        , _comparer(Comparator::from_type(type, length))
-    {
-    }
-    explicit TypeInfo(Type type)
-        : _type(type)
-        , _size(sizeof(int))
-        , _comparer(Comparator::from_type(type))
-    {
-    }
-
-    Type type() const { return _type; }
-
-    size_t size() const { return _size; }
-
-    std::string name() const
-    {
-        switch(_type)
-        {
-        case Int:
-            return "int";
-            break;
-        case Float: 
-            return "float";
-            break;
-        case Chars: 
-            return "char(" + std::to_string(_size)+ ")";
-            break;
-        default: 
-            return "invalid";
-            break;
-        }
-    }
-
-    bool operator==(const TypeInfo& other) const
-    {
-        return _type == other._type && _size == other._size;
-    }
-
-    bool operator!=(const TypeInfo& other) const
-    {
-        return !(*this == other);
-    }
-};
-
-template<>
-class Serializer<TypeInfo>
-{
-public:
-    static TypeInfo deserialize(MemoryReadStream& mrs)
-    {
-        Type type;
-        mrs >> type;
-        if (type == Chars)
-        {
-            size_t size;
-            mrs >> size;
-            return TypeInfo(type, size);
-        }
-        return TypeInfo(type);
-    }
-
-    static void serialize(MemoryWriteStream& mws, const TypeInfo& value)
-    {
-        mws << value._type;
-        if (value._type == Chars)
-        {
-            mws << value._size;
-        }
-    }
-};
+#include "TypeInfo.h"
 
 class TokenField
 {
@@ -268,7 +116,7 @@ public:
         {
             if (*_info == *other._info)
             {
-                return (*_info->_comparer)(_raw, other._raw);
+                return (*_info->_comparator)(_raw, other._raw);
             }
             throw InvalidType("compare type doesn't match");
         }
@@ -304,7 +152,7 @@ public:
     private:
         BlockPtr _block;
         const TableInfo* _info;
-        TupleProxy(BlockPtr block, const TableInfo* info)
+        TupleProxy(const BlockPtr& block, const TableInfo* info)
             : _block(block)
             , _info(info)
         {
@@ -326,7 +174,7 @@ public:
             {
                 throw InvalidKey(("invalid key name: " + keyName).c_str());
             }
-            return{(*_block).raw_ptr() + place->_offset, &place->_info};
+            return{_block->raw_ptr() + place->_offset, &place->_info};
         }
     };
 
@@ -336,12 +184,12 @@ public:
     private:
         byte* _raw;
         const TableInfo* _info;
+    public:
         RawTupleProxy(byte* block, const TableInfo* info)
             : _raw(block)
             , _info(info)
         {
         }
-    public:
         RawTupleProxy(RawTupleProxy&& other)
             : _raw(other._raw)
             , _info(other._info)
@@ -351,7 +199,7 @@ public:
         }
 
         const TableInfo& table_info() const { return *_info; }
-        
+
         ValueProxy operator[](const std::string& keyName) const
         {
             auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
@@ -370,6 +218,8 @@ public:
     size_t primary_pos() const { return _primaryPos; }
 
     size_t index_pos() const { return _indexPos; }
+
+    void index_pos(size_t v) { _indexPos = v; }
 
     size_t entry_size() const { return _size; }
 
@@ -452,6 +302,14 @@ public:
 
     ~CatalogManager();
 
+    void drop_info(const std::string& tableName)
+    {
+        auto iter = std::find_if(_tables.begin(), _tables.end(), [&](const auto& elm) {
+            return elm.name() == tableName;
+        });
+        _tables.erase(iter);
+    }
+
     void add_table(const TableInfo& tableInfo)
     {
         if (locate_table(tableInfo.name()) != -1)
@@ -461,7 +319,7 @@ public:
         _tables.push_back(tableInfo);
     }
 
-    const TableInfo& find_table(const std::string& tableName) const
+    TableInfo& find_table(const std::string& tableName)
     {
         size_t i = locate_table(tableName);
         if (i == -1)

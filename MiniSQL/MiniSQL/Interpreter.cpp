@@ -4,11 +4,62 @@
 
 Tokenizer Interpreter::_tokenizer;
 
+void Interpreter::create()
+{
+    auto token = _tokenizer.get();
+    if(token.kind == Kind::Table)
+    {
+        create_table();
+    }
+    else if(token.kind == Kind::Index)
+    {
+        create_index();
+    }
+    else
+    {
+        throw SyntaxError("expect table or index", token.line, token.column);
+    }
+}
+
+void Interpreter::drop()
+{
+    auto token = _tokenizer.get();
+    if (token.kind == Kind::Table)
+    {
+        drop_table();
+    }
+    else if (token.kind == Kind::Index)
+    {
+        drop_index();
+    }
+    else
+    {
+        throw SyntaxError("expect table or index", token.line, token.column);
+    }
+}
+
+void Interpreter::create_index()
+{
+    auto tokIndexName = _tokenizer.get();
+    ASSERT(tokIndexName, Kind::Identifier, "index name");
+    EXPECT(Kind::On, "keyword: 'on'");
+    auto tokTableName = _tokenizer.get();
+    IndexCreater creater;
+    creater.set_table(tokTableName.content);
+    EXPECT(Kind::LBracket, "'('");
+    auto tokFieldName = _tokenizer.get();
+    ASSERT(tokIndexName, Kind::Identifier, "index name");
+    EXPECT(Kind::RBracket, "')'");
+    EXPECT(Kind::SemiColon, "';'");
+
+    creater.set_index(tokIndexName.content);
+
+    creater.execute();
+}
+
 void Interpreter::create_table()
 {
     auto token = _tokenizer.get();
-    check_assert(token, Kind::Table, "keyword 'table'");
-    token = _tokenizer.get();
     check_assert(token, Kind::Identifier, "identifier");
     TableCreater creater(token.content);
     check_assert(_tokenizer.get(), Kind::LBracket, "'('");
@@ -99,9 +150,7 @@ void Interpreter::create_table()
     {
         throw SyntaxError("expect ';'", tokSemi.line, tokSemi.column);
     }
-
-    CatalogManager::instance().add_table(creater.create());
-    RecordManager::instance().create_table(creater.table_name(), creater.size());
+    creater.execute();
 }
 
 void Interpreter::select()
@@ -183,14 +232,14 @@ void Interpreter::insert()
     EXPECT(Kind::Into, "keyword 'into'");
     auto tokTableName = _tokenizer.get();
     ASSERT(tokTableName, Kind::Identifier, "table name");
-    TupleBuilder builder(tokTableName.content);
+    TableInserter inserter(tokTableName.content);
     EXPECT(Kind::Values, "keyword 'values'");
     EXPECT(Kind::LBracket, "'('");
     for (;;)
     {
         auto tokValue = _tokenizer.get();
         check_value(tokValue);
-        builder.set_value(tokValue.content, to_type(tokValue));
+        inserter.set_value(tokValue.content, to_type(tokValue));
         auto tokCommaOrRBracket = _tokenizer.get();
         if (tokCommaOrRBracket.kind == Kind::Comma)
         {
@@ -207,7 +256,8 @@ void Interpreter::insert()
     }
     EXPECT(Kind::SemiColon, "';'");
 
-    RecordManager::instance().insert_entry(builder.table_name(), builder.get_field());
+    inserter.execute();
+
 }
 
 void Interpreter::delete_entry()
@@ -290,6 +340,31 @@ void Interpreter::drop_table()
     ASSERT(tokTableName, Kind::Identifier, "table name");
     EXPECT(Kind::SemiColon, "';'");
 
-    CatalogManager::instance().remove_table(tokTableName.content);
-    RecordManager::instance().remove_table(tokTableName.content);
+    TableDroper droper;
+    droper.set_table(tokTableName.content);
+
+    droper.execute();
+}
+
+void Interpreter::drop_index()
+{
+    auto tokIndexName = _tokenizer.get();
+    ASSERT(tokIndexName, Kind::Identifier, "index name");
+    EXPECT(Kind::On, "keyword: 'on'");
+    auto tokTableName = _tokenizer.get();
+    IndexDroper droper;
+    droper.set_table(tokTableName.content);
+
+    EXPECT(Kind::SemiColon, "';'");
+
+    droper.execute();
+}
+
+void Interpreter::exec()
+{
+    auto tokFileName = _tokenizer.get();
+    ASSERT(tokFileName, Kind::String, "file name surrounded by \" \"");
+    std::ifstream file(tokFileName.content);
+
+    main_loop(file);
 }

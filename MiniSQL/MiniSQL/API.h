@@ -1,16 +1,13 @@
 #pragma once
 #include "CatalogManager.h"
 #include "RecordManager.h"
-#include "Utils.h"
-#include <string>
-#include <memory>
-#include <vector>
+#include "IndexManager.h"
 
 class Value
 {
 public:
     virtual ~Value() {}
-    virtual TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) = 0;
+    virtual TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) = 0;
 };
 
 class TokenFieldValue : public Value
@@ -22,9 +19,9 @@ public:
         : _fieldName(fieldName)
     {
     }
-    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) override
     {
-        return info[block][_fieldName];
+        return info[ptr][_fieldName];
     }
 };
 
@@ -38,6 +35,7 @@ public:
         : _value(new byte[type.size()])
         , _type(&type)
     {
+        memset(_value.get(), 0, type.size());
         switch (_type->type())
         {
         case Int:
@@ -63,9 +61,19 @@ public:
         }
     }
 
-    TableInfo::ValueProxy value(const TableInfo& info, const BufferBlock& block) override
+    TableInfo::ValueProxy value(const TableInfo& info, const BlockPtr& ptr) override
+    {
+        return get_value();
+    }
+
+    TableInfo::ValueProxy get_value() const
     {
         return TableInfo::ValueProxy(_value.get(), _type);
+    }
+
+    byte* raw() const
+    {
+        return _value.get();
     }
 };
 
@@ -85,7 +93,7 @@ public:
         , _rhs(rhs)
     {
     }
-    virtual bool evaluate(const TableInfo& info, const BufferBlock& block) const = 0;
+    virtual bool evaluate(const TableInfo& info, const BlockPtr& ptr) const = 0;
     virtual ComparisonType type() const = 0;
 };
 
@@ -96,9 +104,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) == _rhs->value(info, block);
+        return _lhs->value(info, ptr) == _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Eq; }
 };
@@ -110,9 +118,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) != _rhs->value(info, block);
+        return _lhs->value(info, ptr) != _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Ne; }
 };
@@ -124,9 +132,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) > _rhs->value(info, block);
+        return _lhs->value(info, ptr) > _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Gt; }
 };
@@ -138,9 +146,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) < _rhs->value(info, block);
+        return _lhs->value(info, ptr) < _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Lt; }
 };
@@ -152,9 +160,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) >= _rhs->value(info, block);
+        return _lhs->value(info, ptr) >= _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Gt; }
 };
@@ -166,9 +174,9 @@ public:
         : Comparison(lhs, rhs)
     {
     }
-    bool evaluate(const TableInfo& info, const BufferBlock& block) const override
+    bool evaluate(const TableInfo& info, const BlockPtr& ptr) const override
     {
-        return _lhs->value(info, block) <= _rhs->value(info, block);
+        return _lhs->value(info, ptr) <= _rhs->value(info, ptr);
     }
     ComparisonType type() const override { return ComparisonType::Le; }
 };
@@ -178,10 +186,14 @@ class QueryListBase
 protected:
     const TableInfo* _info;
     std::vector<std::unique_ptr<Comparison>> _comparisonNodes;
+    std::pair<std::shared_ptr<LiteralValue>, std::shared_ptr<LiteralValue>> _indexQuery;
+    bool _isValid;
 public:
     QueryListBase()
         : _info()
         , _comparisonNodes()
+        , _indexQuery(nullptr, nullptr)
+        , _isValid(true)
     {
     }
     virtual ~QueryListBase()
@@ -193,6 +205,14 @@ public:
     }
     void add_query(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
+        if (!_isValid)
+        {
+            return;
+        }
+        if(_info->index_pos() != -1 && fieldName == _info->fields()[_info->index_pos()].name())
+        {
+            add_index_query(type, value);
+        }
         std::unique_ptr<Comparison> comparison;
         auto lValue = new TokenFieldValue(fieldName);
         auto rValue = new LiteralValue(value, _info->field(fieldName).type_info());
@@ -223,7 +243,84 @@ public:
         }
         _comparisonNodes.emplace_back(expr);
     }
+
+    void add_index_query(Comparison::ComparisonType type, const std::string& value)
+    {
+        auto newValue = std::make_shared<LiteralValue>(value, _info->fields()[_info->index_pos()].type_info());
+        switch (type)
+        {
+        case Comparison::ComparisonType::Eq:
+            if (_indexQuery.first != nullptr)
+            {
+                if (newValue->get_value() < _indexQuery.first->get_value())
+                {
+                    _isValid = false;
+                    break;
+                }
+            }
+            if (_indexQuery.second != nullptr)
+            {
+                if (newValue->get_value() > _indexQuery.first->get_value())
+                {
+                    _isValid = false;
+                    break;
+                }
+            }
+            _indexQuery.first = newValue;
+            _indexQuery.second = newValue;
+            break;
+        case Comparison::ComparisonType::Lt:
+        case Comparison::ComparisonType::Le:
+            if (_indexQuery.first != nullptr)
+            {
+                if (newValue->get_value() < _indexQuery.first->get_value())
+                {
+                    _isValid = false;
+                    break;
+                }
+            }
+            if (_indexQuery.second != nullptr)
+            {
+                if (newValue->get_value() < _indexQuery.second->get_value())
+                {
+                    _indexQuery.second = newValue;
+                }
+            }
+            else
+            {
+                _indexQuery.second = newValue;
+            }
+            break;
+        case Comparison::ComparisonType::Gt:
+        case Comparison::ComparisonType::Ge:
+            if (_indexQuery.first != nullptr)
+            {
+                if (newValue->get_value() > _indexQuery.first->get_value())
+                {
+                    _indexQuery.first = newValue;
+                    break;
+                }
+            }
+            else
+            {
+                _indexQuery.first = newValue;
+            }
+            if (_indexQuery.second != nullptr)
+            {
+                if (newValue->get_value() > _indexQuery.second->get_value())
+                {
+                    _isValid = false;
+                    break;
+                }
+            }
+            break;
+        case Comparison::ComparisonType::Ne: break;
+        default: break;
+        }
+    }
+
     virtual std::vector<BlockPtr> execute_linearly() const = 0;
+    virtual std::vector<BlockPtr> execute() const = 0;
 };
 
 class QueryList : public QueryListBase
@@ -236,6 +333,10 @@ public:
 
     virtual std::vector<BlockPtr> execute_linearly() const override
     {
+        if (!_isValid)
+        {
+            return{};
+        }
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
         auto listSize = recList.size();
@@ -246,7 +347,7 @@ public:
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                if (cmpEntry->evaluate(*_info, recList[i]) == false)
                 {
                     success = false;
                     break;
@@ -258,6 +359,41 @@ public:
             }
         }
 
+        return result;
+    }
+
+    std::vector<BlockPtr> execute() const override
+    {
+        if (_info->index_pos() == -1)
+        {
+            return execute_linearly();
+        }
+        if (!_isValid)
+        {
+            return{};
+        }
+
+        std::vector<BlockPtr> result;
+
+        auto entries = IndexManager::instance().search(_info->name(), _indexQuery.first ? _indexQuery.first->raw() : nullptr
+                                                       , _indexQuery.second? _indexQuery.second->raw() : nullptr);
+
+        for (const auto& pEntry : entries)
+        {
+            bool success = true;
+            for (auto& cmpEntry : _comparisonNodes)
+            {
+                if (cmpEntry->evaluate(*_info, pEntry) == false)
+                {
+                    success = false;
+                    break;
+                }
+            }
+            if (success)
+            {
+                result.push_back(pEntry);
+            }
+        }
         return result;
     }
 };
@@ -273,13 +409,14 @@ public:
     {
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
+        auto& index = IndexManager::instance().check_index(_info->name());
 
         for (size_t i = 0; i != recList.size();)
         {
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, *recList[i]) == false)
+                if (cmpEntry->evaluate(*_info, recList[i]) == false)
                 {
                     success = false;
                     break;
@@ -288,6 +425,7 @@ public:
             if (success)
             {
                 recList.erase(i);
+                index.tree()->remove(recList[i]->raw_ptr() + _info->fields()[_info->primary_pos()].offset());
             }
             else
             {
@@ -296,6 +434,11 @@ public:
         }
 
         return{};
+    }
+
+    std::vector<BlockPtr> execute() const override
+    {
+        return execute_linearly();
     }
 };
 
@@ -406,20 +549,25 @@ public:
         return -1;
     }
 
-    TableInfo create() const
+    void execute() const
     {
-        return TableInfo(_tableName, _primaryPos, _indexPos, _size, _fields);
+        CatalogManager::instance().add_table({_tableName, _primaryPos, _indexPos, (uint16_t)_size, _fields});
+        RecordManager::instance().create_table(_tableName, (uint16_t)_size);
+        if (_primaryPos != -1)
+        {
+            IndexManager::instance().create_index(_tableName, _fields[_primaryPos].name(), _fields[_primaryPos].type_info());
+        }
     }
 };
 
-class TupleBuilder
+class TableInserter
 {
 private:
     const TableInfo* _tableInfo;
     std::unique_ptr<byte, ArrayDeleter> _raw;
     size_t _iField;
 public:
-    TupleBuilder(const std::string& tableName)
+    TableInserter(const std::string& tableName)
         : _tableInfo(&CatalogManager::instance().find_table(tableName))
         , _raw(new byte[_tableInfo->entry_size()])
         , _iField(0)
@@ -480,6 +628,45 @@ public:
     byte* get_field() const
     {
         return _raw.get();
+    }
+
+    void check_unique_field() const
+    {
+        auto& rec = RecordManager::instance().find_table(_tableInfo->name());
+        for (size_t iRec = 0; iRec != rec.size(); iRec++)
+        {
+            for (auto& field : _tableInfo->fields())
+            {
+                if (field.is_unique() && (*_tableInfo)[rec[iRec]][field.name()] == (*_tableInfo)[_raw.get()][field.name()])
+                {
+                    throw SQLError(("not unique " + field.name()).c_str());
+                }
+            }
+        }
+    }
+
+    void execute()
+    {
+        if (_tableInfo->index_pos() != -1)
+        {
+            if (IndexManager::instance().check_index_unique(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset()))
+            {
+                for (size_t i = 0; i != _tableInfo->fields().size(); i++)
+                {
+                    if (_tableInfo->fields()[i].is_unique() && i != _tableInfo->primary_pos())
+                    {
+                        check_unique_field();
+                        break;
+                    }
+                }
+                auto ptr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
+                IndexManager::instance().insert(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset(), ptr);
+            }
+            else
+            {
+                throw SQLError("not unique: primary");
+            }
+        }
     }
 };
 
@@ -551,7 +738,7 @@ public:
 
     virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        return std::make_shared<SelectQueryResult>(*_info, _fields, _query->execute_linearly());
+        return std::make_shared<SelectQueryResult>(*_info, _fields, _query->execute());
     }
 };
 
@@ -565,7 +752,90 @@ public:
 
     virtual std::shared_ptr<QueryResult> get_result() const override
     {
-        _query->execute_linearly();
+        _query->execute();
         return nullptr;
+    }
+};
+
+class TableDroper
+{
+    const TableInfo* _info;
+public:
+    TableDroper()
+        : _info(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void execute()
+    {
+        RecordManager::instance().drop_record(_info->name());
+        if (IndexManager::instance().has_index(_info->name()))
+        {
+            IndexManager::instance().drop_index(_info->name());
+        }
+        CatalogManager::instance().drop_info(_info->name());
+    }
+};
+
+class IndexDroper
+{
+    TableInfo* _info;
+public:
+    IndexDroper()
+        : _info(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void execute()
+    {
+        IndexManager::instance().drop_index(_info->name());
+        _info->index_pos(-1);
+    }
+};
+
+class IndexCreater
+{
+    TableInfo* _info;
+    const TokenField* _field;
+public:
+    IndexCreater()
+        : _info(nullptr)
+        , _field(nullptr)
+    {
+    }
+    void set_table(const std::string& table)
+    {
+        _info = &CatalogManager::instance().find_table(table);
+    }
+    void set_index(const std::string& fieldName)
+    {
+        _field = &_info->field(fieldName);
+        if (!_field->is_unique())
+        {
+            throw SQLError(("field not unique: " + _field->name()).c_str());
+        }
+    }
+    void execute()
+    {
+        auto& index = IndexManager::instance().create_index(_info->name(), _field->name(), _field->type_info());
+        auto& tableInfo = *_info;
+
+        auto iterField = std::find_if(_info->fields().begin(), _info->fields().end(), [&](const auto& elm) {
+            return elm.name() == _field->name();
+        });
+
+        tableInfo.index_pos(iterField - _info->fields().begin());
+
+        auto& records = RecordManager::instance().find_table(_info->name());
+        for (size_t i = 0; i != records.size(); i++)
+        {
+            index.tree()->insert(records[i]->raw_ptr() + _field->offset(), records[i]);
+        }
     }
 };

@@ -25,17 +25,10 @@ public:
     }
 };
 
-#if defined _DEBUG || defined DEBUG
 
-#define log(...) logger(__VA_ARGS__)
-#define log_enum(enum_val) (__TEXT(enum_val), enum_val) 
-#define log_expr(expr) (__TEXT(expr), expr)
-
-#else 
 
 #define log(...)
 #define log_enum(enum_val)
 #define log_expr(expr)
 
-#endif 
 extern Logger logger;

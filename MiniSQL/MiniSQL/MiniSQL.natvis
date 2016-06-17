@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="BPlusTree&lt;*&gt;::OberservableArray&lt;*&gt;">
+    <DisplayString>{{ size={*_psize} }}</DisplayString>
+    <Expand>
+      <Item Name="[capacity]" ExcludeView="simple">_capacity</Item>
+      <ArrayItems>
+        <Size>*_psize</Size>
+        <ValuePointer>_array</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="BPlusTree&lt;*&gt;::TreeNode">
+    <DisplayString>{{ is_leaf={_base->is_leaf} ptr_count={*_ptrs._psize} key_count={*_keys._psize}}</DisplayString>
+    <Expand>
+      <Item Name="[self]">_selfPtr</Item>
+      <Item Name="[parent ptr]">_base->parent</Item>
+      <Item Name="[ptrs]">_ptrs</Item>
+      <Item Name="[keys]">_keys</Item>
+      <Item Condition="_base->is_leaf" Name="[next ptr]">_ptrs._array[_ptrs._capacity]</Item>
+    </Expand>
+  </Type>
+
+
+
+  <Type Name="BlockPtr">
+    <DisplayString Condition="_fileNameIndex == 4294967295 &amp;&amp; _fileIndex == 4294967295 &amp;&amp; _blockIndex == 65535 &amp;&amp; _offset == 65535">nullptr</DisplayString>
+    <DisplayString Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535">
+      {{ {_fileNameIndex}, {_fileIndex}, {_blockIndex}, {_offset} }
+    </DisplayString>
+    <Expand>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[file name]">_fileNameIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[file index]">_fileIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[block index]">_blockIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[offset]">_offset</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="BufferBlock">
+    <DisplayString>
+      {{ lock={_lockTimes} dirty={_hasModified} [{_fileName}, {_fileIndex}, {_blockIndex}] }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[file name]">_fileName</Item>
+      <Item Name="[file index]">_fileIndex</Item>
+      <Item Name="[block index]">_blockIndex</Item>
+      <Item Name="[offset]">_offset</Item>
+      <Item Name="[buffer]">(byte*)_buffer._Mypair._Myval2, 4096</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="BPlusTree&lt;*&gt;::TreeIterator">
+    <DisplayString>
+      {{ [{_ptr}, {_i}] }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[leaf]">_ptr</Item>
+      <Item Name="[i]">_i</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="MemoryWriteStream">
+    <DisplayString>
+      {{ remains={_size-_current} }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[buffer]">_buffer, 4096</Item>
+      <Item Name="[current]">_current</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="MemoryReadStream">
+    <DisplayString>
+      {{ remains={_size-_current} }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[buffer]">_buffer, 4096</Item>
+      <Item Name="[current]">_current</Item>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>

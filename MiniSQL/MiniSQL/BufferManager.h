@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Serialization.h"
+
 struct ArrayDeleter
 {
     void operator()(byte* array) const
@@ -24,11 +26,13 @@ public:
     using offset_t = uint16_t;
 private:
     using IndexPair = std::pair<uint32_t, uint16_t>;
+    using ListIter = std::list<std::unique_ptr<BufferBlock>>::iterator;
 
     std::map<uint32_t, std::string> _indexNameMap;
     std::map<std::string, uint32_t> _nameIndexMap;
 
-    std::array<std::unique_ptr<BufferBlock>, BlockCount> _blocks;
+    std::list<std::unique_ptr<BufferBlock>> _blocks;
+    std::map<std::string, std::set<IndexPair>> _freeIndexPairs;
 
     const static char* const FileName;
 
@@ -60,9 +64,14 @@ public:
     const std::string& check_file_name(uint32_t index);
     uint32_t check_file_index(const std::string& file);
 
+    BufferBlock& alloc_block(const std::string& fileName);
+    void drop_block(BufferBlock& block);
+    void drop_block(const BlockPtr& block);
+    void drop_block(const std::string& name);
+
     bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:
-    size_t find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    ListIter find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     void save_block(BufferBlock& block);
     void write_file(const byte* content, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
@@ -82,9 +91,9 @@ private:
     std::string _fileName;
     uint32_t _fileIndex;
     uint16_t _blockIndex;
-    bool _isLocked;
+    int _lockTimes;
     bool _hasModified;
-    boost::posix_time::ptime _lastModifiedTime;
+    mutable boost::posix_time::ptime _lastModifiedTime;
     uint16_t _offset;
 
     BufferBlock()
@@ -96,7 +105,7 @@ private:
         , _fileName(fileName)
         , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)
-        , _isLocked(false)
+        , _lockTimes(0)
         , _hasModified(false)
         , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
         , _offset(0)
@@ -118,6 +127,11 @@ public:
     {
         log("BB: get dirty");
         _hasModified = true;
+        update_time();
+    }
+
+    void update_time() const
+    {
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
 
@@ -127,13 +141,14 @@ public:
         _buffer.reset();
         _fileIndex = -1;
         _blockIndex = -1;
-        _isLocked = false;
+        _lockTimes = 0;
         _lastModifiedTime = boost::posix_time::special_values::not_a_date_time;
     }
 
     template<typename T>
     T* as()
     {
+        update_time();
         log("BB: content asked", _fileName, _fileIndex, _blockIndex);
         int tempOffset = _offset;
         _offset = 0;
@@ -149,24 +164,26 @@ public:
     }
     bool is_locked() const
     {
-        return _isLocked;
+        return _lockTimes > 0;
     }
     void lock()
     {
         log("BB: lock", _fileName, _fileIndex, _blockIndex);
-        _isLocked = true;
+        _lockTimes++;
     }
     void unlock()
     {
         log("BB: unlock", _fileName, _fileIndex, _blockIndex);
-        assert(_isLocked == true);
-        _isLocked = false;
+        assert(_lockTimes > 0);
+        _lockTimes--;
     }
 };
 
 class BlockPtr
 {
     friend class BufferBlock;
+    friend class BufferManager;
+    friend class Serializer<BlockPtr>;
 private:
     uint32_t _fileNameIndex;
     uint32_t _fileIndex;
@@ -195,11 +212,15 @@ public:
     }
     ~BlockPtr()
     {
-        assert(BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex)._offset == 0);
-        log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
+        if (_fileNameIndex != -1)
+        {
+            assert(BufferManager::instance().find_or_alloc(BufferManager::instance().check_file_name(_fileNameIndex), _fileIndex, _blockIndex)._offset == 0);
+            log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
+        }
     }
     BlockPtr& operator=(const BlockPtr& other)
     {
+        _fileNameIndex = other._fileNameIndex;
         _fileIndex = other._fileIndex;
         _blockIndex = other._blockIndex;
         _offset = other._offset;
@@ -207,14 +228,18 @@ public:
     }
     BlockPtr& operator=(nullptr_t)
     {
+        _fileNameIndex = -1;
         _fileIndex = -1;
         _blockIndex = -1;
-        _offset = 0;
+        _offset = -1;
         return *this;
     }
     bool operator==(const BlockPtr& rhs) const
     {
-        return _fileIndex == rhs._fileIndex && _blockIndex == rhs._blockIndex;
+        return _fileNameIndex == rhs._fileNameIndex &&
+            _fileIndex == rhs._fileIndex &&
+            _blockIndex == rhs._blockIndex &&
+            _offset == rhs._offset;
     }
     bool operator!=(const BlockPtr& rhs) const
     {
@@ -222,7 +247,7 @@ public:
     }
     explicit operator bool() const
     {
-        return _fileIndex != -1 && _blockIndex != -1;
+        return *this != nullptr;
     }
     BufferBlock& operator*()
     {
@@ -250,7 +275,31 @@ public:
     }
 };
 
+template<>
+class Serializer<BlockPtr>
+{
+public:
+    static BlockPtr deserialize(MemoryReadStream& mrs)
+    {
+        BlockPtr t;
+        mrs >> t._fileNameIndex >> t._fileIndex >> t._blockIndex >> t._offset;
+        return t;
+    }
+
+    static void serialize(MemoryWriteStream& mws, const BlockPtr& value)
+    {
+        mws << value._fileNameIndex << value._fileIndex << value._blockIndex << value._offset;
+    }
+
+    static size_t size(const BlockPtr& value)
+    {
+        return sizeof(value._fileNameIndex) + sizeof(value._fileIndex)
+            + sizeof(value._blockIndex) + sizeof(value._offset);
+    }
+};
+
 inline BlockPtr BufferBlock::ptr() const
 {
+    update_time();
     return BlockPtr(BufferManager::instance().check_file_index(_fileName), _fileIndex, _blockIndex, _offset);
 }

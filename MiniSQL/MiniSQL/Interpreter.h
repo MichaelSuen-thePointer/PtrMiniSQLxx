@@ -13,13 +13,13 @@ public:
     using Kind = Tokenizer::Kind;
     using Token = Tokenizer::Token;
 
-    static void main_loop()
+    static void main_loop(std::istream& is)
     {
         std::string command;
         std::cout << "> ";
-        while (std::cin.peek() != -1)
+        while (is.peek() != -1)
         {
-            command.push_back(std::cin.get());
+            command.push_back(is.get());
             if (command.back() == ';')
             {
                 try
@@ -71,7 +71,7 @@ public:
         {
         case Kind::Create:
         {
-            create_table();
+            create();
             break;
         }
         case Kind::Delete:
@@ -81,7 +81,7 @@ public:
         }
         case Kind::Drop:
         {
-            drop_table();
+            drop();
             break;
         }
         case Kind::Insert:
@@ -104,6 +104,11 @@ public:
             show_table();
             break;
         }
+        case Kind::Exec:
+        {
+            exec();
+            break;
+        }
         case Kind::Exit:
             return false;
             break;
@@ -118,6 +123,12 @@ public:
 #define EXPECT(type, msg) check_assert(_tokenizer.get(), type, msg)
 #define ASSERT(token, type, msg) check_assert(token, type, msg)
 
+    static void create();
+
+    static void drop();
+
+    static void create_index();
+
     static void create_table();
 
     static void select();
@@ -129,6 +140,10 @@ public:
     static void show_select_result(const SelectStatementBuilder& builder);
 
     static void drop_table();
+
+    static void drop_index();
+
+    static void exec();
 
     static void desc_table()
     {

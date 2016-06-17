@@ -3,5 +3,5 @@
 
 int main()
 {
-    Interpreter::main_loop();
+    Interpreter::main_loop(std::cin);
 }
