@@ -60,4 +60,25 @@
       <Item Name="[i]">_i</Item>
     </Expand>
   </Type>
+
+  <Type Name="MemoryWriteStream">
+    <DisplayString>
+      {{ remains={_size-_current} }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[buffer]">_buffer, 4096</Item>
+      <Item Name="[current]">_current</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="MemoryReadStream">
+    <DisplayString>
+      {{ remains={_size-_current} }}
+    </DisplayString>
+    <Expand>
+      <Item Name="[buffer]">_buffer, 4096</Item>
+      <Item Name="[current]">_current</Item>
+    </Expand>
+  </Type>
+
 </AutoVisualizer>

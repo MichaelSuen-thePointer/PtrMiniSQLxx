@@ -33,7 +33,7 @@ RecordManager::~RecordManager()
 
             size_t maxRange = std::min(tableInfoPair.second._records.size(), (i + 1) * blockCnt);
 
-            for (size_t iRec = i * blockCnt; iRec < i * blockCnt + maxRange; iRec++)
+            for (size_t iRec = i * blockCnt; iRec < maxRange; iRec++)
             {
                 otableStream << tableInfoPair.second._records[iRec].first << tableInfoPair.second._records[iRec].second;
             }

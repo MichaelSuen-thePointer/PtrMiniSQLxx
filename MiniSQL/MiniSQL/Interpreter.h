@@ -107,6 +107,7 @@ public:
         case Kind::Exec:
         {
             exec();
+            break;
         }
         case Kind::Exit:
             return false;

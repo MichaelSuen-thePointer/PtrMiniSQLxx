@@ -140,7 +140,7 @@ private:
 public:
 
     IndexInfo& create_index(const std::string& tableName, const std::string& fieldName,
-                      const TypeInfo& type)
+                            const TypeInfo& type)
     {
         auto iterPrev = _tables.find(tableName);
         if (iterPrev != _tables.end())
@@ -150,8 +150,8 @@ public:
         auto result = _tables.insert({tableName,
             IndexInfo{fieldName,
                 TreeCreater::create(type.type(), type.size(),
-                    BufferManager::instance().alloc_block(tableName + "_record").ptr(),
-                    tableName + "_record", true), type.type(), type.size()}});
+                    BufferManager::instance().alloc_block(tableName + "_bplustree").ptr(),
+                    tableName + "_bplustree", true), type.type(), type.size()}});
 
         return result.first->second;
     }
@@ -178,7 +178,7 @@ public:
     bool check_index_unique(const std::string& tableName, byte* key)
     {
         auto& info = check_index(tableName);
-        return info.tree()->find_eq(key) != nullptr;
+        return info.tree()->find_eq(key) == nullptr;
     }
 
     const IndexInfo& check_index(const std::string& tableName)
@@ -209,10 +209,13 @@ public:
 
     std::vector<BlockPtr> search(const std::string& tableName, byte* lower, byte* upper)
     {
-        assert(lower != nullptr || upper != nullptr);
         auto& indexInfo = check_index(tableName);
 
-        if (lower == nullptr)
+        if (lower == nullptr && upper == nullptr)
+        {
+            return indexInfo.tree()->find_all();
+        }
+        else if (lower == nullptr)
         {
             return indexInfo.tree()->find_le(upper);
         }
@@ -242,7 +245,7 @@ public:
         {
             uint16_t totalEntry;
             ostream >> totalEntry;
-            if (totalEntry == -1)
+            if (totalEntry == (uint16_t)-1)
             {
                 break;
             }
@@ -268,26 +271,36 @@ public:
 
         MemoryWriteStream ostream(rawMem, BufferBlock::BlockSize);
 
-        ostream << (uint16_t)_tables.size();
-
         uint16_t iBlock = 0;
-        for (const auto& pair : _tables)
+
+        auto iter = _tables.begin();
+
+        for (;;)
         {
             uint16_t totalEntry = 0;
-
+            if (iter == _tables.end())
+            {
+                break;
+            }
             auto& entryBlock = BufferManager::instance().find_or_alloc(FileName, 0, iBlock + 1);
             MemoryWriteStream blockStream(entryBlock.as<byte>(), BufferBlock::BlockSize);
-            while (blockStream.remain() >= sizeof(pair.first) + Serializer<IndexInfo>::size(pair.second))
+            while (blockStream.remain() >= sizeof(iter->first) + Serializer<IndexInfo>::size(iter->second))
             {
-                blockStream << pair.first;
-                Serializer<IndexInfo>::serialize(blockStream, pair.second);
+                blockStream << iter->first;
+                Serializer<IndexInfo>::serialize(blockStream, iter->second);
 
                 totalEntry++;
+                ++iter;
+                if (iter == _tables.end())
+                {
+                    break;
+                }
             }
             entryBlock.notify_modification();
             ostream << totalEntry;
             iBlock++;
         }
+
         ostream << (uint16_t)-1;
 
         block.notify_modification();

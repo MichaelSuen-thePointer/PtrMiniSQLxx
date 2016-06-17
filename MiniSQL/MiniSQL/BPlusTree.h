@@ -9,6 +9,8 @@ public:
     virtual std::vector<BlockPtr> find_le(byte* pkey) = 0;
     virtual std::vector<BlockPtr> find_ge(byte* pkey) = 0;
     virtual std::vector<BlockPtr> find_range(byte* lower, byte* upper) = 0;
+    virtual std::vector<BlockPtr> find_all() = 0;
+
     virtual BlockPtr find_eq(byte* key) = 0;
 
     virtual void remove(byte* key) = 0;
@@ -239,6 +241,10 @@ private:
             {
                 ptrs().capacity(BPlusTree::ptr_count - 1);
             }
+            if (is_leaf)
+            {
+                next_ptr() = nullptr;
+            }
 
             _selfPtr->notify_modification();
         }
@@ -376,10 +382,10 @@ private:
         TreeIterator& operator++()
         {
             auto rawNode = _ptr->as<BTreeNodeModel>();
-            if (_i == rawNode->total_ptr)
+            if (_i == rawNode->total_ptr - 1)
             {
                 _i = 0;
-                _ptr = rawNode->ptrs[BPlusTree::ptr_count - 1];
+                _ptr = rawNode->ptrs[BPlusTree::next_index];
             }
             else
             {
@@ -799,7 +805,6 @@ public:
         if (iterValue != targetLeaf.keys().end())
         {
             TreeIterator iter{targetLeaf.self_ptr(), (size_t)iValue};
-            ++iter;
             return iter;
         }
         return{targetLeaf.next_ptr(), 0};
@@ -850,6 +855,10 @@ public:
         std::vector<BlockPtr> result;
         TreeIterator left = begin();
         TreeIterator right = find(*reinterpret_cast<key_type*>(pkey));
+        if (right != end())
+        {
+            ++right;
+        }
         if (left && right)
         {
             while (left != right)
@@ -876,6 +885,10 @@ public:
     {
         auto left = find(*reinterpret_cast<key_type*>(lower));
         auto right = find(*reinterpret_cast<key_type*>(upper));
+        if (right != end())
+        {
+            ++right;
+        }
         std::vector<BlockPtr> result;
         if (left)
         {
@@ -908,11 +921,21 @@ public:
     {
         TreeNode targetLeaf = find_leaf(*reinterpret_cast<const key_type*>(key));
         auto place = std::find(targetLeaf.keys().begin(), targetLeaf.keys().end(), *reinterpret_cast<const key_type*>(key));
-        if(place == targetLeaf.keys.end())
+        if (place == targetLeaf.keys().end())
         {
             return nullptr;
         }
         return targetLeaf.ptrs()[place - targetLeaf.keys().begin()];
+    }
+
+    std::vector<BlockPtr> find_all() override
+    {
+        std::vector<BlockPtr> result;
+        for (auto iter = begin(); iter != end(); ++iter)
+        {
+            result.push_back(*iter);
+        }
+        return result;
     }
 };
 
