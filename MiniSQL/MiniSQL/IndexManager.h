@@ -134,7 +134,7 @@ public:
     }
 
 private:
-    std::map<std::string, IndexInfo> _tables;
+    std::multimap<std::string, IndexInfo> _tables;
 
     const static char* const FileName;
 public:
@@ -142,74 +142,127 @@ public:
     IndexInfo& create_index(const std::string& tableName, const std::string& fieldName,
                             const TypeInfo& type)
     {
-        auto iterPrev = _tables.find(tableName);
-        if (iterPrev != _tables.end())
+        if (has_index(tableName, fieldName))
         {
-            throw AlreadyHaveIndex(tableName.c_str());
+            throw AlreadyHaveIndex((tableName + " " + fieldName).c_str());
         }
         auto result = _tables.insert({tableName,
             IndexInfo{fieldName,
                 TreeCreater::create(type.type(), type.size(),
-                    BufferManager::instance().alloc_block(tableName + "_bplustree").ptr(),
-                    tableName + "_bplustree", true), type.type(), type.size()}});
+                    BufferManager::instance().alloc_block(tableName + "_" + fieldName + "_bplustree").ptr(),
+                                     tableName + "_" + fieldName + "_bplustree", true), type.type(), type.size()}});
 
-        return result.first->second;
+        return result->second;
+    }
+
+    void drop_index(const std::string& tableName, const std::string& fieldName)
+    {
+        auto iterPair = _tables.equal_range(tableName);
+        if (iterPair.first == iterPair.second)
+        {
+            throw NoIndex(tableName.c_str());
+        }
+        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
+        {
+            if (iter->second.field_name() == fieldName)
+            {
+                iter->second.tree()->drop_tree();
+                _tables.erase(iter);
+                return;
+            }
+        }
+        throw NoIndex((tableName + " " + fieldName).c_str());
     }
 
     void drop_index(const std::string& tableName)
     {
-        auto iterPrev = _tables.find(tableName);
-        if (iterPrev != _tables.end())
-        {
-            iterPrev->second.tree()->drop_tree();
-            _tables.erase(iterPrev);
-        }
-        else
+        auto iterPair = _tables.equal_range(tableName);
+        if (iterPair.first == iterPair.second)
         {
             throw NoIndex(tableName.c_str());
         }
-    }
-
-    bool has_index(const std::string& tableName)
-    {
-        return _tables.find(tableName) != _tables.end();
-    }
-
-    bool check_index_unique(const std::string& tableName, byte* key)
-    {
-        auto& info = check_index(tableName);
-        return info.tree()->find_eq(key) == nullptr;
-    }
-
-    const IndexInfo& check_index(const std::string& tableName)
-    {
-        auto iter = _tables.find(tableName);
-        if (iter != _tables.end())
+        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
         {
-            return iter->second;
+            iter->second.tree()->drop_tree();
+            _tables.erase(iter);
+            return;
         }
         throw NoIndex(tableName.c_str());
     }
 
-    void insert(const std::string& tableName, byte* key, const BlockPtr& ptr)
+    bool has_index(const std::string& tableName, const std::string& fieldName)
     {
-        auto iter = _tables.find(tableName);
-        if (iter == _tables.end())
+        auto iterPair = _tables.equal_range(tableName);
+
+        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
         {
-            throw NoIndex(tableName.c_str());
+            if (iter->second.field_name() == fieldName)
+            {
+                return true;
+            }
         }
-        iter->second.tree()->insert(key, ptr);
+        return false;
     }
 
-    void remove(const std::string& tableName, byte* key)
+    bool has_index(const std::string& tableName)
     {
-        auto& indexInfo = check_index(tableName);
+        auto iterPair = _tables.equal_range(tableName);
+
+        if (iterPair.first != iterPair.second)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    std::vector<std::string> indexed_fields(const std::string& tableName) const
+    {
+        std::vector<std::string> results;
+
+        auto iterPair = _tables.equal_range(tableName);
+
+        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
+        {
+            results.push_back(iter->second.field_name());
+        }
+        return results;
+    }
+
+    bool check_index_unique(const std::string& tableName, const std::string& fieldName, byte* key)
+    {
+        auto& info = check_index(tableName, fieldName);
+        return info.tree()->find_eq(key) == nullptr;
+    }
+
+    const IndexInfo& check_index(const std::string& tableName, const std::string& fieldName)
+    {
+        auto iterPair = _tables.equal_range(tableName);
+
+        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
+        {
+            if (iter->second.field_name() == fieldName)
+            {
+                return iter->second;
+            }
+        }
+        throw NoIndex(tableName.c_str());
+    }
+
+    void insert(const std::string& tableName, const std::string& fieldName, byte* key, const BlockPtr& ptr)
+    {
+        auto& indexInfo = check_index(tableName, fieldName);
+        indexInfo.tree()->insert(key, ptr);
+    }
+
+    void remove(const std::string& tableName, const std::string& fieldName, byte* key)
+    {
+        auto& indexInfo = check_index(tableName, fieldName);
         indexInfo.tree()->remove(key);
     }
 
-    std::vector<BlockPtr> search(const std::string& tableName, byte* lower, byte* upper)
+    std::vector<BlockPtr> search(const std::string& tableName, const std::string& fieldName, byte* lower, byte* upper)
     {
-        auto& indexInfo = check_index(tableName);
+        auto& indexInfo = check_index(tableName, fieldName);
 
         if (lower == nullptr && upper == nullptr)
         {

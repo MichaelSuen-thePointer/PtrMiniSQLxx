@@ -866,7 +866,6 @@ public:
                 result.push_back(*left);
                 ++left;
             }
-            result.push_back(*right);
         }
         return result;
     }
@@ -897,7 +896,6 @@ public:
                 result.push_back(*left);
                 ++left;
             }
-            result.push_back(*right);
         }
         return result;
     }

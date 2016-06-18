@@ -1,9 +1,12 @@
-5
-0 tt_bplustree
+6
+0 tt_f1_bplustree
 1 tt_records
 2 IndexManagerMeta
 3 RecordManagerMeta
 4 CatalogManagerMeta
-1
-tt_bplustree 1
-0 79
+5 tt_f2_bplustree
+2
+tt_f1_bplustree 1
+0 1
+tt_f2_bplustree 1
+0 1

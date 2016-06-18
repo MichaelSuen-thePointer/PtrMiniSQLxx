@@ -14,6 +14,7 @@
 #include <array>
 #include <vector>
 #include <set>
+#include <map>
 #include <list>
 #include <deque>
 #include <cassert>

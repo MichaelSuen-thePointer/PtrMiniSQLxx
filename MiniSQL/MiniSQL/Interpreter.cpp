@@ -354,7 +354,7 @@ void Interpreter::drop_index()
     auto tokTableName = _tokenizer.get();
     IndexDroper droper;
     droper.set_table(tokTableName.content);
-
+    droper.set_field(tokIndexName.content);
     EXPECT(Kind::SemiColon, "';'");
 
     droper.execute();
@@ -365,6 +365,6 @@ void Interpreter::exec()
     auto tokFileName = _tokenizer.get();
     ASSERT(tokFileName, Kind::String, "file name surrounded by \" \"");
     std::ifstream file(tokFileName.content);
-
+    EXPECT(Kind::SemiColon, "';'");
     main_loop(file);
 }

@@ -186,13 +186,14 @@ class QueryListBase
 protected:
     const TableInfo* _info;
     std::vector<std::unique_ptr<Comparison>> _comparisonNodes;
-    std::pair<std::shared_ptr<LiteralValue>, std::shared_ptr<LiteralValue>> _indexQuery;
+    std::map<std::string,
+        std::pair<std::shared_ptr<LiteralValue>, std::shared_ptr<LiteralValue>>> _indexQueries;
     bool _isValid;
 public:
     QueryListBase()
         : _info()
         , _comparisonNodes()
-        , _indexQuery(nullptr, nullptr)
+        , _indexQueries()
         , _isValid(true)
     {
     }
@@ -209,9 +210,10 @@ public:
         {
             return;
         }
-        if(_info->index_pos() != -1 && fieldName == _info->fields()[_info->index_pos()].name())
+        auto& indexMgr = IndexManager::instance();
+        if (indexMgr.has_index(_info->name(), fieldName))
         {
-            add_index_query(type, value);
+            add_index_query(type, fieldName, value);
         }
         std::unique_ptr<Comparison> comparison;
         auto lValue = new TokenFieldValue(fieldName);
@@ -244,70 +246,70 @@ public:
         _comparisonNodes.emplace_back(expr);
     }
 
-    void add_index_query(Comparison::ComparisonType type, const std::string& value)
+    void add_index_query(Comparison::ComparisonType type, const std::string& fieldName, const std::string& value)
     {
-        auto newValue = std::make_shared<LiteralValue>(value, _info->fields()[_info->index_pos()].type_info());
+        auto newValue = std::make_shared<LiteralValue>(value, _info->field(fieldName).type_info());
         switch (type)
         {
         case Comparison::ComparisonType::Eq:
-            if (_indexQuery.first != nullptr)
+            if (_indexQueries[fieldName].first != nullptr)
             {
-                if (newValue->get_value() < _indexQuery.first->get_value())
+                if (newValue->get_value() < _indexQueries[fieldName].first->get_value())
                 {
                     _isValid = false;
                     break;
                 }
             }
-            if (_indexQuery.second != nullptr)
+            if (_indexQueries[fieldName].second != nullptr)
             {
-                if (newValue->get_value() > _indexQuery.first->get_value())
+                if (newValue->get_value() > _indexQueries[fieldName].first->get_value())
                 {
                     _isValid = false;
                     break;
                 }
             }
-            _indexQuery.first = newValue;
-            _indexQuery.second = newValue;
+            _indexQueries[fieldName].first = newValue;
+            _indexQueries[fieldName].second = newValue;
             break;
         case Comparison::ComparisonType::Lt:
         case Comparison::ComparisonType::Le:
-            if (_indexQuery.first != nullptr)
+            if (_indexQueries[fieldName].first != nullptr)
             {
-                if (newValue->get_value() < _indexQuery.first->get_value())
+                if (newValue->get_value() < _indexQueries[fieldName].first->get_value())
                 {
                     _isValid = false;
                     break;
                 }
             }
-            if (_indexQuery.second != nullptr)
+            if (_indexQueries[fieldName].second != nullptr)
             {
-                if (newValue->get_value() < _indexQuery.second->get_value())
+                if (newValue->get_value() < _indexQueries[fieldName].second->get_value())
                 {
-                    _indexQuery.second = newValue;
+                    _indexQueries[fieldName].second = newValue;
                 }
             }
             else
             {
-                _indexQuery.second = newValue;
+                _indexQueries[fieldName].second = newValue;
             }
             break;
         case Comparison::ComparisonType::Gt:
         case Comparison::ComparisonType::Ge:
-            if (_indexQuery.first != nullptr)
+            if (_indexQueries[fieldName].first != nullptr)
             {
-                if (newValue->get_value() > _indexQuery.first->get_value())
+                if (newValue->get_value() > _indexQueries[fieldName].first->get_value())
                 {
-                    _indexQuery.first = newValue;
+                    _indexQueries[fieldName].first = newValue;
                     break;
                 }
             }
             else
             {
-                _indexQuery.first = newValue;
+                _indexQueries[fieldName].first = newValue;
             }
-            if (_indexQuery.second != nullptr)
+            if (_indexQueries[fieldName].second != nullptr)
             {
-                if (newValue->get_value() > _indexQuery.second->get_value())
+                if (newValue->get_value() > _indexQueries[fieldName].second->get_value())
                 {
                     _isValid = false;
                     break;
@@ -364,7 +366,7 @@ public:
 
     std::vector<BlockPtr> execute() const override
     {
-        if (_info->index_pos() == -1)
+        if (!IndexManager::instance().has_index(_info->name()))
         {
             return execute_linearly();
         }
@@ -374,24 +376,50 @@ public:
         }
 
         std::vector<BlockPtr> result;
-
-        auto entries = IndexManager::instance().search(_info->name(), _indexQuery.first ? _indexQuery.first->raw() : nullptr
-                                                       , _indexQuery.second? _indexQuery.second->raw() : nullptr);
-
-        for (const auto& pEntry : entries)
+        std::vector<BlockPtr> entries;
+        if (_indexQueries.size() == 0)
+        {
+            entries = IndexManager::instance().search(_info->name(), _info->fields()[_info->primary_pos()].name(), nullptr, nullptr);
+        }
+        bool first = true;
+        for (auto& idxQuery : _indexQueries)
+        {
+            auto temp = IndexManager::instance().search(_info->name(), idxQuery.first, idxQuery.second.first ? idxQuery.second.first->raw() : nullptr,
+                                                        idxQuery.second.second ? idxQuery.second.second->raw() : nullptr);
+            if (first)
+            {
+                entries = temp;
+                first = false;
+            }
+            else
+            {
+                for (const auto& pEntry : temp)
+                {
+                    if (std::find(entries.begin(), entries.end(), pEntry) == entries.end())
+                    {
+                        entries.push_back(pEntry);
+                    }
+                }
+            }
+            if (entries.size() == RecordManager::instance().find_table(_info->name()).size())
+            {
+                break;
+            }
+        }
+        for (auto entry : entries)
         {
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, pEntry) == false)
+                if (cmpEntry->evaluate(*_info, entry) == false)
                 {
                     success = false;
                     break;
                 }
             }
-            if (success)
+            if(success)
             {
-                result.push_back(pEntry);
+                result.push_back(entry);
             }
         }
         return result;
@@ -409,7 +437,6 @@ public:
     {
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
-        auto& index = IndexManager::instance().check_index(_info->name());
 
         for (size_t i = 0; i != recList.size();)
         {
@@ -425,7 +452,11 @@ public:
             if (success)
             {
                 recList.erase(i);
-                index.tree()->remove(recList[i]->raw_ptr() + _info->fields()[_info->primary_pos()].offset());
+                auto indexedFields = IndexManager::instance().indexed_fields(_info->name());
+                for (const auto& fieldName : indexedFields)
+                {
+                    IndexManager::instance().remove(_info->name(), fieldName, recList[i]->raw_ptr() + _info->field(fieldName).offset());
+                }
             }
             else
             {
@@ -497,14 +528,12 @@ class TableCreater
 private:
     std::string _tableName;
     size_t _primaryPos;
-    size_t _indexPos;
     size_t _size;
     std::vector<TokenField> _fields;
 public:
     TableCreater(const std::string& name)
         : _tableName(name)
         , _primaryPos(-1)
-        , _indexPos(-1)
         , _size(0)
     {
     }
@@ -522,10 +551,6 @@ public:
         {
             throw InsuffcientSpace("too much fields");
         }
-        if (isUnique)
-        {
-            _indexPos = _fields.size() - 1;
-        }
     }
 
     void set_primary(const std::string& name)
@@ -533,7 +558,6 @@ public:
         auto pos = locate_field(name);
         assert(pos != -1);
         _primaryPos = pos;
-        _indexPos = pos;
         _fields[pos]._isUnique = true;
     }
 
@@ -551,7 +575,7 @@ public:
 
     void execute() const
     {
-        CatalogManager::instance().add_table({_tableName, _primaryPos, _indexPos, (uint16_t)_size, _fields});
+        CatalogManager::instance().add_table({_tableName, _primaryPos, (uint16_t)_size, _fields});
         RecordManager::instance().create_table(_tableName, (uint16_t)_size);
         if (_primaryPos != -1)
         {
@@ -647,24 +671,32 @@ public:
 
     void execute()
     {
-        if (_tableInfo->index_pos() != -1)
+        auto& im = IndexManager::instance();
+        if (im.has_index(_tableInfo->name()))
         {
-            if (IndexManager::instance().check_index_unique(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset()))
+            auto fields = im.indexed_fields(_tableInfo->name());
+            for (auto fieldName : fields)
             {
-                for (size_t i = 0; i != _tableInfo->fields().size(); i++)
+                if (IndexManager::instance().check_index_unique(_tableInfo->name(), fieldName, _raw.get() + _tableInfo->field(fieldName).offset()))
                 {
-                    if (_tableInfo->fields()[i].is_unique() && i != _tableInfo->primary_pos())
+                    for (size_t i = 0; i != _tableInfo->fields().size(); i++)
                     {
-                        check_unique_field();
-                        break;
+                        if (_tableInfo->fields()[i].is_unique() && i != _tableInfo->primary_pos())
+                        {
+                            check_unique_field();
+                            break;
+                        }
                     }
                 }
-                auto ptr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
-                IndexManager::instance().insert(_tableInfo->name(), _raw.get() + _tableInfo->fields()[_tableInfo->index_pos()].offset(), ptr);
+                else
+                {
+                    throw SQLError("not unique: primary");
+                }
             }
-            else
+            for (auto fieldName : fields)
             {
-                throw SQLError("not unique: primary");
+                auto ptr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
+                IndexManager::instance().insert(_tableInfo->name(), fieldName, _raw.get() + _tableInfo->field(fieldName).offset(), ptr);
             }
         }
     }
@@ -783,6 +815,7 @@ public:
 class IndexDroper
 {
     TableInfo* _info;
+    std::string _fieldName;
 public:
     IndexDroper()
         : _info(nullptr)
@@ -792,10 +825,13 @@ public:
     {
         _info = &CatalogManager::instance().find_table(table);
     }
+    void set_field(const std::string& table)
+    {
+        _fieldName = table;
+    }
     void execute()
     {
-        IndexManager::instance().drop_index(_info->name());
-        _info->index_pos(-1);
+        IndexManager::instance().drop_index(_info->name(), _fieldName);
     }
 };
 
@@ -824,13 +860,6 @@ public:
     void execute()
     {
         auto& index = IndexManager::instance().create_index(_info->name(), _field->name(), _field->type_info());
-        auto& tableInfo = *_info;
-
-        auto iterField = std::find_if(_info->fields().begin(), _info->fields().end(), [&](const auto& elm) {
-            return elm.name() == _field->name();
-        });
-
-        tableInfo.index_pos(iterField - _info->fields().begin());
 
         auto& records = RecordManager::instance().find_table(_info->name());
         for (size_t i = 0; i != records.size(); i++)

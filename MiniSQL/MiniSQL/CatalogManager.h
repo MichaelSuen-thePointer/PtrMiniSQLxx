@@ -58,14 +58,12 @@ class TableInfo
 private:
     std::string _name;
     size_t _primaryPos;
-    size_t _indexPos;
     size_t _size;
     std::vector<TokenField> _fields;
 
-    TableInfo(const std::string& name, size_t primaryPos, size_t indexPos, size_t size, const std::vector<TokenField> _fields)
+    TableInfo(const std::string& name, size_t primaryPos, size_t size, const std::vector<TokenField> _fields)
         : _name(name)
         , _primaryPos(primaryPos)
-        , _indexPos(indexPos)
         , _size(size)
         , _fields(_fields)
     {
@@ -217,10 +215,6 @@ public:
 
     size_t primary_pos() const { return _primaryPos; }
 
-    size_t index_pos() const { return _indexPos; }
-
-    void index_pos(size_t v) { _indexPos = v; }
-
     size_t entry_size() const { return _size; }
 
     const std::vector<TokenField>& fields() const { return _fields; }
@@ -261,13 +255,11 @@ public:
     {
         std::string tableName;
         size_t primaryPos;
-        size_t indexPos;
         size_t size;
         size_t fieldCount;
 
         mrs >> tableName;
         mrs >> primaryPos;
-        mrs >> indexPos;
         mrs >> size;
         mrs >> fieldCount;
 
@@ -276,12 +268,12 @@ public:
         {
             fields.push_back(Serializer<TokenField>::deserialize(mrs));
         }
-        return TableInfo(tableName, primaryPos, indexPos, size, fields);
+        return TableInfo(tableName, primaryPos, size, fields);
     }
 
     static void serialize(MemoryWriteStream& mws, const TableInfo& value)
     {
-        mws << value._name << value._primaryPos << value._indexPos << value._size << value._fields.size();
+        mws << value._name << value._primaryPos << value._size << value._fields.size();
         for (auto& entry : value._fields)
         {
             Serializer<TokenField>::serialize(mws, entry);

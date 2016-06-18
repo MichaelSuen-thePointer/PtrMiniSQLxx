@@ -66,10 +66,10 @@
     <ClInclude Include="BPlusTree.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="IndexManager.h">
+    <ClInclude Include="TypeInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TypeInfo.h">
+    <ClInclude Include="IndexManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -110,10 +110,10 @@
     <ClCompile Include="BPlusTree.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="IndexManager.cpp">
+    <ClCompile Include="TypeInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TypeInfo.cpp">
+    <ClCompile Include="IndexManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
