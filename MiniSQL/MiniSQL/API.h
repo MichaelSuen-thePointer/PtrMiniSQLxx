@@ -529,7 +529,7 @@ private:
     std::string _tableName;
     size_t _primaryPos;
     size_t _size;
-    std::vector<TokenField> _fields;
+    std::vector<FieldInfo> _fields;
 public:
     TableCreater(const std::string& name)
         : _tableName(name)
@@ -736,7 +736,7 @@ public:
         {
             for (auto& fieldName : _fields)
             {
-                if (std::find_if(_info->fields().begin(), _info->fields().end(), [&fieldName](const TokenField& field) {
+                if (std::find_if(_info->fields().begin(), _info->fields().end(), [&fieldName](const FieldInfo& field) {
                     return field.name() == fieldName;
                 }) == _info->fields().end())
                 {
@@ -838,7 +838,7 @@ public:
 class IndexCreater
 {
     TableInfo* _info;
-    const TokenField* _field;
+    const FieldInfo* _field;
 public:
     IndexCreater()
         : _info(nullptr)

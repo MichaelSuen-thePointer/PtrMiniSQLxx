@@ -72,14 +72,14 @@ public:
     }
 private:
     template<typename T>
-    class OberservableArray
+    class ObservableArray
     {
     private:
         T* _array;
         size_t* _psize;
         size_t _capacity;
     public:
-        OberservableArray(T* base, size_t& size, size_t capacity)
+        ObservableArray(T* base, size_t& size, size_t capacity)
             : _array(base)
             , _psize(&size)
             , _capacity(capacity)
@@ -173,8 +173,8 @@ private:
         friend class BPlusTree;
         ptr_type _selfPtr;
         BTreeNodeModel* _base;
-        mutable OberservableArray<key_type> _keys;
-        mutable OberservableArray<ptr_type> _ptrs;
+        mutable ObservableArray<key_type> _keys;
+        mutable ObservableArray<ptr_type> _ptrs;
     public:
         bool is_leaf() const { return _base->is_leaf; }
         bool is_root() { return parent_ptr() != nullptr; }
@@ -224,8 +224,8 @@ private:
 
         ptr_type self_ptr() const { return _selfPtr; }
 
-        OberservableArray<key_type>& keys() { return _keys; }
-        OberservableArray<ptr_type>& ptrs() { return _ptrs; }
+        ObservableArray<key_type>& keys() { return _keys; }
+        ObservableArray<ptr_type>& ptrs() { return _ptrs; }
         void reset(bool is_leaf = false)
         {
             _base->is_leaf = is_leaf;

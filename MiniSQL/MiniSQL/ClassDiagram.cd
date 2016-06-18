@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Value" Collapsed="true">
+    <Position X="6.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TokenFieldValue" Collapsed="true">
+    <Position X="5.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAACAEAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LiteralValue" Collapsed="true">
+    <Position X="7.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAIAAAAAAQAAAAAAAAAAAAAACAAAQAAAAgAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Comparison" Collapsed="true">
+    <Position X="6.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAgAAAAQAAAAAAAIBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EqComparison" Collapsed="true">
+    <Position X="3.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAIBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeComparison" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIBAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GtComparison" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAIBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LtComparison" Collapsed="true">
+    <Position X="10" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIBAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GeComparison" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAIBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeComparison" Collapsed="true">
+    <Position X="1" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAIBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QueryListBase" Collapsed="true">
+    <Position X="1.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAIAQAAAAIEAAAAAAAAACAAAEAiAAAAACA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QueryList" Collapsed="true">
+    <Position X="0.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAEAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DeleteList" Collapsed="true">
+    <Position X="2.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QueryResult" Collapsed="true">
+    <Position X="8" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAIAAABAAAAAAAAgCAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SelectQueryResult" Collapsed="true">
+    <Position X="8" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAICAAAIAAAABAAwCAAAAAAIAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableCreater">
+    <Position X="17.5" Y="12.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAIDkAEAAAAABBAAAAAAAAAIAAIA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableInserter">
+    <Position X="19.5" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAGAAEAAAAAAAAAAABEAAAEAAAAABAAAAAAAAgAABA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StatementBuilder">
+    <Position X="21.5" Y="12.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIQAAgAACAAEgAAAAAAAAAAAAgAAAAQIA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SelectStatementBuilder">
+    <Position X="19.5" Y="12.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAgAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DeleteStatementBuilder">
+    <Position X="23.5" Y="12.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableDroper">
+    <Position X="21.5" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIBAAAAAAEAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IndexDroper">
+    <Position X="23.5" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAEQAAAAAAAAAAEAAAgAAAAABA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IndexCreater">
+    <Position X="17.5" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAIEAAAEAAAAQAAAAAAgAAAAAAA=</HashCode>
+      <FileName>API.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BPlusTreeBase">
+    <Position X="11" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAYAIBQAAQEEAAgAECAAAAAAAABCAAAAAAAAAA=</HashCode>
+      <FileName>BPlusTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BPlusTree&lt;TKey&gt;">
+    <Position X="13.25" Y="9.75" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="BPlusTree&lt;TKey&gt;::BTreeNodeModel">
+        <TypeIdentifier>
+          <NewMemberFileName>BPlusTree.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Class Name="BPlusTree&lt;TKey&gt;::OberservableArray&lt;T&gt;">
+        <TypeIdentifier>
+          <NewMemberFileName>BPlusTree.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="BPlusTree&lt;TKey&gt;::TreeNode">
+        <TypeIdentifier>
+          <NewMemberFileName>BPlusTree.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="BPlusTree&lt;TKey&gt;::TreeIterator">
+        <TypeIdentifier>
+          <NewMemberFileName>BPlusTree.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ICAAAgCaAIBAEIEUGIAAAWAQAAAAACAACAAAAAAAwAA=</HashCode>
+      <FileName>BPlusTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BufferManager">
+    <Position X="19.25" Y="1.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAQAAEICAAAACAAQgQAEQAARCEQBABAAABgBAEAA=</HashCode>
+      <FileName>BufferManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BufferBlock" Collapsed="true">
+    <Position X="1.25" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ECAAAIAgEAQAAAQAIAAIAAEQBAAABEAAAEIAACQAAAA=</HashCode>
+      <FileName>BufferManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BlockPtr" Collapsed="true">
+    <Position X="24.5" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAEIAAIAwAAAAAABAAAABAgAAAQAAA=</HashCode>
+      <FileName>BufferManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Serializer&lt;BlockPtr&gt;" Collapsed="true">
+    <Position X="22.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAIAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>BufferManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FieldInfo" Collapsed="true">
+    <Position X="31.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAIIAAgAAAAAAAIAAAAAAgAAAEgAAAAAAgAAAAAAA=</HashCode>
+      <FileName>CatalogManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Serializer&lt;T&gt;" Collapsed="true">
+    <Position X="31.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Serialization.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableInfo" Collapsed="true">
+    <Position X="22.75" Y="5.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="TableInfo::TupleProxy">
+        <TypeIdentifier>
+          <NewMemberFileName>CatalogManager.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="TableInfo::ValueProxy">
+        <TypeIdentifier>
+          <NewMemberFileName>CatalogManager.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="TableInfo::RawTupleProxy" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CatalogManager.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAGAIAAAIAAAAAEAAACAAAAAAAEEAAAAAABAAAIAAAA=</HashCode>
+      <FileName>CatalogManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Serializer&lt;TableInfo&gt;" Collapsed="true">
+    <Position X="29.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>CatalogManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CatalogManager" Collapsed="true">
+    <Position X="14.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAIQAIAAABAACAAAAgAAABAAAAAAAAAACBBAAA=</HashCode>
+      <FileName>CatalogManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SQLError" Collapsed="true">
+    <Position X="24.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidKey" Collapsed="true">
+    <Position X="26.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidType" Collapsed="true">
+    <Position X="28" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidComparisonType" Collapsed="true">
+    <Position X="31.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlreadyHaveIndex" Collapsed="true">
+    <Position X="22.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NoIndex" Collapsed="true">
+    <Position X="22.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidIndex" Collapsed="true">
+    <Position X="24.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InsuffcientSpace" Collapsed="true">
+    <Position X="28" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SyntaxError" Collapsed="true">
+    <Position X="26.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAgAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LexicalError" Collapsed="true">
+    <Position X="29.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableNotExist" Collapsed="true">
+    <Position X="26.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TableExist" Collapsed="true">
+    <Position X="31.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidField" Collapsed="true">
+    <Position X="22.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Errors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharTreeCreater&lt;l, r&gt;" Collapsed="true">
+    <Position X="28" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharTreeCreater&lt;1, 1&gt;" Collapsed="true">
+    <Position X="29.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CharTreeCreater&lt;255, 255&gt;" Collapsed="true">
+    <Position X="26.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TreeCreater" Collapsed="true">
+    <Position X="29.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IndexInfo">
+    <Position X="30.5" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAUAgAAAAAAAAAAAAAAEAAACAAIAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Serializer&lt;IndexInfo&gt;" Collapsed="true">
+    <Position X="26.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAIAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IndexManager" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAEgAAAEDAAAAGAAAAAAAAAABEAAAAADAAAABAABA=</HashCode>
+      <FileName>IndexManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Interpreter">
+    <Position X="27.25" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>DAACAIAAAADAAgAAEgAAAIAAAAAACBFAAADRAAIwAAA=</HashCode>
+      <FileName>Interpreter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Logger" Collapsed="true">
+    <Position X="31.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAEAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Logger.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MemoryReadStream" Collapsed="true">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAIgAAAAAAAAAKAAIgAAAAAYAAAAAAAABAIAAAA=</HashCode>
+      <FileName>MemoryReadStream.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MemoryWriteStream" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAgCAAAAAAIAICAIAAAAAAYAAAAAAAABAIAAAA=</HashCode>
+      <FileName>MemoryWriteStream.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RecordManager" Collapsed="true">
+    <Position X="27.25" Y="6.75" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="RecordManager::TableRecordList">
+        <TypeIdentifier>
+          <NewMemberFileName>RecordManager.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAIAAAQAAQAFAAAAAAAAgAAZRAAA=</HashCode>
+      <FileName>RecordManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ScopeExit" Collapsed="true">
+    <Position X="12.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAEAAAAAAAAQAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>ScopeHelper.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ScopeEnter" Collapsed="true">
+    <Position X="17" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAEAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>ScopeHelper.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Tokenizer" Collapsed="true">
+    <Position X="28" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAABAAQMAAAABIBBAIAJSAAAAAYgAAAAAAAABEQAgAA=</HashCode>
+      <FileName>Tokenizer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TypeInfo" Collapsed="true">
+    <Position X="31.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAIACAQAAEAAFAAAgAAAAAAMAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Serializer&lt;TypeInfo&gt;" Collapsed="true">
+    <Position X="28" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uncopyable" Collapsed="true">
+    <Position X="10.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAgAAAAEAA=</HashCode>
+      <FileName>Uncopyable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="ArrayDeleter" Collapsed="true">
+    <Position X="22.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BufferManager.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Comparator" Collapsed="true">
+    <Position X="3" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEIAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="IntComparator" Collapsed="true">
+    <Position X="0.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FloatComparator" Collapsed="true">
+    <Position X="3" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CharsComparator" Collapsed="true">
+    <Position X="5.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEIAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Type" Collapsed="true">
+    <Position X="22.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAgACA=</HashCode>
+      <FileName>TypeInfo.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

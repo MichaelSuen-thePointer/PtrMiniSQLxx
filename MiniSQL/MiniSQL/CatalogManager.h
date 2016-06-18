@@ -3,18 +3,18 @@
 #include "BufferManager.h"
 #include "TypeInfo.h"
 
-class TokenField
+class FieldInfo
 {
     friend class TableCreater;
     friend class TableInfo;
-    friend class Serializer<TokenField>;
+    friend class Serializer<FieldInfo>;
 private:
     std::string _name;
-    TypeInfo _info;
-    size_t _offset;
-    bool _isUnique;
+    TypeInfo    _info;
+    size_t      _offset;
+    bool        _isUnique;
 public:
-    TokenField(const std::string& name, const TypeInfo& info, size_t offset, bool isUnique)
+    FieldInfo(const std::string& name, const TypeInfo& info, size_t offset, bool isUnique)
         : _name(name)
         , _info(info)
         , _offset(offset)
@@ -28,10 +28,10 @@ public:
 };
 
 template<>
-class Serializer<TokenField>
+class Serializer<FieldInfo>
 {
 public:
-    static TokenField deserialize(MemoryReadStream& mrs)
+    static FieldInfo deserialize(MemoryReadStream& mrs)
     {
         std::string name;
         mrs >> name;
@@ -40,9 +40,9 @@ public:
         mrs >> offset;
         bool isUnique;
         mrs >> isUnique;
-        return TokenField(name, info, offset, isUnique);
+        return FieldInfo(name, info, offset, isUnique);
     }
-    static void serialize(MemoryWriteStream& mws, const TokenField& value)
+    static void serialize(MemoryWriteStream& mws, const FieldInfo& value)
     {
         mws << value._name;
         Serializer<TypeInfo>::serialize(mws, value._info);
@@ -59,9 +59,9 @@ private:
     std::string _name;
     size_t _primaryPos;
     size_t _size;
-    std::vector<TokenField> _fields;
+    std::vector<FieldInfo> _fields;
 
-    TableInfo(const std::string& name, size_t primaryPos, size_t size, const std::vector<TokenField> _fields)
+    TableInfo(const std::string& name, size_t primaryPos, size_t size, const std::vector<FieldInfo> _fields)
         : _name(name)
         , _primaryPos(primaryPos)
         , _size(size)
@@ -77,6 +77,7 @@ public:
         byte* _raw;
         const TypeInfo* _info;
     public:
+        //构造函数
         ValueProxy(byte* raw, const TypeInfo* info)
             : _raw(raw)
             , _info(info)
@@ -91,6 +92,7 @@ public:
             other._info = nullptr;
         }
 
+        //输出为字符串
         std::string to_string() const
         {
             switch (_info->type())
@@ -110,6 +112,7 @@ public:
             }
         }
 
+        //与另一个ValueProxy比较
         int compare(const ValueProxy& other) const
         {
             if (*_info == *other._info)
@@ -119,6 +122,7 @@ public:
             throw InvalidType("compare type doesn't match");
         }
 
+        //比较函数
         bool operator==(const ValueProxy& other) const { return compare(other) == 0; }
 
         bool operator!=(const ValueProxy& other) const { return compare(other) != 0; }
@@ -131,12 +135,14 @@ public:
 
         bool operator<=(const ValueProxy& other) const { return compare(other) <= 0; }
 
+        //获取相关属性
         const TypeInfo& type_info() const { return *_info; }
 
         Type type() const { return _info->_type; }
 
         size_t size() const { return _info->_size; }
 
+        //将内容转换为对应类型
         int as_int() const { return *reinterpret_cast<int*>(_raw); }
 
         float as_float() const { return *reinterpret_cast<float*>(_raw); }
@@ -163,9 +169,10 @@ public:
             other._block = nullptr;
             other._info = nullptr;
         }
+        //获取对应字段名的ValueProxy
         ValueProxy operator[](const std::string& keyName)
         {
-            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
+            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const FieldInfo& item) {
                 return item._name == keyName;
             });
             if (place == _info->_fields.end())
@@ -200,7 +207,7 @@ public:
 
         ValueProxy operator[](const std::string& keyName) const
         {
-            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const TokenField& item) {
+            auto place = std::find_if(_info->_fields.begin(), _info->_fields.end(), [&keyName](const FieldInfo& item) {
                 return item._name == keyName;
             });
             if (place == _info->_fields.end())
@@ -217,7 +224,7 @@ public:
 
     size_t entry_size() const { return _size; }
 
-    const std::vector<TokenField>& fields() const { return _fields; }
+    const std::vector<FieldInfo>& fields() const { return _fields; }
 
     TupleProxy operator[](const BlockPtr& ptr) const
     {
@@ -234,7 +241,7 @@ public:
         return RawTupleProxy{raw, this};
     }
 
-    const TokenField& field(const std::string& fieldName) const
+    const FieldInfo& field(const std::string& fieldName) const
     {
         for (auto& entry : _fields)
         {
@@ -263,10 +270,10 @@ public:
         mrs >> size;
         mrs >> fieldCount;
 
-        std::vector<TokenField> fields;
+        std::vector<FieldInfo> fields;
         for (size_t i = 0; i != fieldCount; i++)
         {
-            fields.push_back(Serializer<TokenField>::deserialize(mrs));
+            fields.push_back(Serializer<FieldInfo>::deserialize(mrs));
         }
         return TableInfo(tableName, primaryPos, size, fields);
     }
@@ -276,7 +283,7 @@ public:
         mws << value._name << value._primaryPos << value._size << value._fields.size();
         for (auto& entry : value._fields)
         {
-            Serializer<TokenField>::serialize(mws, entry);
+            Serializer<FieldInfo>::serialize(mws, entry);
         }
     }
 };
@@ -284,6 +291,7 @@ public:
 class CatalogManager : Uncopyable
 {
 public:
+    //获取管理器实例
     static CatalogManager& instance()
     {
         static CatalogManager instance;
@@ -294,6 +302,7 @@ public:
 
     ~CatalogManager();
 
+    //丢弃表信息
     void drop_info(const std::string& tableName)
     {
         auto iter = std::find_if(_tables.begin(), _tables.end(), [&](const auto& elm) {
@@ -302,6 +311,7 @@ public:
         _tables.erase(iter);
     }
 
+    //增加表信息
     void add_table(const TableInfo& tableInfo)
     {
         if (locate_table(tableInfo.name()) != -1)
@@ -311,6 +321,7 @@ public:
         _tables.push_back(tableInfo);
     }
 
+    //查找表信息
     TableInfo& find_table(const std::string& tableName)
     {
         size_t i = locate_table(tableName);
@@ -321,6 +332,7 @@ public:
         return _tables[i];
     }
 
+    //定位表信息在表信息数组中的位置
     size_t locate_table(const std::string& tableName) const
     {
         for (size_t i = 0; i != _tables.size(); i++)
@@ -333,12 +345,13 @@ public:
         return -1;
     }
 
+    //移除表信息
     void remove_table(const std::string& tableName)
     {
-        size_t i = locate_table(tableName);
-        _tables.erase(_tables.begin() + i);
+        drop_info(tableName);
     }
 
+    //获取表信息数组
     const std::vector<TableInfo>& tables() const { return _tables; }
 
 private:

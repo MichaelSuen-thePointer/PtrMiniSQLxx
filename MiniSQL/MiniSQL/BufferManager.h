@@ -52,23 +52,31 @@ public:
         save();
     }
 
+    //获取管理器的实例
     static BufferManager& instance()
     {
         static BufferManager instance;
         return instance;
     }
 
+    //查找或分配指定的块
     BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 
+    //为指定的文件名创建整数token并返回
     uint32_t allocate_file_name_index(const std::string& fileName);
+    //给定token返回文件名
     const std::string& check_file_name(uint32_t index);
+    //给定文件名返回token
     uint32_t check_file_index(const std::string& file);
 
+    //分配一个块，使用管理器内部索引管理器
     BufferBlock& alloc_block(const std::string& fileName);
+    //丢弃一个块
     void drop_block(BufferBlock& block);
     void drop_block(const BlockPtr& block);
     void drop_block(const std::string& name);
 
+    //检查内部索引管理器中是否包含某个块
     bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
 private:
     ListIter find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
@@ -77,7 +85,6 @@ private:
     byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
     BufferBlock& alloc_block(const std::string& name, uint32_t fileIndex, uint16_t blockIndex);
     BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
-
 };
 
 class BufferBlock : Uncopyable
@@ -85,6 +92,7 @@ class BufferBlock : Uncopyable
     friend class BufferManager;
     friend class BlockPtr;
 public:
+    //块大小
     const static int BlockSize = 4096;
 private:
     std::unique_ptr<byte, ArrayDeleter> _buffer;
@@ -117,12 +125,14 @@ private:
         BufferManager::instance().save_block(*this);
     }
 public:
+    //析构函数
     ~BufferBlock()
     {
         log("BB: block dtor", _fileName, _fileIndex, _blockIndex);
         release();
     }
 
+    //用户对内容进行修改后调用，将Block标记为dirty
     void notify_modification()
     {
         log("BB: get dirty");
@@ -130,21 +140,13 @@ public:
         update_time();
     }
 
+    //更新访问时间
     void update_time() const
     {
         _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
 
-    void reset()
-    {
-        release();
-        _buffer.reset();
-        _fileIndex = -1;
-        _blockIndex = -1;
-        _lockTimes = 0;
-        _lastModifiedTime = boost::posix_time::special_values::not_a_date_time;
-    }
-
+    //将Buffer内部的块内容解释为指定的类型
     template<typename T>
     T* as()
     {
@@ -154,23 +156,27 @@ public:
         _offset = 0;
         return reinterpret_cast<T*>(_buffer.get() + tempOffset);
     }
+
+    //获取对应的BlockPtr
     BlockPtr ptr() const;
 
+    //获取Buffer内部块的原生指针
     byte* raw_ptr() { return this->as<byte>(); }
 
-    explicit operator bool() const
-    {
-        return _buffer != nullptr;
-    }
+    //确定块是否被锁住
     bool is_locked() const
     {
         return _lockTimes > 0;
     }
+
+    //锁住块
     void lock()
     {
         log("BB: lock", _fileName, _fileIndex, _blockIndex);
         _lockTimes++;
     }
+
+    //解锁块
     void unlock()
     {
         log("BB: unlock", _fileName, _fileIndex, _blockIndex);
@@ -190,6 +196,7 @@ private:
     uint16_t _blockIndex;
     uint16_t _offset;
 public:
+    //构造函数
     BlockPtr(nullptr_t)
         : BlockPtr()
     {
@@ -210,6 +217,7 @@ public:
     {
         log("BP: ctor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
     }
+    //析构函数
     ~BlockPtr()
     {
         if (_fileNameIndex != -1)
@@ -218,6 +226,7 @@ public:
             log("BP: dtor", _fileNameIndex, _fileIndex, _blockIndex, _offset);
         }
     }
+    //拷贝构造
     BlockPtr& operator=(const BlockPtr& other)
     {
         _fileNameIndex = other._fileNameIndex;
@@ -234,6 +243,7 @@ public:
         _offset = -1;
         return *this;
     }
+    //比较操作
     bool operator==(const BlockPtr& rhs) const
     {
         return _fileNameIndex == rhs._fileNameIndex &&
@@ -245,10 +255,12 @@ public:
     {
         return !(*this == rhs);
     }
+    //隐式转换操作
     explicit operator bool() const
     {
         return *this != nullptr;
     }
+    //获取对应的block
     BufferBlock& operator*()
     {
         log("BP: deref");

@@ -13,6 +13,7 @@ public:
     using Kind = Tokenizer::Kind;
     using Token = Tokenizer::Token;
 
+    //解释器主循环
     static void main_loop(std::istream& is)
     {
         std::string command;
@@ -64,6 +65,7 @@ public:
         }
     }
 
+    //执行指令
     static bool execute_command()
     {
         Tokenizer::Token token = _tokenizer.get();
@@ -123,28 +125,29 @@ public:
 #define EXPECT(type, msg) check_assert(_tokenizer.get(), type, msg)
 #define ASSERT(token, type, msg) check_assert(token, type, msg)
 
+    //创建（表/索引）
     static void create();
-
+    //丢弃（表/索引）
     static void drop();
-
+    //创建所有
     static void create_index();
-
+    //创建表
     static void create_table();
-
+    //选择
     static void select();
-
+    //插入
     static void insert();
-
+    //删除项
     static void delete_entry();
-
+    //输出select结果
     static void show_select_result(const SelectStatementBuilder& builder);
-
+    //丢弃表
     static void drop_table();
-
+    //丢弃索引
     static void drop_index();
-
+    //执行之林
     static void exec();
-
+    //显示表的定义信息
     static void desc_table()
     {
         auto tokTableName = _tokenizer.get();
@@ -166,7 +169,7 @@ public:
         }
 
     }
-
+    //显示所有表
     static void show_table()
     {
         EXPECT(Kind::Tables, "keyword 'tables'");
@@ -177,7 +180,7 @@ public:
             std::cout << tables.name() << "\n";
         }
     }
-
+private:
     static Type to_type(const Token& token)
     {
         switch (token.kind)

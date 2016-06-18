@@ -105,16 +105,12 @@ public:
         {
         case Int:
             return "int";
-            break;
         case Float:
             return "float";
-            break;
         case Chars:
             return "char(" + std::to_string(_size) + ")";
-            break;
         default:
             return "invalid";
-            break;
         }
     }
 

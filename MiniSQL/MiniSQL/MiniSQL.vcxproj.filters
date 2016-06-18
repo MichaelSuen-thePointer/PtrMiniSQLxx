@@ -120,4 +120,7 @@
   <ItemGroup>
     <Natvis Include="MiniSQL.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
 </Project>

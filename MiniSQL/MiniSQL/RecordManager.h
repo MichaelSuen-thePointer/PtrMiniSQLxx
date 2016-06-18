@@ -33,6 +33,7 @@ public:
         }
     public:
 
+        //构造函数
         TableRecordList(TableRecordList&& other)
             : _fileName(std::move(other._fileName))
             , _records(std::move(other._records))
@@ -41,7 +42,7 @@ public:
             , _nextPos(other._nextPos)
         {
         }
-
+        //移动构造
         TableRecordList& operator=(TableRecordList&& other)
         {
             _fileName = std::move(other._fileName);
@@ -51,19 +52,19 @@ public:
             _nextPos = other._nextPos;
             return *this;
         }
-
+        //获取record数
         size_t size() const
         {
             return _records.size();
         }
-
+        //获取条目指针
         BlockPtr operator[](size_t index) const
         {
             auto& pair = _records[index];
             assert((int)pair.second * (int)_entrySize <= std::numeric_limits<uint16_t>::max());
             return{BufferManager::instance().check_file_index(_fileName), 0, pair.first, static_cast<uint16_t>(pair.second * _entrySize)};
         }
-
+        //插入条目
         BlockPtr insert(byte* buffer)
         {
             Record entry;
@@ -98,7 +99,7 @@ public:
 
             return{BufferManager::instance().check_file_index(_fileName), 0, entry.first, static_cast<uint16_t>(entry.second * _entrySize)};
         }
-
+        //删除条目
         void erase(size_t i)
         {
             assert(i >= 0 && i < _records.size());
@@ -108,7 +109,7 @@ public:
 
             _records.erase(_records.begin() + i);
         }
-
+        //清空条目
         void clear()
         {
             _freeRecords.insert(_records.begin(), _records.end());
@@ -131,17 +132,18 @@ private:
     }
 
 public:
+    //获取管理器实例
     static RecordManager& instance()
     {
         static RecordManager instance;
         return instance;
     }
-
+    //删除记录
     void drop_record(const std::string& tableName)
     {
         _tableInfos.erase(tableName);
     }
-
+    //查找表
     TableRecordList& find_table(const std::string& tableName)
     {
         auto tableInfo = _tableInfos.find(tableName);
@@ -151,24 +153,24 @@ public:
         }
         return tableInfo->second;
     }
-
+    //插入条目并返回文件指针
     BlockPtr insert_entry(const std::string& tableName, byte* entry)
     {
         auto& table = find_table(tableName);
         return table.insert(entry);
     }
-
+    //移除条目
     void remove_entry(const std::string& tableName, size_t i)
     {
         auto& table = find_table(tableName);
         table.erase(i);
     }
-
+    //获取表信息
     TableRecordList& operator[](const std::string& tableName)
     {
         return find_table(tableName);
     }
-
+    //新建表
     TableRecordList& create_table(const std::string& tableName, uint16_t entrySize)
     {
         if (_tableInfos.size() > std::numeric_limits<uint16_t>::max())
@@ -182,7 +184,7 @@ public:
         auto place = _tableInfos.insert({tableName,TableRecordList{tableName, {}, {}, entrySize, {0,0}}});
         return place.first->second;
     }
-
+    //移除表
     void remove_table(const std::string& tableName)
     {
         if (!table_exists(tableName))

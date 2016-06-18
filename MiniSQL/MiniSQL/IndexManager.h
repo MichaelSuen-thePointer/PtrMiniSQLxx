@@ -127,6 +127,7 @@ public:
 class IndexManager : Uncopyable
 {
 public:
+    //获取管理器实例
     static IndexManager& instance()
     {
         static IndexManager instance;
@@ -138,7 +139,7 @@ private:
 
     const static char* const FileName;
 public:
-
+    //创建索引树
     IndexInfo& create_index(const std::string& tableName, const std::string& fieldName,
                             const TypeInfo& type)
     {
@@ -154,7 +155,7 @@ public:
 
         return result->second;
     }
-
+    //丢弃特定字段上的索引
     void drop_index(const std::string& tableName, const std::string& fieldName)
     {
         auto iterPair = _tables.equal_range(tableName);
@@ -173,7 +174,7 @@ public:
         }
         throw NoIndex((tableName + " " + fieldName).c_str());
     }
-
+    //丢弃所有索引
     void drop_index(const std::string& tableName)
     {
         auto iterPair = _tables.equal_range(tableName);
@@ -189,7 +190,7 @@ public:
         }
         throw NoIndex(tableName.c_str());
     }
-
+    //检查特定字段上是否有索引
     bool has_index(const std::string& tableName, const std::string& fieldName)
     {
         auto iterPair = _tables.equal_range(tableName);
@@ -203,7 +204,7 @@ public:
         }
         return false;
     }
-
+    //检查表是否有索引
     bool has_index(const std::string& tableName)
     {
         auto iterPair = _tables.equal_range(tableName);
@@ -214,7 +215,7 @@ public:
         }
         return false;
     }
-
+    //返回所有有索引的字段名
     std::vector<std::string> indexed_fields(const std::string& tableName) const
     {
         std::vector<std::string> results;
@@ -227,13 +228,13 @@ public:
         }
         return results;
     }
-
+    //检查值在索引中是否已经存在
     bool check_index_unique(const std::string& tableName, const std::string& fieldName, byte* key)
     {
         auto& info = check_index(tableName, fieldName);
         return info.tree()->find_eq(key) == nullptr;
     }
-
+    //获取索引信息
     const IndexInfo& check_index(const std::string& tableName, const std::string& fieldName)
     {
         auto iterPair = _tables.equal_range(tableName);
@@ -247,19 +248,19 @@ public:
         }
         throw NoIndex(tableName.c_str());
     }
-
+    //插入索引和对应的值
     void insert(const std::string& tableName, const std::string& fieldName, byte* key, const BlockPtr& ptr)
     {
         auto& indexInfo = check_index(tableName, fieldName);
         indexInfo.tree()->insert(key, ptr);
     }
-
+    //移除key对应的项
     void remove(const std::string& tableName, const std::string& fieldName, byte* key)
     {
         auto& indexInfo = check_index(tableName, fieldName);
         indexInfo.tree()->remove(key);
     }
-
+    //进行搜索
     std::vector<BlockPtr> search(const std::string& tableName, const std::string& fieldName, byte* lower, byte* upper)
     {
         auto& indexInfo = check_index(tableName, fieldName);
@@ -278,7 +279,7 @@ public:
         }
         return indexInfo.tree()->find_range(lower, upper);
     }
-
+    //构造和析构
     IndexManager()
         : _tables()
     {
