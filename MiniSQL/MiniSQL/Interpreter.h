@@ -14,7 +14,7 @@ public:
     using Token = Tokenizer::Token;
 
     //解释器主循环
-    static void main_loop(std::istream& is)
+    static void main_loop(std::istream& is, bool outputSuccessPrompt = true)
     {
         std::string command;
         std::cout << "> ";
@@ -26,7 +26,7 @@ public:
                 try
                 {
                     _tokenizer.reset(command);
-                    if (!execute_command())
+                    if (!execute_command(outputSuccessPrompt))
                     {
                         return;
                     }
@@ -66,7 +66,7 @@ public:
     }
 
     //执行指令
-    static bool execute_command()
+    static bool execute_command(bool outputSuccessPrompt)
     {
         Tokenizer::Token token = _tokenizer.get();
         switch (token.kind)
@@ -118,7 +118,10 @@ public:
             throw SyntaxError("Syntax error: invalid instruction");
             break;
         }
-        std::cout << "done.\n";
+        if (outputSuccessPrompt)
+        {
+            std::cout << "done.\n";
+        }
         return true;
     }
 
@@ -145,7 +148,7 @@ public:
     static void drop_table();
     //丢弃索引
     static void drop_index();
-    //执行之林
+    //执行指令
     static void exec();
     //显示表的定义信息
     static void desc_table()

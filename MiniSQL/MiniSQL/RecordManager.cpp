@@ -23,8 +23,8 @@ RecordManager::~RecordManager()
 
         const size_t blockCnt = BufferBlock::BlockSize / sizeof(TableRecordList::Record);
 
-        uint16_t recordBlockNeeded = static_cast<uint16_t>(std::ceil(tableInfoPair.second._records.size() / double(blockCnt)));
-        for (uint16_t i = 0; i != recordBlockNeeded; i++)
+        uint32_t recordBlockNeeded = static_cast<uint32_t>(std::ceil(tableInfoPair.second._records.size() / double(blockCnt)));
+        for (uint32_t i = 0; i != recordBlockNeeded; i++)
         {
             auto& tableInfoBlock = BufferManager::instance().find_or_alloc(FileName, tableNo, i);
             tableInfoBlock.lock();
@@ -41,8 +41,8 @@ RecordManager::~RecordManager()
             tableInfoBlock.unlock();
         }
 
-        uint16_t freeBlockNeeded = static_cast<uint16_t>(std::ceil(tableInfoPair.second._freeRecords.size() / double(blockCnt)));
-        for (uint16_t i = 0; i != freeBlockNeeded; i++)
+        uint32_t freeBlockNeeded = static_cast<uint32_t>(std::ceil(tableInfoPair.second._freeRecords.size() / double(blockCnt)));
+        for (uint32_t i = 0; i != freeBlockNeeded; i++)
         {
             auto& tableInfoBlock = BufferManager::instance().find_or_alloc(FileName, tableNo, i + recordBlockNeeded);
             tableInfoBlock.lock();
@@ -98,9 +98,9 @@ RecordManager::RecordManager()
 
         std::deque<TableRecordList::Record> records;
 
-        uint16_t recordBlockCount = static_cast<uint16_t>(std::ceil(recordCount / static_cast<double>(entryPerBlock)));
-        uint16_t readBlock = 0;
-        for (uint16_t iBlk = 0; iBlk != recordBlockCount; iBlk++)
+        uint32_t recordBlockCount = static_cast<uint32_t>(std::ceil(recordCount / static_cast<double>(entryPerBlock)));
+        uint32_t readBlock = 0;
+        for (uint32_t iBlk = 0; iBlk != recordBlockCount; iBlk++)
         {
             auto& tableInfoBlock = BufferManager::instance().find_or_alloc(FileName, iTable + 1, iBlk);
             tableInfoBlock.lock();
@@ -121,9 +121,9 @@ RecordManager::RecordManager()
 
         std::set<TableRecordList::Record> freeRecords;
 
-        uint16_t freeRecordBlockCount = static_cast<uint16_t>(std::ceil(freeRecordCount / static_cast<double>(entryPerBlock)));
+        uint32_t freeRecordBlockCount = static_cast<uint16_t>(std::ceil(freeRecordCount / static_cast<double>(entryPerBlock)));
         uint16_t freeBlockRead = 0;
-        for (uint16_t iBlk = 0; iBlk != freeRecordBlockCount; iBlk++)
+        for (uint32_t iBlk = 0; iBlk != freeRecordBlockCount; iBlk++)
         {
             auto& tableInfoBlock = BufferManager::instance().find_or_alloc(FileName, iTable + 1, iBlk + recordBlockCount);
             tableInfoBlock.lock();

@@ -10,14 +10,12 @@ public:
         friend class RecordManager;
         friend class std::map<std::string, TableRecordList>;
     private:
-        using Record = std::pair<uint16_t, uint16_t>;
+        using Record = std::pair<uint32_t, uint16_t>;
         std::string _fileName;
         std::deque<Record> _records;
         std::set<Record> _freeRecords;
         uint16_t _entrySize;
         Record _nextPos;
-
-        const static size_t MaxRecordCount = std::numeric_limits<uint16_t>::max() / sizeof(Record) * (size_t)BufferBlock::BlockSize;
 
         TableRecordList(const std::string& tableName,
             std::deque<Record>&& records,
@@ -75,15 +73,11 @@ public:
             }
             else
             {
-                if (_records.size() + _freeRecords.size() >= MaxRecordCount)
-                {
-                    throw InsuffcientSpace("not enough space for new record");
-                }
                 entry = _nextPos;
                 _nextPos += 1;
                 if (_nextPos.second * _entrySize >= BufferBlock::BlockSize)
                 {
-                    if (_nextPos.first == std::numeric_limits<uint16_t>::max())
+                    if (_nextPos.first == std::numeric_limits<uint32_t>::max())
                     {
                         throw InsuffcientSpace("not enough space for new record");
                     }

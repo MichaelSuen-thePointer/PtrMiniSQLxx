@@ -20,12 +20,8 @@ class BufferManager : Uncopyable
 public:
     const static int BlockCount = 128;
 
-    using file_name_index_t = uint32_t;
-    using file_index_t = uint32_t;
-    using block_index_t = uint16_t;
-    using offset_t = uint16_t;
 private:
-    using IndexPair = std::pair<uint32_t, uint16_t>;
+    using IndexPair = std::pair<uint32_t, uint32_t>;
     using ListIter = std::list<std::unique_ptr<BufferBlock>>::iterator;
 
     std::map<uint32_t, std::string> _indexNameMap;
@@ -60,7 +56,7 @@ public:
     }
 
     //查找或分配指定的块
-    BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    BufferBlock& find_or_alloc(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
 
     //为指定的文件名创建整数token并返回
     uint32_t allocate_file_name_index(const std::string& fileName);
@@ -77,14 +73,14 @@ public:
     void drop_block(const std::string& name);
 
     //检查内部索引管理器中是否包含某个块
-    bool has_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    bool has_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
 private:
-    ListIter find_block(const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    ListIter find_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
     void save_block(BufferBlock& block);
-    void write_file(const byte* content, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
-    byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
-    BufferBlock& alloc_block(const std::string& name, uint32_t fileIndex, uint16_t blockIndex);
-    BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint16_t blockIndex);
+    void write_file(const byte* content, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
+    byte* read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
+    BufferBlock& alloc_block(const std::string& name, uint32_t fileIndex, uint32_t blockIndex);
+    BufferBlock& replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex);
 };
 
 class BufferBlock : Uncopyable
@@ -98,7 +94,7 @@ private:
     std::unique_ptr<byte, ArrayDeleter> _buffer;
     std::string _fileName;
     uint32_t _fileIndex;
-    uint16_t _blockIndex;
+    uint32_t _blockIndex;
     int _lockTimes;
     bool _hasModified;
     mutable boost::posix_time::ptime _lastModifiedTime;
@@ -108,7 +104,7 @@ private:
         : BufferBlock(nullptr, "", -1, -1)
     {
     }
-    BufferBlock(byte* buffer, const std::string& fileName, int fileIndex, int blockIndex)
+    BufferBlock(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
         : _buffer(buffer)
         , _fileName(fileName)
         , _fileIndex(fileIndex)
@@ -193,7 +189,7 @@ class BlockPtr
 private:
     uint32_t _fileNameIndex;
     uint32_t _fileIndex;
-    uint16_t _blockIndex;
+    uint32_t _blockIndex;
     uint16_t _offset;
 public:
     //构造函数
@@ -205,11 +201,11 @@ public:
         : BlockPtr(-1, -1, -1, -1)
     {
     }
-    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint16_t blockIndex)
+    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint32_t blockIndex)
         : BlockPtr(fileNameIndex, fileIndex, blockIndex, 0)
     {
     }
-    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint16_t blockIndex, uint16_t offset)
+    BlockPtr(uint32_t fileNameIndex, uint32_t fileIndex, uint32_t blockIndex, uint16_t offset)
         : _fileNameIndex(fileNameIndex)
         , _fileIndex(fileIndex)
         , _blockIndex(blockIndex)

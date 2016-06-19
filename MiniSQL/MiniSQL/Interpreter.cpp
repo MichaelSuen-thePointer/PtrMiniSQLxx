@@ -366,5 +366,5 @@ void Interpreter::exec()
     ASSERT(tokFileName, Kind::String, "file name surrounded by \" \"");
     std::ifstream file(tokFileName.content);
     EXPECT(Kind::SemiColon, "';'");
-    main_loop(file);
+    main_loop(file, false);
 }
