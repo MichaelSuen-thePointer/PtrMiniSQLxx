@@ -2,7 +2,7 @@
 #include "BufferManager.h"
 #include <algorithm>
 
-const char* const BufferManager::FileName = "BufferManagerMeta";
+const char* const BufferManager::FileName = "files\\metadata\\BufferManagerMeta";
 
 void BufferManager::save_block(BufferBlock& block)
 {
@@ -17,7 +17,7 @@ void BufferManager::save_block(BufferBlock& block)
 bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
     FILE* fp;
-    if ((fp = fopen((fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
+    if ((fp = fopen(("files\\"+fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
     {
         return false;
     }
@@ -29,7 +29,7 @@ void BufferManager::write_file(const byte * content, const std::string& fileName
 {
     log("BM: write file", fileName, fileIndex, blockIndex);
     FILE* stream;
-    stream = fopen((fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb+");
+    stream = fopen(("files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb+");
     fseek(stream, 0, SEEK_SET);
     auto cur = ftell(stream);
     fwrite(content, 1, BufferBlock::BlockSize, stream);
@@ -41,7 +41,7 @@ byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32
 {
     log("BM: read file", fileName, fileIndex, blockIndex);
     FILE* stream;
-    auto relFileName = fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex);
+    auto relFileName = "files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex);
     stream = fopen(relFileName.c_str(), "rb+");
     if (stream == nullptr)
     {
