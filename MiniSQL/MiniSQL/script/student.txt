@@ -1,0 +1,17 @@
+create table student2(
+	id int,
+	name char(12) unique,
+	score float,
+	primary key(id) 
+);
+
+exec "script/instruction0.txt";
+exec "script/instruction1.txt";
+exec "script/instruction2.txt";
+exec "script/instruction3.txt";
+exec "script/instruction4.txt";
+exec "script/instruction5.txt";
+exec "script/instruction6.txt";
+exec "script/instruction7.txt";
+exec "script/instruction8.txt";
+exec "script/instruction9.txt";

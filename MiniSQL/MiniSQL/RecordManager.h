@@ -75,17 +75,18 @@ public:
             {
                 entry = _nextPos;
                 _nextPos += 1;
-                if (_nextPos.second * _entrySize >= BufferBlock::BlockSize)
+                if ((_nextPos.second + 1) * _entrySize >= BufferBlock::BlockSize)
                 {
                     if (_nextPos.first == std::numeric_limits<uint32_t>::max())
                     {
                         throw InsuffcientSpace("not enough space for new record");
                     }
-                    _nextPos.first++;
+                    _nextPos.first += 1;
                     _nextPos.second = 0;
                 }
             }
             auto& block = BufferManager::instance().find_or_alloc(_fileName, 0, entry.first);
+            assert(entry.second * _entrySize + _entrySize < BufferBlock::BlockSize);
             memcpy(block.raw_ptr() + entry.second * _entrySize, buffer, _entrySize);
             block.notify_modification();
 
@@ -112,6 +113,8 @@ public:
     };
 
     const static char* const FileName; /*= "RecordManagerMeta";*/
+
+    const static int MaxRecordSize = BufferBlock::BlockSize;
 
     ~RecordManager();
 

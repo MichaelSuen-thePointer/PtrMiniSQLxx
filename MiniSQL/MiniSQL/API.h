@@ -375,8 +375,8 @@ public:
             return{};
         }
 
-        std::vector<BlockPtr> result;
         std::vector<BlockPtr> entries;
+
         if (_indexQueries.size() == 0)
         {
             entries = IndexManager::instance().search(_info->name(), _info->fields()[_info->primary_pos()].name(), nullptr, nullptr);
@@ -406,23 +406,27 @@ public:
                 break;
             }
         }
-        for (auto entry : entries)
+        for (size_t i = 0; i != entries.size(); )
         {
             bool success = true;
             for (auto& cmpEntry : _comparisonNodes)
             {
-                if (cmpEntry->evaluate(*_info, entry) == false)
+                if (cmpEntry->evaluate(*_info, entries[i]) == false)
                 {
                     success = false;
                     break;
                 }
             }
-            if(success)
+            if (!success)
             {
-                result.push_back(entry);
+                entries.erase(entries.begin() + i);
+            }
+            else
+            {
+                i++;
             }
         }
-        return result;
+        return entries;
     }
 };
 
@@ -547,7 +551,7 @@ public:
         assert(locate_field(name) == -1);
         _fields.emplace_back(name, type, _size, isUnique);
         _size += type.size();
-        if (_size > std::numeric_limits<uint16_t>::max())
+        if (_size > RecordManager::MaxRecordSize)
         {
             throw InsuffcientSpace("too much fields");
         }
@@ -654,16 +658,16 @@ public:
         return _raw.get();
     }
 
-    void check_unique_field() const
+    void linearly_check_unique_field() const
     {
         auto& rec = RecordManager::instance().find_table(_tableInfo->name());
         for (size_t iRec = 0; iRec != rec.size(); iRec++)
         {
-            for (auto& field : _tableInfo->fields())
+            for (const auto& field : _tableInfo->fields())
             {
                 if (field.is_unique() && (*_tableInfo)[rec[iRec]][field.name()] == (*_tableInfo)[_raw.get()][field.name()])
                 {
-                    throw SQLError(("not unique " + field.name()).c_str());
+                    throw SQLError(("not unique: " + field.name()).c_str());
                 }
             }
         }
@@ -672,32 +676,26 @@ public:
     void execute()
     {
         auto& im = IndexManager::instance();
-        if (im.has_index(_tableInfo->name()))
+
+        for (const auto& field : _tableInfo->fields())
         {
-            auto fields = im.indexed_fields(_tableInfo->name());
-            for (auto fieldName : fields)
+            if (im.has_index(_tableInfo->name(), field.name()))
             {
-                if (IndexManager::instance().check_index_unique(_tableInfo->name(), fieldName, _raw.get() + _tableInfo->field(fieldName).offset()))
-                {
-                    for (size_t i = 0; i != _tableInfo->fields().size(); i++)
-                    {
-                        if (_tableInfo->fields()[i].is_unique() && i != _tableInfo->primary_pos())
-                        {
-                            check_unique_field();
-                            break;
-                        }
-                    }
-                }
-                else
+                if (!im.check_index_unique(_tableInfo->name(), field.name(), _raw.get() + field.offset()))
                 {
                     throw SQLError("not unique: primary");
                 }
             }
-            for (auto fieldName : fields)
+            else if (field.is_unique())
             {
-                auto ptr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
-                IndexManager::instance().insert(_tableInfo->name(), fieldName, _raw.get() + _tableInfo->field(fieldName).offset(), ptr);
+                linearly_check_unique_field();
             }
+        }
+        auto entryPtr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
+        auto fields = im.indexed_fields(_tableInfo->name());
+        for (const auto& fieldName : fields)
+        {
+            im.insert(_tableInfo->name(), fieldName, _raw.get() + _tableInfo->field(fieldName).offset(), entryPtr);
         }
     }
 };
