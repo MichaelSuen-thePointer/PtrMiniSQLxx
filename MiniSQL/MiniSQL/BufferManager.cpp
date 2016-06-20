@@ -17,7 +17,7 @@ void BufferManager::save_block(BufferBlock& block)
 bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
     FILE* fp;
-    if ((fp = fopen(("files\\"+fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
+    if ((fp = fopen(("files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
     {
         return false;
     }
@@ -198,25 +198,11 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fi
 
 BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
-    ListIter lruIter = _blocks.end();
-    for (auto iter = _blocks.begin(); iter != _blocks.end(); ++iter)
+    auto lruIter = std::find_if(_blocks.rbegin(), _blocks.rend(), [](const auto& block)
     {
-        if (!(*iter)->is_locked())
-        {
-            if (lruIter != _blocks.end())
-            {
-                if ((*lruIter)->_lastModifiedTime < (*iter)->_lastModifiedTime)
-                {
-                    lruIter = iter;
-                }
-            }
-            else
-            {
-                lruIter = iter;
-            }
-        }
-    }
-    if (lruIter == _blocks.end())
+        return !block->is_locked();
+    });
+    if (lruIter == _blocks.rend())
     {
         throw InsuffcientSpace("Cannot find a block to be replaced.");
     }
@@ -224,9 +210,11 @@ BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& f
 
     lruIter->reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
 
-    if (lruIter != _blocks.begin())
+    auto iter = lruIter.base();
+
+    if (iter != _blocks.begin())
     {
-        _blocks.splice(_blocks.begin(), _blocks, lruIter, std::next(lruIter));
+        _blocks.splice(_blocks.begin(), _blocks, std::prev(iter), iter);
     }
 
     return *_blocks.front();

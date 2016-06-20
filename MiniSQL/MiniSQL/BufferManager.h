@@ -64,7 +64,6 @@ public:
     const std::string& check_file_name(uint32_t index);
     //给定文件名返回token
     uint32_t check_file_index(const std::string& file);
-
     //分配一个块，使用管理器内部索引管理器
     BufferBlock& alloc_block(const std::string& fileName);
     //丢弃一个块
@@ -97,7 +96,7 @@ private:
     uint32_t _blockIndex;
     int _lockTimes;
     bool _hasModified;
-    mutable boost::posix_time::ptime _lastModifiedTime;
+    //mutable boost::posix_time::ptime _lastModifiedTime;
     uint16_t _offset;
 
     BufferBlock()
@@ -111,7 +110,7 @@ private:
         , _blockIndex(blockIndex)
         , _lockTimes(0)
         , _hasModified(false)
-        , _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
+        //, _lastModifiedTime(boost::posix_time::microsec_clock::universal_time())
         , _offset(0)
     {
         log("BB: ctor", fileName, fileIndex, blockIndex);
@@ -139,7 +138,7 @@ public:
     //更新访问时间
     void update_time() const
     {
-        _lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
+        //_lastModifiedTime = boost::posix_time::microsec_clock::universal_time();
     }
 
     //将Buffer内部的块内容解释为指定的类型

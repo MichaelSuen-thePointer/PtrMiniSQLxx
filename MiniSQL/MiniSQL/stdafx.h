@@ -24,7 +24,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-#include <boost/date_time.hpp>
 #include <boost/multi_array.hpp>
 #include "Uncopyable.h"
 #include "Utils.h"

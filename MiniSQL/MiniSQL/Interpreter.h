@@ -14,7 +14,7 @@ public:
     using Token = Tokenizer::Token;
 
     //½âÊÍÆ÷Ö÷Ñ­»·
-    static void main_loop(std::istream& is, bool outputSuccessPrompt = true)
+    static void main_loop(std::istream& is, bool showPrompt = true)
     {
         std::string command;
         std::cout << "> ";
@@ -26,7 +26,7 @@ public:
                 try
                 {
                     _tokenizer.reset(command);
-                    if (!execute_command(outputSuccessPrompt))
+                    if (!execute_command(showPrompt))
                     {
                         return;
                     }
@@ -69,6 +69,7 @@ public:
     static bool execute_command(bool outputSuccessPrompt)
     {
         Tokenizer::Token token = _tokenizer.get();
+
         switch (token.kind)
         {
         case Kind::Create:
@@ -113,14 +114,12 @@ public:
         }
         case Kind::Exit:
             return false;
-            break;
         default:
             throw SyntaxError("Syntax error: invalid instruction");
-            break;
         }
         if (outputSuccessPrompt)
         {
-            std::cout << "done.\n";
+            std::cout << "done. \n";
         }
         return true;
     }
