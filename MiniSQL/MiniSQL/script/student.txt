@@ -5,6 +5,8 @@ create table student2(
 	primary key(id) 
 );
 
+create index name on student2(name);
+
 exec "script/instruction0.txt";
 exec "script/instruction1.txt";
 exec "script/instruction2.txt";
