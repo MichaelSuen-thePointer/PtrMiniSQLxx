@@ -58,6 +58,8 @@ byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32
 
 void BufferManager::load()
 {
+    std::experimental::filesystem::create_directory("files");
+    std::experimental::filesystem::create_directory("files\\metadata");
     std::ifstream config{FileName};
     if (config.good())
     {
