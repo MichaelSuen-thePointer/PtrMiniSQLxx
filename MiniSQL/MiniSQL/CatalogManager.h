@@ -104,6 +104,11 @@ public:
                 return std::to_string(*reinterpret_cast<float*>(_raw));
                 break;
             case Chars:
+                if(_raw[_info->size() - 1] == '\0')
+                {
+                    auto size = strlen((char*)_raw);
+                    return{_raw, _raw + size};
+                }
                 return{_raw, _raw + _info->size()};
                 break;
             default:

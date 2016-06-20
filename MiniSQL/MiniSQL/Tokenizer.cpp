@@ -65,6 +65,10 @@ void Tokenizer::generate_all()
     while (_front != _end)
     {
         char ch = _content[_front];
+        if (!(ch >= -1 && ch <= 255))
+        {
+            throw LexicalError("char must be ascii character", _line, _column);
+        }
         switch (_state)
         {
         case None:

@@ -76,11 +76,7 @@ public:
         }
         else
         {
-#ifdef _DEBUG
-            throw std::exception("disabled in debug mode");
-#else
             return CharTreeCreater<1, 255>::create(size, ptr, name, isNew);
-#endif
         }
     }
 };

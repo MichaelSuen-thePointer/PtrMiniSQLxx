@@ -7,11 +7,11 @@ Tokenizer Interpreter::_tokenizer;
 void Interpreter::create()
 {
     auto token = _tokenizer.get();
-    if(token.kind == Kind::Table)
+    if (token.kind == Kind::Table)
     {
         create_table();
     }
-    else if(token.kind == Kind::Index)
+    else if (token.kind == Kind::Index)
     {
         create_index();
     }
@@ -64,7 +64,7 @@ void Interpreter::create_table()
     TableCreater creater(token.content);
     check_assert(_tokenizer.get(), Kind::LBracket, "'('");
     while (_tokenizer.peek().kind != Kind::SemiColon &&
-        _tokenizer.peek().kind != Kind::End)
+           _tokenizer.peek().kind != Kind::End)
     {
         auto fieldName = _tokenizer.get();
         check_assert(token, Kind::Identifier, "identifier");
@@ -310,34 +310,52 @@ void Interpreter::show_select_result(const SelectStatementBuilder& builder)
 {
     auto result = builder.get_result();
     size_t totalWidth = 0;
-    std::cout << "|";
+    auto bar = " | ";
+    auto barSize = 3;
+
     for (size_t i = 0; i != result->fields().size(); i++)
     {
-        std::cout << std::setw(result->field_width()[i]) << result->fields()[i] << '|';
         totalWidth += result->field_width()[i];
     }
-    totalWidth += result->fields().size() + 1;
+    totalWidth += (result->fields().size() + 1) * barSize;
+
     std::cout << "\n";
     for (auto i = 0; i != totalWidth; i++)
     {
         std::cout << "-";
     }
     std::cout << "\n";
+
+    std::cout << bar;
+    for (size_t i = 0; i != result->fields().size(); i++)
+    {
+        std::cout << std::setw(result->field_width()[i]) << result->fields()[i] << bar;
+    }
+
+    std::cout << "\n";
+    for (auto i = 0; i != totalWidth; i++)
+    {
+        std::cout << "-";
+    }
+    std::cout << "\n";
+
     for (auto iResult = 0; iResult != result->size(); iResult++)
     {
-        std::cout << "|";
+        std::cout << bar;
         for (size_t i = 0; i < result->fields().size(); i++)
         {
-            std::cout << std::setw(result->field_width()[i]) << result->results()[iResult][i] << "|";
+            std::cout << std::setw(result->field_width()[i]) << result->results()[iResult][i] << bar;
         }
         std::cout << "\n";
     }
+
     for (auto i = 0; i != totalWidth; i++)
     {
         std::cout << "-";
     }
-    std::cout << "\n";
-    std::cout << "total " << result->size() << " records" << std::endl;
+    std::cout << "\ntotal " << result->size() << " record(s) in set.";
+
+    std::cout << std::endl;
 }
 
 void Interpreter::drop_table()
@@ -372,5 +390,12 @@ void Interpreter::exec()
     ASSERT(tokFileName, Kind::String, "file name surrounded by \" \"");
     std::ifstream file(tokFileName.content);
     EXPECT(Kind::SemiColon, "';'");
-    main_loop(file, false);
+    if (file.good())
+    {
+        main_loop(file, false);
+    }
+    else
+    {
+        throw SQLError(("file not available: " + tokFileName.content).c_str());
+    }
 }
