@@ -330,8 +330,14 @@ void Interpreter::show_select_result(const SelectStatementBuilder& builder)
         {
             std::cout << std::setw(result->field_width()[i]) << result->results()[iResult][i] << "|";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
+    for (auto i = 0; i != totalWidth; i++)
+    {
+        std::cout << "-";
+    }
+    std::cout << "\n";
+    std::cout << "total " << result->size() << " records" << std::endl;
 }
 
 void Interpreter::drop_table()
