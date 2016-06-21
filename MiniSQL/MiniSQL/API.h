@@ -658,16 +658,16 @@ public:
         return _raw.get();
     }
 
-    void linearly_check_unique_field() const
+    void linearly_check_unique_field(const std::vector<std::string>& nonindexedUniqueFieldNames) const
     {
         auto& rec = RecordManager::instance().find_table(_tableInfo->name());
         for (size_t iRec = 0; iRec != rec.size(); iRec++)
         {
-            for (const auto& field : _tableInfo->fields())
+            for (const auto& fieldName : nonindexedUniqueFieldNames)
             {
-                if (field.is_unique() && (*_tableInfo)[rec[iRec]][field.name()] == (*_tableInfo)[_raw.get()][field.name()])
+                if ((*_tableInfo)[rec[iRec]][fieldName] == (*_tableInfo)[_raw.get()][fieldName])
                 {
-                    throw SQLError(("not unique: " + field.name()).c_str());
+                    throw SQLError(("not unique: " + fieldName).c_str());
                 }
             }
         }
@@ -676,7 +676,8 @@ public:
     void execute()
     {
         auto& im = IndexManager::instance();
-
+        std::vector<std::string> nonindexedUniqueFields;
+        nonindexedUniqueFields.reserve(_tableInfo->fields().size());
         for (const auto& field : _tableInfo->fields())
         {
             if (im.has_index(_tableInfo->name(), field.name()))
@@ -688,9 +689,10 @@ public:
             }
             else if (field.is_unique())
             {
-                linearly_check_unique_field();
+                nonindexedUniqueFields.push_back(field.name());
             }
         }
+        linearly_check_unique_field(nonindexedUniqueFields);
         auto entryPtr = RecordManager::instance().insert_entry(_tableInfo->name(), _raw.get());
         auto fields = im.indexed_fields(_tableInfo->name());
         for (const auto& fieldName : fields)

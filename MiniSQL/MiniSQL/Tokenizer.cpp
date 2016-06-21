@@ -239,6 +239,11 @@ void Tokenizer::generate_all()
                 push_char(ch);
                 push_token(Kind::LE);
             }
+            else if(ch == '>')
+            {
+                push_char(ch);
+                push_token(Kind::NE);
+            }
             else
             {
                 push_token(Kind::LT);

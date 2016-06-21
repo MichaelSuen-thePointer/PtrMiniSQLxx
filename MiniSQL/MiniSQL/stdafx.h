@@ -23,6 +23,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <boost/multi_array.hpp>
 #include "Uncopyable.h"
