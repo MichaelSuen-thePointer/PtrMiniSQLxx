@@ -566,15 +566,17 @@ private:
         node.remove_entry(key, cptr);
         if (node.parent_ptr() == nullptr)
         {
-            if (node.ptr_count() == 1) //is root and only one child
+            if (!node.is_leaf() && node.ptr_count() == 1) //is root and only one child
             {
                 _root = node.ptrs()[0];
-                node.parent_ptr() = nullptr;
-                node.self_ptr()->notify_modification();
+                TreeNode newRoot{_root};
+                newRoot.parent_ptr() = nullptr;
+                newRoot.self_ptr()->notify_modification();
                 BufferManager::instance().drop_block(node.self_ptr());
             }
         }
-        else if (node.ptr_count() < node.ptrs().capacity() / 2)
+        else if (node.is_leaf() && node.key_count() < ptr_count / 2 ||
+                 !node.is_leaf() && node.ptr_count() < ptr_count / 2)
         {
             bool nodeIsPredecessor = true;
             auto psibling = node.right_key_and_sibling();
@@ -663,12 +665,6 @@ private:
                 sibling.self_ptr()->notify_modification();
             }
         }
-
-    }
-
-    void delete_adjust(const TreeNode& node)
-    {
-
     }
 
     std::pair<TreeNode, key_type> insert_split_node(TreeNode& node,

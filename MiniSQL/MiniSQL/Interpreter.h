@@ -16,6 +16,7 @@ public:
     //解释器主循环
     static void main_loop(std::istream& is, bool showPrompt = true)
     {
+        std::cout.sync_with_stdio(false);
         std::string command;
         std::cout << "> ";
         while (is.peek() != -1)
@@ -170,6 +171,17 @@ public:
             std::cout << "primary key: " << table.fields()[table.primary_pos()].name() << std::endl;
         }
 
+        auto& tables = IndexManager::instance().tables();
+        auto indexInfos = tables.equal_range(tokTableName.content);
+        if(indexInfos.first != indexInfos.second)
+        {
+            std::cout << "index information: \n";
+        }
+        for (auto iter = indexInfos.first; iter != indexInfos.second; ++iter)
+        {
+            std::cout << iter->second.index_name() << " on field: " << iter->second.field_name() << "\n";
+        }
+        std::cout << std::endl;
     }
     //显示所有表
     static void show_table()

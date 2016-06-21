@@ -85,13 +85,15 @@ class IndexInfo
 {
     friend class Serializer<IndexInfo>;
 private:
+    std::string _indexName;
     std::string _fieldName;
     std::unique_ptr<BPlusTreeBase> _tree;
     Type _type;
     size_t _size;
 public:
-    IndexInfo(const std::string& cs, BPlusTreeBase* tree, Type type, size_t size)
-        : _fieldName(cs)
+    IndexInfo(const std::string& indexName, const std::string& cs, BPlusTreeBase* tree, Type type, size_t size)
+        : _indexName(indexName)
+        , _fieldName(cs)
         , _tree(tree)
         , _type(type)
         , _size(size)
@@ -99,13 +101,14 @@ public:
     }
 
     IndexInfo(IndexInfo&& rhs)
-        : _fieldName(std::move(rhs._fieldName))
+        : _indexName(std::move(rhs._indexName))
+        , _fieldName(std::move(rhs._fieldName))
         , _tree(rhs._tree.release())
         , _type(rhs._type)
         , _size(rhs._size)
     {
     }
-
+    const std::string& index_name() const { return _indexName; }
     const std::string& field_name() const { return _fieldName; }
     BPlusTreeBase* tree() const { return _tree.get(); }
 };
@@ -136,39 +139,41 @@ private:
     const static char* const FileName;
 public:
     //创建索引树
-    IndexInfo& create_index(const std::string& tableName, const std::string& fieldName,
-                            const TypeInfo& type)
+    IndexInfo& create_index(const std::string& tableName, const std::string& indexName,
+                            const std::string& fieldName, const TypeInfo& type)
     {
         if (has_index(tableName, fieldName))
         {
             throw AlreadyHaveIndex((tableName + " " + fieldName).c_str());
         }
         auto result = _tables.insert({tableName,
-            IndexInfo{fieldName,
+            IndexInfo{indexName, fieldName,
                 TreeCreater::create(type.type(), type.size(),
                     BufferManager::instance().alloc_block(tableName + "_" + fieldName + "_bplustree").ptr(),
                                      tableName + "_" + fieldName + "_bplustree", true), type.type(), type.size()}});
 
         return result->second;
     }
-    //丢弃特定字段上的索引
-    void drop_index(const std::string& tableName, const std::string& fieldName)
+    //丢弃特定名称的索引
+    void drop_index(const std::string& tableName, const std::string& indexName)
     {
         auto iterPair = _tables.equal_range(tableName);
         if (iterPair.first == iterPair.second)
         {
             throw NoIndex(tableName.c_str());
         }
-        for (auto iter = iterPair.first; iter != iterPair.second; ++iter)
+        auto iter = std::find_if(iterPair.first, iterPair.second, [&indexName](const auto& idxnfo) {
+            return idxnfo.second.index_name() == indexName;
+        });
+        if (iter != iterPair.second)
         {
-            if (iter->second.field_name() == fieldName)
-            {
-                iter->second.tree()->drop_tree();
-                _tables.erase(iter);
-                return;
-            }
+            iter->second.tree()->drop_tree();
+            _tables.erase(iter);
         }
-        throw NoIndex((tableName + " " + fieldName).c_str());
+        else
+        {
+            throw NoIndex((tableName + " " + indexName).c_str());
+        }
     }
     //丢弃所有索引
     void drop_index(const std::string& tableName)
@@ -275,6 +280,9 @@ public:
         }
         return indexInfo.tree()->find_range(lower, upper);
     }
+
+    const std::multimap<std::string, IndexInfo>& tables() const { return _tables; }
+
     //构造和析构
     IndexManager()
         : _tables()

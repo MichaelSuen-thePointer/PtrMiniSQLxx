@@ -222,6 +222,10 @@ public:
         }
     }
     //øΩ±¥ππ‘Ï
+    BlockPtr(const BlockPtr& other)
+        : BlockPtr(other._fileNameIndex, other._fileIndex, other._blockIndex, other._offset)
+    {
+    }
     BlockPtr& operator=(const BlockPtr& other)
     {
         _fileNameIndex = other._fileNameIndex;

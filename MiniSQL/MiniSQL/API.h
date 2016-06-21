@@ -442,6 +442,8 @@ public:
         auto& recMgr = RecordManager::instance();
         auto& recList = recMgr[_info->name()];
 
+        int debugCount = 0;
+
         for (size_t i = 0; i != recList.size();)
         {
             bool success = true;
@@ -455,12 +457,13 @@ public:
             }
             if (success)
             {
-                recList.erase(i);
+                debugCount++;
                 auto indexedFields = IndexManager::instance().indexed_fields(_info->name());
                 for (const auto& fieldName : indexedFields)
                 {
                     IndexManager::instance().remove(_info->name(), fieldName, recList[i]->raw_ptr() + _info->field(fieldName).offset());
                 }
+                recList.erase(i);
             }
             else
             {
@@ -583,7 +586,7 @@ public:
         RecordManager::instance().create_table(_tableName, (uint16_t)_size);
         if (_primaryPos != -1)
         {
-            IndexManager::instance().create_index(_tableName, _fields[_primaryPos].name(), _fields[_primaryPos].type_info());
+            IndexManager::instance().create_index(_tableName, _fields[_primaryPos].name(), _fields[_primaryPos].name(), _fields[_primaryPos].type_info());
         }
     }
 };
@@ -815,7 +818,7 @@ public:
 class IndexDroper
 {
     TableInfo* _info;
-    std::string _fieldName;
+    std::string _indexName;
 public:
     IndexDroper()
         : _info(nullptr)
@@ -825,13 +828,13 @@ public:
     {
         _info = &CatalogManager::instance().find_table(table);
     }
-    void set_field(const std::string& table)
+    void set_name(const std::string& indexName)
     {
-        _fieldName = table;
+        _indexName = indexName;
     }
     void execute()
     {
-        IndexManager::instance().drop_index(_info->name(), _fieldName);
+        IndexManager::instance().drop_index(_info->name(), _indexName);
     }
 };
 
@@ -839,6 +842,7 @@ class IndexCreater
 {
     TableInfo* _info;
     const FieldInfo* _field;
+    std::string _indexName;
 public:
     IndexCreater()
         : _info(nullptr)
@@ -848,6 +852,10 @@ public:
     void set_table(const std::string& table)
     {
         _info = &CatalogManager::instance().find_table(table);
+    }
+    void set_name(const std::string& indexName)
+    {
+        _indexName = indexName;
     }
     void set_index(const std::string& fieldName)
     {
@@ -859,7 +867,7 @@ public:
     }
     void execute()
     {
-        auto& index = IndexManager::instance().create_index(_info->name(), _field->name(), _field->type_info());
+        auto& index = IndexManager::instance().create_index(_info->name(), _indexName, _field->name(), _field->type_info());
 
         auto& records = RecordManager::instance().find_table(_info->name());
         for (size_t i = 0; i != records.size(); i++)

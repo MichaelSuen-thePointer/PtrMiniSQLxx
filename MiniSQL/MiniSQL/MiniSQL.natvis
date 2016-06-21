@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-  <Type Name="BPlusTree&lt;*&gt;::OberservableArray&lt;*&gt;">
+  <Type Name="BPlusTree&lt;*&gt;::ObservableArray&lt;*&gt;">
     <DisplayString>{{ size={*_psize} }}</DisplayString>
     <Expand>
       <Item Name="[capacity]" ExcludeView="simple">_capacity</Item>
@@ -26,15 +26,15 @@
 
 
   <Type Name="BlockPtr">
-    <DisplayString Condition="_fileNameIndex == 4294967295 &amp;&amp; _fileIndex == 4294967295 &amp;&amp; _blockIndex == 65535 &amp;&amp; _offset == 65535">nullptr</DisplayString>
-    <DisplayString Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535">
+    <DisplayString Condition="_fileNameIndex == 4294967295 &amp;&amp; _fileIndex == 4294967295 &amp;&amp; _blockIndex == 4294967295 &amp;&amp; _offset == 65535">nullptr</DisplayString>
+    <DisplayString Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 4294967295 || _offset != 65535">
       {{ {_fileNameIndex}, {_fileIndex}, {_blockIndex}, {_offset} }
     </DisplayString>
     <Expand>
-      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[file name]">_fileNameIndex</Item>
-      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[file index]">_fileIndex</Item>
-      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[block index]">_blockIndex</Item>
-      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 65535 || _offset != 65535" Name="[offset]">_offset</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 4294967295 || _offset != 65535" Name="[file name]">_fileNameIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 4294967295 || _offset != 65535" Name="[file index]">_fileIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 4294967295 || _offset != 65535" Name="[block index]">_blockIndex</Item>
+      <Item Condition="_fileNameIndex != 4294967295 || _fileIndex != 4294967295 || _blockIndex != 4294967295 || _offset != 65535" Name="[offset]">_offset</Item>
     </Expand>
   </Type>
 
