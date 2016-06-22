@@ -817,16 +817,10 @@ public:
 
 class IndexDroper
 {
-    TableInfo* _info;
     std::string _indexName;
 public:
     IndexDroper()
-        : _info(nullptr)
     {
-    }
-    void set_table(const std::string& table)
-    {
-        _info = &CatalogManager::instance().find_table(table);
     }
     void set_name(const std::string& indexName)
     {
@@ -834,7 +828,7 @@ public:
     }
     void execute()
     {
-        IndexManager::instance().drop_index(_info->name(), _indexName);
+        IndexManager::instance().drop_index_with_name(_indexName);
     }
 };
 

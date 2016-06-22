@@ -155,24 +155,19 @@ public:
         return result->second;
     }
     //丢弃特定名称的索引
-    void drop_index(const std::string& tableName, const std::string& indexName)
+    void drop_index_with_name(const std::string& indexName)
     {
-        auto iterPair = _tables.equal_range(tableName);
-        if (iterPair.first == iterPair.second)
-        {
-            throw NoIndex(tableName.c_str());
-        }
-        auto iter = std::find_if(iterPair.first, iterPair.second, [&indexName](const auto& idxnfo) {
+        auto iter = std::find_if(_tables.begin(), _tables.end(), [&indexName](const auto& idxnfo) {
             return idxnfo.second.index_name() == indexName;
         });
-        if (iter != iterPair.second)
+        if (iter != _tables.end())
         {
             iter->second.tree()->drop_tree();
             _tables.erase(iter);
         }
         else
         {
-            throw NoIndex((tableName + " " + indexName).c_str());
+            throw NoIndex((indexName).c_str());
         }
     }
     //丢弃所有索引

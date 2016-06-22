@@ -50,10 +50,9 @@ void Interpreter::create_index()
     EXPECT(Kind::LBracket, "'('");
     auto tokFieldName = _tokenizer.get();
     ASSERT(tokIndexName, Kind::Identifier, "index name");
+    creater.set_index(tokFieldName.content);
     EXPECT(Kind::RBracket, "')'");
     EXPECT(Kind::SemiColon, "';'");
-
-    creater.set_index(tokIndexName.content);
 
     creater.execute();
 }
@@ -375,12 +374,10 @@ void Interpreter::drop_index()
 {
     auto tokIndexName = _tokenizer.get();
     ASSERT(tokIndexName, Kind::Identifier, "index name");
-    EXPECT(Kind::On, "keyword: 'on'");
-    auto tokTableName = _tokenizer.get();
-    IndexDroper droper;
-    droper.set_table(tokTableName.content);
-    droper.set_name(tokIndexName.content);
     EXPECT(Kind::SemiColon, "';'");
+
+    IndexDroper droper;
+    droper.set_name(tokIndexName.content);
 
     droper.execute();
 }
