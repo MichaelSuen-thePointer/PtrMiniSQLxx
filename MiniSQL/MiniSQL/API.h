@@ -503,7 +503,7 @@ private:
 public:
     SelectQueryResult(const TableInfo& info, std::vector<std::string> fields, std::vector<BlockPtr> results)
         : _fields(fields)
-        , _field_width(3)
+        , _field_width(fields.size())
         , _results(boost::extents[results.size()][fields.size()])
         , _size(results.size())
     {
