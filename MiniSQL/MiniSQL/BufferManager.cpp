@@ -2,22 +2,12 @@
 #include "BufferManager.h"
 #include <algorithm>
 
-const char* const BufferManager::FileName = "files\\metadata\\BufferManagerMeta";
-
-void BufferManager::save_block(BufferBlock& block)
-{
-    if (block._hasModified)
-    {
-        log("BM: block need to be saved");
-        write_file(block._buffer.get(), block._fileName, block._fileIndex, block._blockIndex);
-    }
-    log("BM: done");
-}
+const char* const BufferManager::FileName = "BufferManagerMeta";
 
 bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
     FILE* fp;
-    if ((fp = fopen(("files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
+    if ((fp = fopen((fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb")) == nullptr)
     {
         return false;
     }
@@ -25,41 +15,8 @@ bool BufferManager::has_block(const std::string& fileName, uint32_t fileIndex, u
     return true;
 }
 
-void BufferManager::write_file(const byte * content, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
-{
-    log("BM: write file", fileName, fileIndex, blockIndex);
-    FILE* stream;
-    stream = fopen(("files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex)).c_str(), "rb+");
-    fseek(stream, 0, SEEK_SET);
-    auto cur = ftell(stream);
-    fwrite(content, 1, BufferBlock::BlockSize, stream);
-    auto pos = ftell(stream);
-    fclose(stream);
-}
-
-byte* BufferManager::read_file(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
-{
-    log("BM: read file", fileName, fileIndex, blockIndex);
-    FILE* stream;
-    auto relFileName = "files\\" + fileName + "." + std::to_string(fileIndex) + "." + std::to_string(blockIndex);
-    stream = fopen(relFileName.c_str(), "rb+");
-    if (stream == nullptr)
-    {
-        stream = fopen(relFileName.c_str(), "wb");
-        fclose(stream);
-        stream = fopen(relFileName.c_str(), "rb+");
-    }
-    fseek(stream, 0, SEEK_SET);
-
-    fread(buffer, 1, BufferBlock::BlockSize, stream);
-    fclose(stream);
-    return buffer;
-}
-
 void BufferManager::load()
 {
-    std::experimental::filesystem::create_directory("files");
-    std::experimental::filesystem::create_directory("files\\metadata");
     std::ifstream config{FileName};
     if (config.good())
     {
@@ -162,9 +119,9 @@ BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t 
         {
             log("BM: move block to first place");
             _blocks.splice(_blocks.begin(), _blocks, iter, std::next(iter));
-            return *_blocks.front();
+            return _blocks.front();
         }
-        return **iter;
+        return *iter;
     }
     log("BM: not found");
     return alloc_block(fileName, fileIndex, blockIndex);
@@ -173,9 +130,9 @@ BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t 
 BufferManager::ListIter BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
     return std::find_if(_blocks.begin(), _blocks.end(), [&](const auto& elm) {
-        return elm->_fileName == fileName &&
-            elm->_fileIndex == fileIndex &&
-            elm->_blockIndex == blockIndex;
+        return elm._fileName == fileName &&
+            elm._fileIndex == fileIndex &&
+            elm._blockIndex == blockIndex;
     });
 }
 
@@ -184,40 +141,34 @@ BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fi
     log("BM: alloate block");
     allocate_file_name_index(fileName);
 
-    byte* buffer = new byte[BufferBlock::BlockSize];
-    read_file(buffer, fileName, fileIndex, blockIndex);
+    //byte* buffer = new byte[BufferBlock::BlockSize];
+    //read_file(buffer, fileName, fileIndex, blockIndex);
 
     if (_blocks.size() < BlockCount)
     {
         log("BM: place block at block array");
-        _blocks.emplace_front(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
-        return *_blocks.front();
+        _blocks.push_front({fileName, fileIndex, blockIndex});
+        return _blocks.front();
     }
-    return replace_lru_block(buffer, fileName, fileIndex, blockIndex);
+    return replace_lru_block(fileName, fileIndex, blockIndex);
 }
 
-BufferBlock& BufferManager::replace_lru_block(byte* buffer, const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
+BufferBlock& BufferManager::replace_lru_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
     auto lruIter = std::find_if(_blocks.rbegin(), _blocks.rend(), [](const auto& block)
     {
-        return !block->is_locked();
+        return !block.is_locked();
     });
     if (lruIter == _blocks.rend())
     {
         throw InsuffcientSpace("Cannot find a block to be replaced.");
     }
-    log("BM: replace lru block:", (*lruIter)->_fileName, (*lruIter)->_fileIndex, (*lruIter)->_blockIndex);
+    log("BM: replace lru block:", lruIter->_fileName, lruIter->_fileIndex, lruIter->_blockIndex);
 
-    lruIter->reset(new BufferBlock(buffer, fileName, fileIndex, blockIndex));
+    _blocks.erase(--lruIter.base());
+    _blocks.push_front({fileName, fileIndex, blockIndex});
 
-    auto iter = lruIter.base();
-
-    if (iter != _blocks.begin())
-    {
-        _blocks.splice(_blocks.begin(), _blocks, std::prev(iter), iter);
-    }
-
-    return *_blocks.front();
+    return _blocks.front();
 }
 
 uint32_t BufferManager::allocate_file_name_index(const std::string& fileName)

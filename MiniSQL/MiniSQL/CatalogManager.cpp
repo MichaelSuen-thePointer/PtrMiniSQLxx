@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CatalogManager.h"
 
-const char* const CatalogManager::FileName = "metadata\\CatalogManagerMeta";
+const char* const CatalogManager::FileName = "CatalogManagerMeta";
 
 Comparator* Comparator::from_type(Type type, size_t length)
 {

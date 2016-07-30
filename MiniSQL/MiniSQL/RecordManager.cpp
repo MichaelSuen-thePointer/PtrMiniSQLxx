@@ -2,7 +2,7 @@
 #include "RecordManager.h"
 #include "MemoryWriteStream.h"
 #include "MemoryReadStream.h"
-const char* const RecordManager::FileName = "metadata\\RecordManagerMeta";
+const char* const RecordManager::FileName = "RecordManagerMeta";
 
 RecordManager::~RecordManager()
 {

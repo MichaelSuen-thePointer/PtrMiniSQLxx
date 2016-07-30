@@ -77,6 +77,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>E:\boost_1_59_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>E:\boost_1_59_0\stage;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -85,6 +87,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>E:\boost_1_59_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>E:\boost_1_59_0\stage;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -160,6 +164,7 @@
     <ClInclude Include="IndexManager.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MemoryMappedFile.h" />
     <ClInclude Include="MemoryReadStream.h" />
     <ClInclude Include="MemoryWriteStream.h" />
     <ClInclude Include="RecordManager.h" />
@@ -179,6 +184,7 @@
     <ClCompile Include="IndexManager.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MemoryMappedFile.cpp" />
     <ClCompile Include="MemoryReadStream.cpp" />
     <ClCompile Include="MemoryWriteStream.cpp" />
     <ClCompile Include="MiniSQL.cpp" />
