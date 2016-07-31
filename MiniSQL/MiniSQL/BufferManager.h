@@ -19,7 +19,7 @@ class BufferManager : Uncopyable
     friend class BufferBlock;
     friend class BlockPtr;
 public:
-    const static int BlockCount = 256;
+    const static int BlockCount = 10240;
 
 private:
     using IndexPair = std::pair<uint32_t, uint32_t>;

@@ -114,13 +114,6 @@ BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t 
     auto iter = find_block(fileName, fileIndex, blockIndex);
     if (iter != _blocks.end())
     {
-        log("BM: found");
-        if (_blocks.size() > 5 && iter != _blocks.begin())
-        {
-            log("BM: move block to first place");
-            _blocks.splice(_blocks.begin(), _blocks, iter, std::next(iter));
-            return _blocks.front();
-        }
         return *iter;
     }
     log("BM: not found");
@@ -129,11 +122,19 @@ BufferBlock& BufferManager::find_or_alloc(const std::string& fileName, uint32_t 
 
 BufferManager::ListIter BufferManager::find_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
 {
-    return std::find_if(_blocks.begin(), _blocks.end(), [&](const auto& elm) {
+    int iPlace = 0;
+    auto place = std::find_if(_blocks.begin(), _blocks.end(), [&](const auto& elm) {
+        iPlace++;
         return elm._fileName == fileName &&
             elm._fileIndex == fileIndex &&
             elm._blockIndex == blockIndex;
     });
+    if(place != _blocks.end() && iPlace > BlockCount / 10)
+    {
+        _blocks.splice(_blocks.begin(), _blocks, place, std::next(place));
+        return _blocks.begin();
+    }
+    return place;
 }
 
 BufferBlock& BufferManager::alloc_block(const std::string& fileName, uint32_t fileIndex, uint32_t blockIndex)
